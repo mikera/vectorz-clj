@@ -135,30 +135,31 @@
     dest))
 
 (defn normalise 
-  "Normalises a vector to unit length and returns it"
+  "Normalises a vector in place to unit length and returns it"
   ([^AVector a]
     (.normalise a)
     a))
 
 (defn negate 
-  "Negates a vector and returns it" 
+  "Negates a vector in place and returns it" 
   ([^AVector a]
     (.negate a)
     a))
 
 (defn scale 
-  "Scales a fector by a scalar numerical factor" 
+  "Scales a vector in place by a scalar numerical factor" 
   ([^AVector a factor]
     (.scale a (double factor))
     a))
 
 (defn scale-add 
-  "Scales a fector by a scalar numerical factor and adds a second vector" 
+  "Scales a fector in place by a scalar numerical factor and adds a second vector" 
   ([^AVector a factor ^AVector b]
-    (.scaleAdd a (double factor) b)))
+    (.scaleAdd a (double factor) b)
+    a))
 
 (defn fill 
-  "Fills a vector with a specific numerical value" 
+  "Fills a vector in place with a specific numerical value" 
   ([^AVector a value]
     (.fill a (double value))
     a))

@@ -20,4 +20,6 @@
 
 (deftest test-vector-ops
   (testing "dot product"
-    (is (= 10.0 (v/dot (v/of 2 3 1) (v/of 1 2 2))))))
+    (is (= 10.0 (v/dot (v/of 2 3 1) (v/of 1 2 2)))))
+  (testing "distance"
+    (is (= 5.0 (v/distance (v/of 1 0 0) (v/of 1 3 4))))))
