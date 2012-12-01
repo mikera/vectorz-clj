@@ -1,4 +1,4 @@
-(ns mikera.vectorz-clj
+(ns mikera.vectorz.core
   (:import [mikera.vectorz AVector Vectorz Vector])
   (:refer-clojure :exclude [+ - * / vec vec? vector subvec]))
 
@@ -66,6 +66,7 @@
     (Vectorz/newVector (int len))))
 
 (defn subvec
+  "Returns a subvector of a vector. The subvector is a reference (i.e can be sed to modify the original vector)" 
   (^AVector [^AVector v start end]
     (.subVector v (int start) (int end))))
 
@@ -102,7 +103,14 @@
     dest))
 
 ;; =====================================
-;; Arithmetic functions
+;; Arithmetic functions and operators
+
+(defn approx=
+  "Returns a boolean indicating whether the two vectors are approximately equal, to an optional tolerance" 
+  ([^AVector a ^AVector b]
+    (.epsilonEquals a b))
+  ([^AVector a ^AVector b epsilon]
+    (.epsilonEquals a b (double epsilon))))
 
 (defn + 
   "Add one or more vectors"
@@ -144,7 +152,7 @@
         (.multiply r v))
       r)))
 
-(defn / 
+(defn divide 
   "Divide one or more vectors"
   (^AVector [^AVector a] (clone a))
   (^AVector [^AVector a ^AVector b] 
@@ -152,7 +160,7 @@
       (.divide ^AVector r ^AVector b)
       r))
   (^AVector [^AVector a ^AVector b & vs] 
-    (let [^AVector r (/ a b)]
+    (let [^AVector r (divide a b)]
       (doseq [^AVector v vs]
         (.divide r v))
       r)))
