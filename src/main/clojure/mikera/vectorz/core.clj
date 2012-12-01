@@ -1,6 +1,6 @@
 (ns mikera.vectorz.core
   (:import [mikera.vectorz AVector Vectorz Vector Vector3])
-  (:refer-clojure :exclude [+ - * / vec vec? vector subvec get set to-array]))
+  (:refer-clojure :exclude [+ - * / vec vec? vector subvec get set to-array empty]))
 
 
 (set! *warn-on-reflection* true)
@@ -77,6 +77,11 @@
   (^AVector [len]
     (Vectorz/newVector (int len))))
 
+(defn empty
+  "Creates an empty vector of a specified length. Will use optimised primitive vectors for small lengths"
+  (^AVector [len]
+    (Vectorz/newVector (int len))))
+
 (defn subvec
   "Returns a subvector of a vector. The subvector is a reference (i.e can be sed to modify the original vector)" 
   (^AVector [^AVector v start end]
@@ -91,10 +96,12 @@
 ;; Conversions
 
 (defn to-array 
+  "Converts a vector to a double array"
   ([^AVector a]
     (.toArray a)))
 
 (defn to-list 
+  "Converts a vector to a list of doubles"
   ([^AVector a]
     (.toList a)))
 
