@@ -1,6 +1,6 @@
 (ns mikera.vectorz-clj
   (:import [mikera.vectorz AVector Vectorz Vector])
-  (:refer-clojure :exclude [+ - * / vec vec? vector]))
+  (:refer-clojure :exclude [+ - * / vec vec? vector subvec]))
 
 
 (set! *warn-on-reflection* true)
@@ -13,6 +13,7 @@
 
 
 (defn clone
+  "Creates a (mutable) clone of a vector. May not be exactly the same class as the original vector."
   (^AVector [^AVector v]
     (.clone v)))
 
@@ -29,30 +30,79 @@
 
 ;; vector constructors
 
+
+(defn of 
+  "Creates a vector from its numerical components"
+  ([& xs]
+    (let [ss (seq xs)
+           len (int (count ss))
+           v (Vectorz/newVector len)]
+       (loop [i (int 0) ss ss]
+         (if ss
+           (do
+             (.set v i (double (first ss)))
+             (recur (inc i) (next ss)))
+           v)))))
+
 (defn vec
-  [coll]
+  "Creates a vector from a collection or sequence"
+  ([coll]
   (cond 
     (vec? coll) (clone coll)
     (instance? java.util.List coll) (Vectorz/create ^java.util.List coll)
-    (sequential? coll) 
-      (let [ss (seq coll)
-            len (count ss)])
+    (sequential? coll) (apply of coll)
     (instance? java.lang.Iterable coll) (Vectorz/create ^java.lang.Iterable coll)
-    :else (error "Can't create vector from: " (class coll))))
+    :else (error "Can't create vector from: " (class coll)))))
 
 (defn vector 
   "Creates a vector from zero or more numerical components."
   (^AVector [& xs]
     (vec xs)))
 
-(def of vector)
 
 (defn of-length
   "Creates a vector of a specified length. Will use optimised primitive vectors for small lengths"
   (^AVector [len]
     (Vectorz/newVector (int len))))
 
-;; arithmetic functions
+(defn subvec
+  (^AVector [^AVector v start end]
+    (.subVector v (int start) (int end))))
+
+
+;; =====================================
+;; In-place operations
+
+(defn add
+  "Add a vector to another (in-place)"
+  (^AVector [^AVector dest ^AVector source]
+    (.add dest source)
+    dest))
+
+(defn sub
+  "Subtract a vector from another (in-place)"
+  (^AVector [^AVector dest ^AVector source]
+    (.sub dest source)
+    dest))
+
+(defn mul
+  "Multiply a vector with another vector or scalar (in-place)"
+  (^AVector [^AVector dest source]
+    (if (number? source) 
+      (.multiply dest (double source))
+      (.multiply dest ^AVector source))
+    dest))
+
+(defn div
+  "Divide a vector by another vector or scalar (in-place)"
+  (^AVector [^AVector dest source]
+    (if (number? source) 
+      (.divide dest (double source))
+      (.divide dest ^AVector source))
+    dest))
+
+;; =====================================
+;; Arithmetic functions
 
 (defn + 
   "Add one or more vectors"
