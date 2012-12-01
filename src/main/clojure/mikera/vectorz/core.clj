@@ -14,12 +14,10 @@
   ([& vals]
     `(throw (mikera.vectorz.util.VectorzException. (str ~@vals)))))
 
-
 (defn clone
   "Creates a (mutable) clone of a vector. May not be exactly the same class as the original vector."
   (^AVector [^AVector v]
     (.clone v)))
-
 
 (defn length
   "Returns the length (number of components) of a vector"
