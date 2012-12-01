@@ -108,25 +108,25 @@
 ;; =====================================
 ;; In-place operations
 
-(defn add
+(defn add!
   "Add a vector to another (in-place)"
   (^AVector [^AVector dest ^AVector source]
     (.add dest source)
     dest))
 
-(defn add-multiple
+(defn add-multiple!
   "Add a vector to another (in-place)"
   (^AVector [^AVector dest ^AVector source ^double factor]
     (.addMultiple dest source factor)
     dest))
 
-(defn sub
+(defn sub!
   "Subtract a vector from another (in-place)"
   (^AVector [^AVector dest ^AVector source]
     (.sub dest source)
     dest))
 
-(defn mul
+(defn mul!
   "Multiply a vector with another vector or scalar (in-place)"
   (^AVector [^AVector dest source]
     (if (number? source) 
@@ -134,7 +134,7 @@
       (.multiply dest ^AVector source))
     dest))
 
-(defn div
+(defn div!
   "Divide a vector by another vector or scalar (in-place)"
   (^AVector [^AVector dest source]
     (if (number? source) 
@@ -142,37 +142,37 @@
       (.divide dest ^AVector source))
     dest))
 
-(defn normalise 
+(defn normalise! 
   "Normalises a vector in place to unit length and returns it"
   ([^AVector a]
     (.normalise a)
     a))
 
-(defn negate 
+(defn negate! 
   "Negates a vector in place and returns it" 
   ([^AVector a]
     (.negate a)
     a))
 
-(defn absolute 
+(defn absolute! 
   "Computes the absolute value of a vector in place and returns it" 
   ([^AVector a]
     (.absolute a)
     a))
 
-(defn scale 
+(defn scale! 
   "Scales a vector in place by a scalar numerical factor" 
   ([^AVector a factor]
     (.scale a (double factor))
     a))
 
-(defn scale-add 
+(defn scale-add! 
   "Scales a fector in place by a scalar numerical factor and adds a second vector" 
   ([^AVector a factor ^AVector b]
     (.scaleAdd a (double factor) b)
     a))
 
-(defn fill 
+(defn fill! 
   "Fills a vector in place with a specific numerical value" 
   ([^AVector a value]
     (.fill a (double value))
@@ -181,11 +181,16 @@
 ;; =====================================
 ;; Special 3D functions
 
-(defn cross-product
+(defn cross-product!
   "Calculates the cross product of a 3D vector in place "
   (^Vector3 [^Vector3 a ^AVector b]
     (.crossProduct a b)
     a)) 
+
+;; =====================================
+;; Pure functional operations
+
+
 
 ;; =====================================
 ;; Arithmetic functions and operators
