@@ -1,10 +1,13 @@
 (ns mikera.vectorz.core
   (:import [mikera.vectorz AVector Vectorz Vector])
-  (:refer-clojure :exclude [+ - * / vec vec? vector subvec]))
+  (:refer-clojure :exclude [+ - * / vec vec? vector subvec get set to-array]))
 
 
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* true)
+
+;; ==================================================
+;; basic functions
 
 (defmacro error
   "Throws a vectorz error with the provided message(s)"
@@ -28,8 +31,18 @@
   ([v]
     (instance? mikera.vectorz.AVector v)))
 
-;; vector constructors
+(defn get
+  "Returns the component of a vector at position i"
+  (^double [^AVector v ^long index]
+    (.get v (int index))))
 
+(defn set
+  "Sets the component of a vector at position i"
+  (^AVector [^AVector v ^long index ^double value]
+    (.set v (int index) value)))
+
+;; ====================================================
+;; vector constructors
 
 (defn of 
   "Creates a vector from its numerical components"
@@ -70,6 +83,21 @@
   (^AVector [^AVector v start end]
     (.subVector v (int start) (int end))))
 
+(defn join 
+  "Joins two vectors together. The returned vector is a new reference vector that refers to the originals."
+  (^AVector [^AVector a ^AVector b]
+    (.join a b)))
+
+;; ======================================
+;; Conversions
+
+(defn to-array 
+  ([^AVector a]
+    (.toArray a)))
+
+(defn to-list 
+  ([^AVector a]
+    (.toList a)))
 
 ;; =====================================
 ;; In-place operations
@@ -78,6 +106,12 @@
   "Add a vector to another (in-place)"
   (^AVector [^AVector dest ^AVector source]
     (.add dest source)
+    dest))
+
+(defn add-multiple
+  "Add a vector to another (in-place)"
+  (^AVector [^AVector dest ^AVector source ^double factor]
+    (.addMultiple dest source factor)
     dest))
 
 (defn sub
@@ -102,6 +136,36 @@
       (.divide dest ^AVector source))
     dest))
 
+(defn normalise 
+  "Normalises a vector to unit length and returns it"
+  ([^AVector a]
+    (.normalise a)
+    a))
+
+(defn negate 
+  "Negates a vector and returns it" 
+  ([^AVector a]
+    (.negate a)
+    a))
+
+(defn scale 
+  "Scales a fector by a scalar numerical factor" 
+  ([^AVector a factor]
+    (.scale a (double factor))
+    a))
+
+(defn scale-add 
+  "Scales a fector by a scalar numerical factor and adds a second vector" 
+  ([^AVector a factor ^AVector b]
+    (.scaleAdd a (double factor) b)))
+
+(defn fill 
+  "Fills a vector with a specific numerical value" 
+  ([^AVector a value]
+    (.fill a (double value))
+    a))
+
+
 ;; =====================================
 ;; Arithmetic functions and operators
 
@@ -116,6 +180,24 @@
   "Compute the dot product of two vectors"
   (^double [^AVector a ^AVector b]
     (.dotProduct a b)))
+
+(defn magnitude
+  (^double [^AVector a]
+    (.magnitude a)))
+
+(defn magnitude-squared
+  (^double [^AVector a]
+    (.magnitudeSquared a)))
+
+(defn distance 
+  "Return the euclidean distance between two vectors" 
+  (^double [^AVector a ^AVector b]
+    (.distance a b)))
+
+(defn distance-squared 
+  "Return the squared euclidean distance between two vectors" 
+  (^double [^AVector a ^AVector b]
+    (.distanceSquared a b)))
 
 (defn + 
   "Add one or more vectors"
