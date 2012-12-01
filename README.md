@@ -1,7 +1,7 @@
 vectorz-clj
 ===========
 
-Fast mutable vector library for Clojure, building on the vectorz vector maths library for Java
+Fast mutable vector library for Clojure, building on the vectorz (https://github.com/mikera/vectorz) vector maths library for Java
 
 Specifically designed for games, simulations and machine learning.
 
