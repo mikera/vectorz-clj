@@ -3,4 +3,16 @@
   <groupId>net.mikera</groupId>
   <artifactId>vectorz-clj</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <dependencies>
+  	<dependency>
+  		<groupId>net.mikera</groupId>
+  		<artifactId>vectorz</artifactId>
+  		<version>0.3.2</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.clojure</groupId>
+  		<artifactId>clojure</artifactId>
+  		<version>1.4.0</version>
+  	</dependency>
+  </dependencies>
 </project>
