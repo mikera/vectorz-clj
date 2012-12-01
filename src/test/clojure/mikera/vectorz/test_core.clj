@@ -17,3 +17,7 @@
   (testing "multiplication"
     (is (= (v/of 2 6) 
            (v/* (v/of 1 2) (v/of 2 3))))))
+
+(deftest test-vector-ops
+  (testing "dot product"
+    (is (= 10.0 (v/dot (v/of 2 3 1) (v/of 1 2 2))))))

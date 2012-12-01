@@ -60,7 +60,7 @@
     (vec xs)))
 
 
-(defn of-length
+(defn create-length
   "Creates a vector of a specified length. Will use optimised primitive vectors for small lengths"
   (^AVector [len]
     (Vectorz/newVector (int len))))
@@ -111,6 +111,11 @@
     (.epsilonEquals a b))
   ([^AVector a ^AVector b epsilon]
     (.epsilonEquals a b (double epsilon))))
+
+(defn dot
+  "Compute the dot product of two vectors"
+  (^double [^AVector a ^AVector b]
+    (.dotProduct a b)))
 
 (defn + 
   "Add one or more vectors"
