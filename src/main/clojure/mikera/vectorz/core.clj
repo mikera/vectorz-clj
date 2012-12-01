@@ -1,5 +1,5 @@
 (ns mikera.vectorz.core
-  (:import [mikera.vectorz AVector Vectorz Vector])
+  (:import [mikera.vectorz AVector Vectorz Vector Vector3])
   (:refer-clojure :exclude [+ - * / vec vec? vector subvec get set to-array]))
 
 
@@ -25,7 +25,7 @@
     (.length v)))
 
 (defn vec?
-  "Returns true if v is a vector (instance of mikera.vectorz.AVector)"
+  "Returns true if v is a vector (i.e. an instance of mikera.vectorz.AVector)"
   ([v]
     (instance? mikera.vectorz.AVector v)))
 
@@ -35,9 +35,10 @@
     (.get v (int index))))
 
 (defn set
-  "Sets the component of a vector at position i"
+  "Sets the component of a vector at position i (mutates in place)"
   (^AVector [^AVector v ^long index ^double value]
-    (.set v (int index) value)))
+    (.set v (int index) value)
+    v))
 
 ;; ====================================================
 ;; vector constructors
@@ -146,6 +147,12 @@
     (.negate a)
     a))
 
+(defn absolute 
+  "Computes the absolute value of a vector in place and returns it" 
+  ([^AVector a]
+    (.absolute a)
+    a))
+
 (defn scale 
   "Scales a vector in place by a scalar numerical factor" 
   ([^AVector a factor]
@@ -164,6 +171,14 @@
     (.fill a (double value))
     a))
 
+;; =====================================
+;; Special 3D functions
+
+(defn cross-product
+  "Calculates the cross product of a 3D vector in place "
+  (^Vector3 [^Vector3 a ^AVector b]
+    (.crossProduct a b)
+    a)) 
 
 ;; =====================================
 ;; Arithmetic functions and operators
@@ -192,6 +207,11 @@
   "Return the euclidean distance between two vectors" 
   (^double [^AVector a ^AVector b]
     (.distance a b)))
+
+(defn angle 
+  "Return the angle between two vectors" 
+  (^double [^AVector a ^AVector b]
+    (.angle a b)))
 
 (defn distance-squared 
   "Return the squared euclidean distance between two vectors" 
