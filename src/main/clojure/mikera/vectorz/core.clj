@@ -162,20 +162,20 @@
 
 (defn scale! 
   "Scales a vector in place by a scalar numerical factor" 
-  ([^AVector a factor]
-    (.scale a (double factor))
+  ([^AVector a ^double factor]
+    (.scale a factor)
     a))
 
 (defn scale-add! 
   "Scales a fector in place by a scalar numerical factor and adds a second vector" 
-  ([^AVector a factor ^AVector b]
-    (.scaleAdd a (double factor) b)
+  ([^AVector a ^double factor ^AVector b]
+    (.scaleAdd a factor b)
     a))
 
 (defn fill! 
   "Fills a vector in place with a specific numerical value" 
-  ([^AVector a value]
-    (.fill a (double value))
+  ([^AVector a ^double value]
+    (.fill a value)
     a))
 
 ;; =====================================
@@ -190,7 +190,60 @@
 ;; =====================================
 ;; Pure functional operations
 
+(defn add
+  "Add a vector to another"
+  (^AVector [^AVector dest ^AVector source]
+    (add! (clone dest) source)))
 
+(defn add-multiple
+  "Add a vector to another"
+  (^AVector [^AVector dest ^AVector source ^double factor]
+    (add-multiple! (clone dest) source factor)))
+
+(defn sub
+  "Subtract a vector from another"
+  (^AVector [^AVector dest ^AVector source]
+    (sub! (clone dest) source)))
+
+(defn mul
+  "Multiply a vector with another vector or scalar"
+  (^AVector [^AVector dest source]
+    (mul! (clone dest) source)))
+
+(defn div
+  "Divide a vector by another vector or scalar"
+  (^AVector [^AVector dest source]
+    (div! (clone dest) source)))
+
+(defn normalise
+  "Normalises a vector to unit length and returns it"
+  ([^AVector a]
+    (normalise! (clone a))))
+
+(defn negate 
+  "Negates a vector and returns it" 
+  ([^AVector a]
+    (negate! (clone a))))
+
+(defn absolute 
+  "Computes the absolute value of a vector and returns it" 
+  ([^AVector a]
+    (absolute! (clone a))))
+
+(defn scale 
+  "Scales a vector by a scalar numerical factor" 
+  ([^AVector a ^double factor]
+    (scale! (clone a) factor)))
+
+(defn scale-add 
+  "Scales a fector by a scalar numerical factor and adds a second vector" 
+  ([^AVector a factor ^AVector b]
+    (scale-add! (clone a) factor b)))
+
+(defn fill 
+  "Fills a vector with a specific numerical value" 
+  ([^AVector a ^double value]
+    (fill! (clone a) value)))
 
 ;; =====================================
 ;; Arithmetic functions and operators
