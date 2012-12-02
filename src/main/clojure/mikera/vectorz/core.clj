@@ -7,6 +7,23 @@
 (set! *unchecked-math* true)
 
 ;; ==================================================
+;; Protocols
+
+(defprotocol PVectorisable
+  (to-vector [a]))
+
+(extend-protocol PVectorisable
+  java.util.List
+    (to-vector [coll]
+       (Vectorz/create ^java.util.List coll))
+  java.lang.Iterable 
+    (to-vector [coll] 
+       (Vectorz/create ^java.lang.Iterable coll))
+  mikera.vectorz.AVector
+    (to-vector [coll]
+       (.clone coll)))
+
+;; ==================================================
 ;; basic functions
 
 (defmacro error
@@ -66,9 +83,8 @@
   ([coll]
   (cond 
     (vec? coll) (clone coll)
-    (instance? java.util.List coll) (Vectorz/create ^java.util.List coll)
+    (satisfies? PVectorisable coll) (to-vector coll)
     (sequential? coll) (apply of coll)
-    (instance? java.lang.Iterable coll) (Vectorz/create ^java.lang.Iterable coll)
     :else (error "Can't create vector from: " (class coll)))))
 
 (defn vector 
