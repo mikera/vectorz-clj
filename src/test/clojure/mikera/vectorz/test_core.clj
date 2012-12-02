@@ -29,3 +29,15 @@
     (is (= 10.0 (v/get (v/of 5 10 15) 1))))
   (testing "set"
     (is (= (v/of 5 10 15) (v/set (v/of 5 0 15) (long 1) 10.0)))))
+
+(deftest test-refs
+  (testing "join"
+    (let [v1 (v/of 1 2)
+          v2 (v/of 3 4)
+          jv (v/join v1 v2)] 
+      (is (= (v/of 1 2 3 4) jv))
+      (v/fill! (v/subvec jv 1 2) 10)
+      (is (== 10.0 (v/get v1 1)))
+      (is (== 10.0 (v/get v2 0)))
+      (v/fill! (v/clone jv) 20)
+      (is (not= 20.0 (v/get v2 0))))))
