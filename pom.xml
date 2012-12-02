@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>vectorz-clj</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.1-SNAPSHOT</version>
 	
 	<licenses>
 		<license>
@@ -17,6 +17,12 @@
 			<url>https://clojars.org/repo</url>
 		</repository>
 	</repositories>
+	
+	<scm>
+		<connection>scm:git:git@github.com:mikera/${project.artifactId}.git</connection>
+		<url>scm:git:git@github.com:mikera/${project.artifactId}.git</url>
+		<developerConnection>scm:git:git@github.com:mikera/${project.artifactId}.git</developerConnection>
+	</scm>
 	
 	<parent>
 		<groupId>net.mikera</groupId>
@@ -36,9 +42,5 @@
 			<version>1.4.0</version>
 		</dependency>
 	</dependencies>
-	
 
-  <scm>
-    <tag>vectorz-clj-0.0.1</tag>
-  </scm>
 </project>
