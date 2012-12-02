@@ -7,8 +7,27 @@ Specifically designed for games, simulations and machine learning.
 
 ### Usage
 
-Install with Leiningen / Maven from Clojars
+Follow the instructions to install with Leiningen / Maven from Clojars: https://clojars.org/net.mikera/vectorz-clj
 
+Examples:
+
+    (in-ns 'mikera.vectorz.core)
+
+    (def a (vec [1 2 3]))
+
+    (+ a a)                    ;; standard arithmetic operations 
+    => #<Vector [2.0,4.0,6.0]>
+    
+    (join a (vec [4 5 6]))     ;; vector concatenation
+    => #<JoinedVector [1.0,2.0,3.0,4.0,5.0,6.0]>
+
+    (magnitude a)              ;; vector magnitude (length)
+    => 3.7416573867739413
+    
+    (add! a (vec [2 2 2]))     ;; in-place vector mutation
+    a
+    => #<Vector [3.0,4.0,5.0]>
+    
 ### Purpose
 
 vectorz-clj design goals:
