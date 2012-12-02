@@ -36,9 +36,14 @@
 
 (defn set
   "Sets the component of a vector at position i (mutates in place)"
-  (^AVector [^AVector v ^long index ^double value]
+  ([^AVector v ^long index ^double value]
     (.set v (int index) value)
     v))
+
+(defn update
+  "Returns a new vector with the component at position i updated"
+  ([^AVector v ^long index ^double value]
+    (set (clone v) index value)))
 
 ;; ====================================================
 ;; vector constructors

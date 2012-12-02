@@ -23,3 +23,9 @@
     (is (= 10.0 (v/dot (v/of 2 3 1) (v/of 1 2 2)))))
   (testing "distance"
     (is (= 5.0 (v/distance (v/of 1 0 0) (v/of 1 3 4))))))
+
+(deftest test-get-set
+  (testing "get"
+    (is (= 10.0 (v/get (v/of 5 10 15) 1))))
+  (testing "set"
+    (is (= (v/of 5 10 15) (v/set (v/of 5 0 15) (long 1) 10.0)))))
