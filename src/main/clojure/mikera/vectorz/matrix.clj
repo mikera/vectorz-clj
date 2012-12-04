@@ -17,8 +17,12 @@
 ;; Matrix contructors
 
 (defn new-matrix 
-  ([rows cols]
+  (^AMatrix [rows cols]
     (Matrixx/newMatrix (int rows) (int cols))))
+
+(defn identity-matrix
+  (^AMatrix [dimensions]
+    (Matrixx/createIdentityMatrix (int dimensions))))
 
 ;; ============================================
 ;; matrix operations
