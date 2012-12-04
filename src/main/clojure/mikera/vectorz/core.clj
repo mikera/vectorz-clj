@@ -79,7 +79,7 @@
            v)))))
 
 (defn vec
-  "Creates a vector from a collection or sequence"
+  "Creates a vector from a collection, a sequence or anything else that implements the PVectorisable protocol"
   ([coll]
   (cond 
     (vec? coll) (clone coll)
