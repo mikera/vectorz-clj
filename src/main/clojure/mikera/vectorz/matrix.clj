@@ -1,7 +1,7 @@
 (ns mikera.vectorz.matrix
   (:import [mikera.vectorz AVector Vectorz Vector Vector3])
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
-  (:require mikera.vectorz.core)
+  (:require [mikera.vectorz.core :as v])
   (:refer-clojure :exclude [*]))
   
 
@@ -17,11 +17,18 @@
 ;; Matrix contructors
 
 (defn new-matrix 
-  [rows cols]
-  (Matrixx/newMatrix (int rows) (int cols)))
+  ([rows cols]
+    (Matrixx/newMatrix (int rows) (int cols))))
+
+;; ============================================
+;; matrix operations
+
 
 ;; ============================================
 ;; Matrix application
 
 (defn * 
-  ([m a]))
+  ([^AMatrix m ^AVector a]
+    (let [^AVector result (v/create-length (.outputDimenstions m))]
+      (.transform m a result)
+      result)))
