@@ -53,6 +53,11 @@
   ([^AMatrix m]
     (.getTranspose m)))
 
+(defn inverse
+  "Gets the inverse of a square matrix as a new matrix."
+  ([^AMatrix m]
+    (.getInverse m)))
+
 ;; ============================================
 ;; Matrix application
 
