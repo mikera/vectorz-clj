@@ -47,7 +47,7 @@
     (instance? mikera.vectorz.AVector v)))
 
 (defn get
-  "Returns the component of a vector at position i"
+  "Returns the component of a vector at a specific index position"
   (^double [^AVector v ^long index]
     (.get v (int index))))
 
