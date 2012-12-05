@@ -33,6 +33,6 @@
 
 (defn * 
   ([^AMatrix m ^AVector a]
-    (let [^AVector result (v/create-length (.outputDimenstions m))]
+    (let [^AVector result (v/create-length (.outputDimensions m))]
       (.transform m a result)
       result)))
