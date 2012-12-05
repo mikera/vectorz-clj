@@ -28,6 +28,11 @@
   ([^AMatrix m ^long row ^long column ^double value]
     (.set m (int row) (int column) value)
     m))
+
+(defn get-row
+  "Sets the component of a matrix at a (row,column) position (mutates in place)"
+  ([^AMatrix m ^long row]
+    (.getRow m (int row))))
   
 ;; ============================================
 ;; Matrix contructors
@@ -35,6 +40,18 @@
 (defn new-matrix 
   (^AMatrix [rows cols]
     (Matrixx/newMatrix (int rows) (int cols))))
+
+(defn matrix
+  "Creates a new matrix using the specified data, which should be a sequence of row vectors"
+  ([rows]
+    (let [vecs (vec (map v/vec rows))
+          cc (apply max (map v/length vecs))
+          rc (count rows)
+          mat (new-matrix rc cc)]
+      (dotimes [i rc]
+        (let [^AVector v (vecs i)]
+          (.copyTo v (get-row mat i) 0)))
+      mat)))
 
 (defn identity-matrix
   (^AMatrix [dimensions]
