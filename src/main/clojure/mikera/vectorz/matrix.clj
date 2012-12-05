@@ -45,17 +45,18 @@
 
 (defn transpose!
   "Transposes a matrix in place, if possible"
-  ([^AMatrix m]
-    (.transposeInPlace m)))
+  (^AMatrix [^AMatrix m]
+    (.transposeInPlace m)
+    m))
 
 (defn transpose
   "Gets the transpose of a matrix as a transposed reference to the original matrix"
-  ([^AMatrix m]
+  (^AMatrix [^AMatrix m]
     (.getTranspose m)))
 
 (defn inverse
   "Gets the inverse of a square matrix as a new matrix."
-  ([^AMatrix m]
+  (^AMatrix [^AMatrix m]
     (.getInverse m)))
 
 ;; ============================================
