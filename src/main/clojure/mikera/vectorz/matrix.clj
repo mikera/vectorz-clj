@@ -43,11 +43,26 @@
 ;; ============================================
 ;; matrix operations
 
+(defn transpose!
+  "Transposes a matrix in place, if possible"
+  ([^AMatrix m]
+    (.transposeInPlace m)))
+
+(defn transpose
+  "Gets the transpose of a matrix as a transposed reference to the original matrix"
+  ([^AMatrix m]
+    (.getTranspose m)))
 
 ;; ============================================
 ;; Matrix application
 
+(defn apply! 
+  "Applies a matrix to a vector, modifying the vector in place"
+  ([^AMatrix m ^AVector a]
+    (.transformInPlace m a)))
+
 (defn * 
+  "Applies a matrix to a vector, returning a new vector"
   ([^AMatrix m ^AVector a]
     (let [^AVector result (v/create-length (.outputDimensions m))]
       (.transform m a result)
