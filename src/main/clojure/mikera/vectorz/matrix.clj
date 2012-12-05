@@ -66,6 +66,11 @@
     (.transposeInPlace m)
     m))
 
+(defn as-vector
+  "Treats a Matrix as a vector reference (in row major order)"
+  (^AVector [^AMatrix m]
+    (.asVector m)))
+
 (defn transpose
   "Gets the transpose of a matrix as a transposed reference to the original matrix"
   (^AMatrix [^AMatrix m]

@@ -6,6 +6,10 @@
   (:import [mikera.vectorz AVector Vectorz Vector]))
 
 
+(deftest test-ops
+  (testing "as-vector"
+    (is (= (v/of 1 0 0 1) (m/as-vector (m/identity-matrix 2))))))
+
 (deftest test-get-set
   (testing "setting"
     (let [m (m/clone (m/identity-matrix 2))]
