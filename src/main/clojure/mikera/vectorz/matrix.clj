@@ -1,6 +1,7 @@
 (ns mikera.vectorz.matrix
   (:import [mikera.vectorz AVector Vectorz Vector Vector3])
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
+  (:import [mikera.transformz ATransform])
   (:require [mikera.vectorz.core :as v])
   (:refer-clojure :exclude [* get set]))
   
@@ -66,32 +67,51 @@
     (.transposeInPlace m)
     m))
 
-(defn as-vector
-  "Treats a Matrix as a vector reference (in row major order)"
-  (^AVector [^AMatrix m]
-    (.asVector m)))
-
 (defn transpose
   "Gets the transpose of a matrix as a transposed reference to the original matrix"
   (^AMatrix [^AMatrix m]
     (.getTranspose m)))
+
+(defn as-vector
+  "Treats a Matrix as a vector reference (in row major order)"
+  (^AVector [^AMatrix m]
+    (.asVector m)))
 
 (defn inverse
   "Gets the inverse of a square matrix as a new matrix."
   (^AMatrix [^AMatrix m]
     (.getInverse m)))
 
+(defn compose!
+  "Composes a transform with another transform (in-place)"
+  (^ATransform [^ATransform a ^ATransform b]
+    (.composeWith a b)
+    a))
+
+(defn compose
+  "Composes a transform with another transform"
+  (^ATransform [^ATransform a ^ATransform b]
+    (.compose a b)))
+
 ;; ============================================
 ;; Matrix application
 
-(defn apply! 
+(defn transform! 
   "Applies a matrix to a vector, modifying the vector in place"
-  ([^AMatrix m ^AVector a]
-    (.transformInPlace m a)))
+  (^AVector [^AMatrix m ^AVector a]
+    (.transformInPlace m a)
+    a))
 
-(defn * 
+(defn transform 
   "Applies a matrix to a vector, returning a new vector"
-  ([^AMatrix m ^AVector a]
+  (^AVector [^AMatrix m ^AVector a]
     (let [^AVector result (v/create-length (.outputDimensions m))]
       (.transform m a result)
       result)))
+
+(defn *
+  "Applies a matrix to a vector or matrix, returning a new vector or matrix"
+  ([^AMatrix m a]
+    (if (instance? AVector a)
+      (transform m a)
+      (compose m a))))
