@@ -36,7 +36,13 @@
   (testing "get"
     (is (= 10.0 (v/get (v/of 5 10 15) 1))))
   (testing "set"
-    (is (= (v/of 5 10 15) (v/set (v/of 5 0 15) (long 1) 10.0)))))
+    (is (= (v/of 5 10 15) 
+           (v/set (v/of 5 0 15) (long 1) 10.0)))
+    (is (= (v/of 3 2) (v/to-vector (v/set (v/of 1 2) 0 3))))))
+
+(deftest test-seq
+  (testing "to seq"
+    (is (= [2.0 3.0] (seq (v/of 2 3))))))
 
 (deftest test-refs
   (testing "join"
