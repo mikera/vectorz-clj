@@ -58,6 +58,12 @@
   (^AMatrix [dimensions]
     (Matrixx/createIdentityMatrix (int dimensions))))
 
+(defn scale-matrix
+  (^AMatrix [scale-factors]
+    (Matrixx/createScaleMatrix (double-array (seq scale-factors))))
+  (^AMatrix [dimensions factor]
+    (Matrixx/createScaleMatrix (int dimensions) (double factor))))
+
 ;; ============================================
 ;; matrix operations
 
@@ -110,8 +116,8 @@
       result)))
 
 (defn *
-  "Applies a matrix to a vector or matrix, returning a new vector or matrix"
-  ([^AMatrix m a]
+  "Applies a matrix to a vector or matrix, returning a new vector or matrix. If applied to a vector, the vector is transformed. If applied to a matrix, the two matrices are composed"
+  ([^ATransform m a]
     (if (instance? AVector a)
       (transform m a)
       (compose m a))))

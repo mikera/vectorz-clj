@@ -5,6 +5,10 @@
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
   (:import [mikera.vectorz AVector Vectorz Vector]))
 
+(deftest test-constructors
+  (testing "identity"
+    (is (= (m/matrix [[1 0] [0 1]]) (m/identity-matrix 2)))
+    (is (= (m/identity-matrix 3) (m/scale-matrix [1 1 1])))))
 
 (deftest test-ops
   (testing "as-vector"
