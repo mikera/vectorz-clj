@@ -24,6 +24,11 @@
   (testing "distance"
     (is (= 5.0 (v/distance (v/of 1 0 0) (v/of 1 3 4))))))
 
+(deftest test-more-vector-ops
+  (testing "add weighted"
+    (is (= (v/of 2 6) 
+           (v/add-weighted (v/of 1 5) (v/of 5 9) 1/4)))))
+
 (deftest test-get-set
   (testing "get"
     (is (= 10.0 (v/get (v/of 5 10 15) 1))))

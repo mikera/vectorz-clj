@@ -238,17 +238,17 @@
 
 (defn normalise
   "Normalises a vector to unit length and returns it"
-  ([^AVector a]
+  (^AVector [^AVector a]
     (normalise! (clone a))))
 
 (defn negate 
   "Negates a vector and returns it" 
-  ([^AVector a]
+  (^AVector [^AVector a]
     (negate! (clone a))))
 
 (defn absolute 
   "Computes the absolute value of a vector and returns it" 
-  ([^AVector a]
+  (^AVector [^AVector a]
     (absolute! (clone a))))
 
 (defn scale 
@@ -265,6 +265,18 @@
   "Fills a vector with a specific numerical value" 
   ([^AVector a ^double value]
     (fill! (clone a) value)))
+
+(defn add-weighted!
+  "Create a weighted average of a vector with another in place. Numerical weight specifies the proportion of the second vector to use"
+  (^AVector [^AVector dest ^AVector source weight]
+    (.addWeighted dest source (double weight))
+    dest))
+
+(defn add-weighted
+  "Create a weighted average of a vector with another. Numerical weight specifies the proportion of the second vector to use"
+  (^AVector [^AVector dest ^AVector source weight]
+    (add-weighted! (clone dest) source (double weight))))
+
 
 ;; =====================================
 ;; Arithmetic functions and operators
