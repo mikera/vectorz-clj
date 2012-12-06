@@ -27,7 +27,10 @@
 (deftest test-more-vector-ops
   (testing "add weighted"
     (is (= (v/of 2 6) 
-           (v/add-weighted (v/of 1 5) (v/of 5 9) 1/4)))))
+           (v/add-weighted (v/of 1 5) (v/of 5 9) 1/4))))
+  (testing "interpolate"
+    (is (= (v/of 2 6) 
+           (v/interpolate (v/of 5 9) (v/of 1 5)  3/4)))))
 
 (deftest test-get-set
   (testing "get"

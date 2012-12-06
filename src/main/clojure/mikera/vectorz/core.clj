@@ -193,6 +193,12 @@
     (.scaleAdd a factor b)
     a))
 
+(defn add-weighted!
+  "Create a weighted average of a vector with another in place. Numerical weight specifies the proportion of the second vector to use"
+  (^AVector [^AVector dest ^AVector source weight]
+    (.addWeighted dest source (double weight))
+    dest))
+
 (defn fill! 
   "Fills a vector in place with a specific numerical value" 
   ([^AVector a ^double value]
@@ -236,6 +242,12 @@
   (^AVector [^AVector dest source]
     (div! (clone dest) source)))
 
+(defn interpolate
+  (^AVector [^AVector a ^AVector b position]
+    (let [^AVector result (clone a)]
+      (.interpolate result b (double position))
+      result))) 
+
 (defn normalise
   "Normalises a vector to unit length and returns it"
   (^AVector [^AVector a]
@@ -266,11 +278,6 @@
   ([^AVector a ^double value]
     (fill! (clone a) value)))
 
-(defn add-weighted!
-  "Create a weighted average of a vector with another in place. Numerical weight specifies the proportion of the second vector to use"
-  (^AVector [^AVector dest ^AVector source weight]
-    (.addWeighted dest source (double weight))
-    dest))
 
 (defn add-weighted
   "Create a weighted average of a vector with another. Numerical weight specifies the proportion of the second vector to use"
@@ -326,7 +333,7 @@
   (^AVector [^AVector a ^AVector b & vs] 
     (let [r (clone a)]
       (.add r b)
-      (doseq [^mikera.vectorz.AVector v vs]
+      (doseq [^AVector v vs]
         (.add r v))
       r)))
 
