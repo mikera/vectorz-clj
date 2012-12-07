@@ -10,7 +10,9 @@
     (is (= (m/matrix [[1 0] [0 1]]) (m/identity-matrix 2)))
     (is (= (m/identity-matrix 3) (m/scale-matrix [1 1 1]))))
   (testing "scale matrix"
-    (is (= (m/matrix [[1 0] [0 1]]) (m/scale-matrix 2 1)))))
+    (is (= (m/matrix [[1 0] [0 1]]) (m/scale-matrix 2 1))))
+  (testing "rotation matrix"
+    (is (v/approx= (v/of 1 2 3) (m/* (m/x-axis-rotation-matrix (* 2 Math/PI)) (v/of 1 2 3))))))
 
 (deftest test-compose
   (testing "composing scales"
