@@ -28,6 +28,12 @@ Examples:
     a
     => #<Vector [3.0,4.0,5.0]>
     
+    ;; you can even get references to sub-vectors and mutate them
+    (let [v (create-length 10)]   ;; create a vector of 10 zeros
+      (fill! (subvec v 3 4) 1.0)  ;; fill a subvector with ones
+      v)
+    => #<Vector [0.0,0.0,0.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0]>
+    
 ### Purpose
 
 vectorz-clj design goals:
