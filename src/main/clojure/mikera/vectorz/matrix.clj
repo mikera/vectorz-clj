@@ -64,6 +64,21 @@
   (^AMatrix [dimensions factor]
     (Matrixx/createScaleMatrix (int dimensions) (double factor))))
 
+(defn x-axis-rotation-matrix
+  "Creates a rotation matrix with the given number of radians around the x axis"
+  (^AMatrix [angle]
+    (Matrixx/createXAxisRotationMatrix (double angle))))
+
+(defn y-axis-rotation-matrix
+  "Creates a rotation matrix with the given number of radians around the y axis"
+  (^AMatrix [angle]
+    (Matrixx/createYAxisRotationMatrix (double angle))))
+
+(defn z-axis-rotation-matrix
+  "Creates a rotation matrix with the given number of radians around the z axis"
+  (^AMatrix [angle]
+    (Matrixx/createZAxisRotationMatrix (double angle))))
+
 ;; ============================================
 ;; matrix operations
 
