@@ -8,7 +8,13 @@
 (deftest test-constructors
   (testing "identity"
     (is (= (m/matrix [[1 0] [0 1]]) (m/identity-matrix 2)))
-    (is (= (m/identity-matrix 3) (m/scale-matrix [1 1 1])))))
+    (is (= (m/identity-matrix 3) (m/scale-matrix [1 1 1]))))
+  (testing "scale matrix"
+    (is (= (m/matrix [[1 0] [0 1]]) (m/scale-matrix 2 1)))))
+
+(deftest test-compose
+  (testing "composing scales"
+    (is (= (m/scale-matrix [3 6]) (m/* (m/scale-matrix [1 2]) (m/scale-matrix 2 3))))))
 
 (deftest test-ops
   (testing "as-vector"
