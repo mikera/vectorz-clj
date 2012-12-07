@@ -118,14 +118,14 @@
 ;; Matrix application
 
 (defn transform! 
-  "Applies a matrix to a vector, modifying the vector in place"
-  (^AVector [^AMatrix m ^AVector a]
+  "Applies a matrix transform to a vector, modifying the vector in place"
+  (^AVector [^ATransform m ^AVector a]
     (.transformInPlace m a)
     a))
 
 (defn transform 
-  "Applies a matrix to a vector, returning a new vector"
-  (^AVector [^AMatrix m ^AVector a]
+  "Applies a matrix transform to a vector, returning a new vector"
+  (^AVector [^ATransform m ^AVector a]
     (let [^AVector result (v/create-length (.outputDimensions m))]
       (.transform m a result)
       result)))
