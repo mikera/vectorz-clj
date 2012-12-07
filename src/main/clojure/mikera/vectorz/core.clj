@@ -289,7 +289,7 @@
 ;; Arithmetic functions and operators
 
 (defn approx=
-  "Returns a boolean indicating whether the two vectors are approximately equal, to an optional tolerance" 
+  "Returns a boolean indicating whether the two vectors are approximately equal, +/- an optional tolerance" 
   ([^AVector a ^AVector b]
     (.epsilonEquals a b))
   ([^AVector a ^AVector b epsilon]
@@ -301,10 +301,12 @@
     (.dotProduct a b)))
 
 (defn magnitude
+  "Return the magnitude of a vector (geometric length)" 
   (^double [^AVector a]
     (.magnitude a)))
 
 (defn magnitude-squared
+  "Return the squared magnitude of a vector. Slightly more efficient than getting the magnitude directly." 
   (^double [^AVector a]
     (.magnitudeSquared a)))
 
@@ -324,7 +326,7 @@
     (.distanceSquared a b)))
 
 (defn + 
-  "Add one or more vectors"
+  "Add one or more vectors, returning a new vector as the result"
   (^AVector [^AVector a] (clone a))
   (^AVector [^AVector a ^AVector b] 
     (let [r (clone a)]
@@ -351,7 +353,7 @@
       r)))
 
 (defn * 
-  "Multiply one or more vectors"
+  "Multiply one or more vectors, element-wise"
   (^AVector [^AVector a] (clone a))
   (^AVector [^AVector a ^AVector b] 
     (let [r (clone a)]
@@ -364,10 +366,10 @@
       r)))
 
 (defn divide 
-  "Divide one or more vectors"
+  "Divide one or more vectors, element-wise"
   (^AVector [^AVector a] (clone a))
   (^AVector [^AVector a ^AVector b] 
-    (let [ r  (clone a)]
+    (let [r (clone a)]
       (.divide ^AVector r ^AVector b)
       r))
   (^AVector [^AVector a ^AVector b & vs] 
