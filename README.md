@@ -9,7 +9,7 @@ Specifically designed for games, simulations and machine learning.
 
 Follow the instructions to install with Leiningen / Maven from Clojars: https://clojars.org/net.mikera/vectorz-clj
 
-Examples:
+Vector Examples:
 
     (in-ns 'mikera.vectorz.core)
 
@@ -40,7 +40,9 @@ vectorz-clj design goals:
 
  - Pure JVM code (i.e. no native dependencies)
  - Very fast, mutable vectors ("as fast as you can get on the JVM")
+ - Build upon a good abstraction for vectors (AVector)
  - Different concrete vector types, e.g. primitive vectors for 2D/3D graphics (Vector2 and Vector3)
  - DSL for vector manipulation that can do useful things like vector subranges etc.
+ - Matrix functionality as required to complement the vector types
  
  vectorz-clj is implemented as a wrapper over the vectorz library, which provides the underlying data structures as well as a set of APIs that can be used from Java.
