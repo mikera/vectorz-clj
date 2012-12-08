@@ -1,5 +1,5 @@
 (ns mikera.vectorz.core
-  (:import [mikera.vectorz AVector Vectorz Vector Vector3])
+  (:import [mikera.vectorz AVector Vectorz Vector Vector1 Vector2 Vector3 Vector4])
   (:refer-clojure :exclude [+ - * / vec vec? vector subvec get set to-array empty]))
 
 
@@ -86,6 +86,54 @@
     (satisfies? PVectorisable coll) (to-vector coll)
     (sequential? coll) (apply of coll)
     :else (error "Can't create vector from: " (class coll)))))
+
+(defn vec1
+  "Creates a Vector1 instance"
+  (^Vector1 []
+    (Vector1.)) 
+  (^Vector1 [coll]
+    (if (number? coll) 
+      (Vector1/of (double coll))
+      (let [v (vec coll)]
+        (if (instance? Vector1 v) 
+          v
+          (error "Can't create Vector1 from: " (str coll))))))) 
+
+(defn vec2
+  "Creates a Vector2 instance"
+  (^Vector2 []
+    (Vector2.)) 
+  (^Vector2 [coll]
+    (let [v (vec coll)]
+      (if (instance? Vector2 v) 
+        v
+        (error "Can't create Vector2 from: " (str coll)))))
+  (^Vector2 [x y]
+    (Vector2/of (double x) (double y)))) 
+
+(defn vec3
+  "Creates a Vector3 instance"
+  (^Vector3 []
+    (Vector3.)) 
+  (^Vector3 [coll]
+    (let [v (vec coll)]
+      (if (instance? Vector3 v) 
+        v
+        (error "Can't create Vector3 from: " (str coll)))))
+  (^Vector3 [x y z]
+    (Vector3/of (double x) (double y) (double z)))) 
+
+(defn vec4
+  "Creates a Vector4 instance"
+  (^Vector4 []
+    (Vector4.)) 
+  (^Vector4 [coll]
+    (let [v (vec coll)]
+      (if (instance? Vector4 v) 
+        v
+        (error "Can't create Vector4 from: " (str coll)))))
+  (^Vector4 [x y z t]
+    (Vector4/of (double x) (double y) (double z) (double t)))) 
 
 (defn vector 
   "Creates a vector from zero or more numerical components."

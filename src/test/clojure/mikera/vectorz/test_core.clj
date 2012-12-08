@@ -55,3 +55,25 @@
       (is (== 10.0 (v/get v2 0)))
       (v/fill! (v/clone jv) 20)
       (is (not= 20.0 (v/get v2 0))))))
+
+(deftest test-primitive-vector-constructors
+  (testing "vec1"
+    (is (= (v/of 1) (v/vec1 1) ))
+    (is (= (v/of 1) (v/vec1 [1])))
+    (is (= (v/of 0) (v/vec1)))
+    (is (thrown? Throwable (v/vec1 [2 3]))))
+  (testing "vec2"
+    (is (= (v/of 1 2) (v/vec2 1 2) ))
+    (is (= (v/of 1 2) (v/vec2 [1 2])))
+    (is (= (v/of 0 0) (v/vec2)))
+    (is (thrown? Throwable (v/vec2 [2]))))
+  (testing "vec3"
+    (is (= (v/of 1 2 3) (v/vec3 1 2 3) ))
+    (is (= (v/of 1 2 3) (v/vec3 [1 2 3])))
+    (is (= (v/of 0 0 0) (v/vec3)))
+    (is (thrown? Throwable (v/vec3 [2 3]))))
+  (testing "vec4"
+    (is (= (v/of 1 2 3 4) (v/vec4 1 2 3 4) ))
+    (is (= (v/of 1 2 3 4) (v/vec4 [1 2 3 4])))
+    (is (= (v/of 0 0 0 0) (v/vec4)))
+    (is (thrown? Throwable (v/vec4 [2 3])))))
