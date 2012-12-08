@@ -56,6 +56,10 @@
       (v/fill! (v/clone jv) 20)
       (is (not= 20.0 (v/get v2 0))))))
 
+(deftest test-assign
+  (testing "assign"
+    (is (= (v/of 1 2) (v/assign! (v/of 2 3) (v/of 1 2))))))
+
 (deftest test-primitive-vector-constructors
   (testing "vec1"
     (is (= (v/of 1) (v/vec1 1) ))

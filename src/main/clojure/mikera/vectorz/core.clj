@@ -177,6 +177,12 @@
 ;; =====================================
 ;; In-place operations
 
+(defn assign! 
+  "Fills a vector in place with the value of another vector" 
+  ([^AVector a ^AVector new-value]
+    (.set a new-value)
+    a))
+
 (defn add!
   "Add a vector to another (in-place)"
   (^AVector [^AVector dest ^AVector source]
@@ -252,6 +258,8 @@
   ([^AVector a ^double value]
     (.fill a value)
     a))
+
+
 
 ;; =====================================
 ;; Special 3D functions
