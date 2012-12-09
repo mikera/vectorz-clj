@@ -191,7 +191,7 @@
 
 (defn add-multiple!
   "Add a vector to another (in-place)"
-  (^AVector [^AVector dest ^AVector source ^double factor]
+  ([^AVector dest ^AVector source ^double factor]
     (.addMultiple dest source factor)
     dest))
 
