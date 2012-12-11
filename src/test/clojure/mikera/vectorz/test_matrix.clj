@@ -22,7 +22,8 @@
 
 (deftest test-ops
   (testing "as-vector"
-    (is (= (v/of 1 0 0 1) (m/as-vector (m/identity-matrix 2))))))
+    (is (= (v/of 1 0 0 1) (m/as-vector (m/identity-matrix 2))))
+    (is (= (v/of 1 0) (m/get-row (m/identity-matrix 2) 0)))))
 
 (deftest test-get-set
   (testing "setting"
