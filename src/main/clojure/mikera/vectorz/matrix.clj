@@ -31,7 +31,7 @@
     m))
 
 (defn get-row
-  "Sets the component of a matrix at a (row,column) position (mutates in place)"
+  "Gets a row of the matrix as a vector"
   ([^AMatrix m ^long row]
     (.getRow m (int row))))
   
