@@ -223,6 +223,13 @@
     (.normalise a)
     a))
 
+(comment 
+  ;; include with next vector iteration
+  (defn normalise-get-magnitude! 
+  "Normalises a vector in place to unit length and returns its magnitude"
+  (^double [^AVector a]
+    (.normalise a))))
+
 (defn negate! 
   "Negates a vector in place and returns it" 
   ([^AVector a]
