@@ -34,7 +34,27 @@
   "Gets a row of the matrix as a vector"
   ([^AMatrix m ^long row]
     (.getRow m (int row))))
-  
+
+;; ============================================
+;; Matrix predicates
+
+(defn fully-mutable?
+  ([^AMatrix m]
+    (.isFullyMutable m)))
+
+(defn zero?
+  ([^AMatrix m]
+    (.isZeroMatrix m)))
+
+(defn square?
+  ([^AMatrix m]
+    (.isSquare m)))
+
+(defn identity?
+  ([^ATransform m]
+    (.isIdentity m)))
+
+
 ;; ============================================
 ;; Matrix contructors
 

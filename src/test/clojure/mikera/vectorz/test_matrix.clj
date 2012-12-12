@@ -38,3 +38,23 @@
           m (m/identity-matrix 2)
           r (m/* m a)]
       (is (= a r)))))
+
+(deftest test-predicates
+  (testing "fully mutable"
+    (is (m/fully-mutable? (m/new-matrix 3 3)))
+  )
+  (testing "square"
+    (is (m/square? (m/new-matrix 3 3)))
+    (is (m/square? (m/identity-matrix 10)))
+    (is (not (m/square? (m/new-matrix 4 3))))
+  )
+  (testing "identity"
+    (is (m/identity? (m/identity-matrix 3)))
+    (is (not (m/identity? (m/new-matrix 2 2 ))))
+    (is (m/identity? (m/scale-matrix [1 1 1])))
+    (is (not (m/identity? (m/scale-matrix [1 2 3]))))
+  )
+  (testing "zero"
+    (is (m/zero? (m/new-matrix 2 3)))
+    (is (m/zero? (m/scale-matrix [0 0 0 0 0])))
+  ))
