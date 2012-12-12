@@ -3,7 +3,7 @@
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
   (:import [mikera.transformz ATransform])
   (:require [mikera.vectorz.core :as v])
-  (:refer-clojure :exclude [* get set]))
+  (:refer-clojure :exclude [* get set zero?]))
   
 
 ;; ============================================
