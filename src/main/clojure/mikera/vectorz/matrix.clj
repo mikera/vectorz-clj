@@ -10,14 +10,19 @@
 ;; Core functions
 
 (defn clone
-  "Creates a (mutable) clone of a matrix. May not be exactly the same class as the original matrix."
+  "Creates a (mutable) deep clone of a matrix. May not be exactly the same class as the original matrix."
   (^AMatrix [^AMatrix v]
     (.clone v)))
+
+(defn transform?
+  "Returns true if m is a transform (i.e. an instance of mikera.transformz.ATransform)"
+  ([m]
+    (instance? ATransform m)))
 
 (defn matrix?
   "Returns true if m is a matrix (i.e. an instance of mikera.matrixx.AMatrix)"
   ([m]
-    (instance? mikera.matrixx.AMatrix m)))
+    (instance? AMatrix m)))
 
 (defn get
   "Returns the component of a matrix at a specific (row,column) position"
@@ -56,7 +61,7 @@
 
 
 ;; ============================================
-;; Matrix contructors
+;; Matrix constructors
 
 (defn new-matrix 
   (^AMatrix [rows cols]
@@ -133,6 +138,11 @@
   "Composes a transform with another transform"
   (^ATransform [^ATransform a ^ATransform b]
     (.compose a b)))
+
+(defn determinant
+  "Gets the determinant of a (square) matrix"
+  (^double [^AMatrix m]
+    (.determinant m)))
 
 ;; ============================================
 ;; Matrix application

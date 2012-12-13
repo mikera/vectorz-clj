@@ -376,15 +376,15 @@
   (^double [^AVector a ^AVector b]
     (.distance a b)))
 
-(defn angle 
-  "Return the angle between two vectors" 
-  (^double [^AVector a ^AVector b]
-    (.angle a b)))
-
 (defn distance-squared 
   "Return the squared euclidean distance between two vectors" 
   (^double [^AVector a ^AVector b]
     (.distanceSquared a b)))
+
+(defn angle 
+  "Return the angle between two vectors" 
+  (^double [^AVector a ^AVector b]
+    (.angle a b)))
 
 (defn + 
   "Add one or more vectors, returning a new vector as the result"
