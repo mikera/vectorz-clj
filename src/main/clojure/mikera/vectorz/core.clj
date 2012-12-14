@@ -1,5 +1,6 @@
 (ns mikera.vectorz.core
   (:import [mikera.vectorz AVector Vectorz Vector Vector1 Vector2 Vector3 Vector4])
+  (:import [mikera.transformz Transformz])
   (:refer-clojure :exclude [+ - * / vec vec? vector subvec get set to-array empty]))
 
 
@@ -163,6 +164,7 @@
 
 ;; ======================================
 ;; Conversions
+
 
 (defn to-array 
   "Converts a vector to a double array"

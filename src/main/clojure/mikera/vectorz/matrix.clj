@@ -1,7 +1,7 @@
 (ns mikera.vectorz.matrix
   (:import [mikera.vectorz AVector Vectorz Vector Vector3])
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
-  (:import [mikera.transformz ATransform])
+  (:import [mikera.transformz Transformz ATransform])
   (:require [mikera.vectorz.core :as v])
   (:refer-clojure :exclude [* get set zero?]))
   
@@ -59,6 +59,14 @@
   ([^ATransform m]
     (.isIdentity m)))
 
+
+;; ============================================
+;; General transform constructors
+
+(defn constant-transform
+  "Converts a vector to a constant transform"
+  (^ATransform [^AVector v]
+    (Transformz/constantTransform (.length v) v)))
 
 ;; ============================================
 ;; Matrix constructors
@@ -143,6 +151,8 @@
   "Gets the determinant of a (square) matrix"
   (^double [^AMatrix m]
     (.determinant m)))
+
+
 
 ;; ============================================
 ;; Matrix application
