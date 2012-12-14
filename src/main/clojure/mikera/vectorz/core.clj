@@ -3,7 +3,6 @@
   (:import [mikera.transformz Transformz])
   (:refer-clojure :exclude [+ - * / vec vec? vector subvec get set to-array empty]))
 
-
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* true)
 

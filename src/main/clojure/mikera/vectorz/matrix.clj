@@ -6,6 +6,9 @@
   (:refer-clojure :exclude [* get set zero?]))
   
 
+(set! *warn-on-reflection* true)
+(set! *unchecked-math* true)
+
 ;; ============================================
 ;; Core functions
 
@@ -65,8 +68,9 @@
 
 (defn constant-transform
   "Converts a vector to a constant transform"
-  (^ATransform [^AVector v]
-    (Transformz/constantTransform (.length v) v)))
+  (^ATransform [^AVector v 
+                & {:keys [input-dimensions]}]
+    (Transformz/constantTransform (or input-dimensions (.length v)) v)))
 
 ;; ============================================
 ;; Matrix constructors
@@ -83,8 +87,9 @@
           rc (count rows)
           mat (new-matrix rc cc)]
       (dotimes [i rc]
-        (let [^AVector v (vecs i)]
-          (.copyTo v (get-row mat i) 0)))
+        (let [^AVector v (vecs i)
+              ^AVector row (get-row mat i)]
+          (.copyTo v row (int 0))))
       mat)))
 
 (defn identity-matrix
@@ -134,7 +139,7 @@
 (defn inverse
   "Gets the inverse of a square matrix as a new matrix."
   (^AMatrix [^AMatrix m]
-    (.getInverse m)))
+    (.inverse m)))
 
 (defn compose!
   "Composes a transform with another transform (in-place)"

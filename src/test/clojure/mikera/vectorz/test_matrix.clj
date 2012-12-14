@@ -27,7 +27,8 @@
 
 (deftest test-constant-transform
   (testing "application"
-    (is (= (v/of 1 0) (m/* (m/constant-transform (v/of 1 0)) (v/of 3 4))))))
+    (is (= (v/of 1 0) (m/* (m/constant-transform (v/of 1 0)) (v/of 3 4))))
+    (is (= (v/of 1 0) (m/* (m/constant-transform (v/of 1 0) :input-dimensions 3) (v/of 3 4 5))))))
 
 (deftest test-get-set
   (testing "setting"
