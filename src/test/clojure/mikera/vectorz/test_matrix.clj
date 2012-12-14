@@ -1,5 +1,5 @@
 (ns mikera.vectorz.test-matrix
-  (:use clojure.test)
+  (:use [clojure test])
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
@@ -11,6 +11,8 @@
     (is (= (m/identity-matrix 3) (m/scale-matrix [1 1 1]))))
   (testing "scale matrix"
     (is (= (m/matrix [[1 0] [0 1]]) (m/scale-matrix 2 1))))
+  (testing "diagonal matrix"
+    (is (= (m/matrix [[2 0] [0 3]]) (m/diagonal-matrix [2 3]))))
   (testing "rotation matrix"
     (is (v/approx= (v/of 1 2 3) 
                    (m/* (m/x-axis-rotation-matrix (* 2 Math/PI)) 

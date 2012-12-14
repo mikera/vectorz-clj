@@ -96,11 +96,17 @@
   (^AMatrix [dimensions]
     (Matrixx/createIdentityMatrix (int dimensions))))
 
+(defn diagonal-matrix
+  (^AMatrix [diagonal-values]
+    (mikera.matrixx.impl.DiagonalMatrix/create (double-array diagonal-values))))
+
 (defn scale-matrix
   (^AMatrix [scale-factors]
     (Matrixx/createScaleMatrix (double-array (seq scale-factors))))
   (^AMatrix [dimensions factor]
     (Matrixx/createScaleMatrix (int dimensions) (double factor))))
+
+(def scalar-matrix scale-matrix)
 
 (defn x-axis-rotation-matrix
   "Creates a rotation matrix with the given number of radians around the x axis"
