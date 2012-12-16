@@ -70,7 +70,7 @@
   "Converts a vector to a constant transform"
   (^ATransform [^AVector v 
                 & {:keys [input-dimensions]}]
-    (Transformz/constantTransform (or input-dimensions (.length v)) v)))
+    (mikera.transformz.Transformz/constantTransform (int (or input-dimensions (.length v))) v)))
 
 ;; ============================================
 ;; Matrix constructors
