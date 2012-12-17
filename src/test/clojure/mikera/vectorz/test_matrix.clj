@@ -65,3 +65,10 @@
     (is (m/zero? (m/new-matrix 2 3)))
     (is (m/zero? (m/scale-matrix [0 0 0 0 0])))
   ))
+
+(deftest test-dimensions
+  (testing "inputs"
+    (is (= 3 (m/input-dimensions (m/new-matrix 2 3)))))
+  (testing "outputs"
+    (is (= 2 (m/output-dimensions (m/new-matrix 2 3)))))
+  )

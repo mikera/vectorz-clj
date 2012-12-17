@@ -126,6 +126,16 @@
 ;; ============================================
 ;; matrix operations
 
+(defn input-dimensions 
+  "Gets the number of input dimensions (columns) of a matrix or other transform"
+  (^long [^ATransform m]
+    (.inputDimensions m)))
+
+(defn output-dimensions 
+  "Gets the number of output dimensions (rows) of a matrix or other transform"
+  (^long [^ATransform m]
+    (.outputDimensions m)))
+
 (defn transpose!
   "Transposes a matrix in place, if possible"
   (^AMatrix [^AMatrix m]
