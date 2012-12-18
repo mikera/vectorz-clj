@@ -13,6 +13,9 @@
   (to-vector [a]))
 
 (extend-protocol PVectorisable
+  (Class/forName "[D")
+    (to-vector [coll]
+      (Vectorz/create ^doubles coll))
   java.util.List
     (to-vector [coll]
        (Vectorz/create ^java.util.List coll))

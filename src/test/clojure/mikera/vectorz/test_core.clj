@@ -60,6 +60,10 @@
   (testing "assign"
     (is (= (v/of 1 2) (v/assign! (v/of 2 3) (v/of 1 2))))))
 
+(deftest test-construction
+  (testing "from double arrays"
+    (is (= (v/of 1 2 3) (v/vec (double-array [1 2 3]))))))
+
 (deftest test-primitive-vector-constructors
   (testing "vec1"
     (is (= (v/of 1) (v/vec1 1) ))
