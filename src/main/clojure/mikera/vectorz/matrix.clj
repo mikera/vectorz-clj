@@ -1,7 +1,7 @@
 (ns mikera.vectorz.matrix
   (:import [mikera.vectorz AVector Vectorz Vector Vector3])
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
-  (:import [mikera.transformz Transformz ATransform])
+  (:import [mikera.transformz Transformz ATransform AAffineTransform])
   (:require [mikera.vectorz.core :as v])
   (:refer-clojure :exclude [* get set zero?]))
   
@@ -200,6 +200,11 @@
     (let [^AVector result (v/create-length (.outputDimensions m))]
       (.transform m a result)
       result)))
+
+(defn transform-normal 
+  "Applies a an affine transform to a normal vector, storing the result in dest"
+  (^AVector [^AAffineTransform m ^AVector src ^AVector dest]
+    (.transformNormal m src dest)))
 
 (defn *
   "Applies a matrix to a vector or matrix, returning a new vector or matrix. If applied to a vector, the vector is transformed. If applied to a matrix, the two matrices are composed"
