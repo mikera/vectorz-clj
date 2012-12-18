@@ -21,6 +21,11 @@
   ([m]
     (instance? ATransform m)))
 
+(defn affine-transform?
+  "Returns true if m is a transform (i.e. an instance of mikera.transformz.AAffineTransform)"
+  ([m]
+    (instance? AAffineTransform m)))
+
 (defn matrix?
   "Returns true if m is a matrix (i.e. an instance of mikera.matrixx.AMatrix)"
   ([m]

@@ -64,7 +64,9 @@
   (testing "zero"
     (is (m/zero? (m/new-matrix 2 3)))
     (is (m/zero? (m/scale-matrix [0 0 0 0 0])))
-  ))
+  )
+  (testing "affine"
+    (is (m/affine-transform? (m/new-matrix 2 3)))))
 
 (deftest test-dimensions
   (testing "inputs"
