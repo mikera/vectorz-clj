@@ -46,18 +46,22 @@
 ;; Matrix predicates
 
 (defn fully-mutable?
+  "Returns true if the matrix is fully mutable"
   ([^AMatrix m]
     (.isFullyMutable m)))
 
 (defn zero?
+  "Returns true if the matrix is a zero-filled matrix (i.e. maps every vector to zero)"
   ([^AMatrix m]
     (.isZeroMatrix m)))
 
 (defn square?
+  "Returns true if the matrix is a square matrix"
   ([^AMatrix m]
     (.isSquare m)))
 
 (defn identity?
+  "Returns true if the matrix is an identity matrix"
   ([^ATransform m]
     (.isIdentity m)))
 
