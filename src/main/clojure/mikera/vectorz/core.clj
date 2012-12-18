@@ -62,6 +62,14 @@
   ([^AVector v ^long index ^double value]
     (mikera.vectorz.core/set (clone v) index value)))
 
+;; =====================================================
+;; vector predicates
+
+(defn normalised?
+  "Returns true if a vector is normalised (has unit length)"
+  [^AVector v]
+  (.isUnitLengthVector v))
+
 ;; ====================================================
 ;; vector constructors
 
