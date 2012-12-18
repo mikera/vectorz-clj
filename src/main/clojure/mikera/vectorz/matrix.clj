@@ -76,8 +76,9 @@
 ;; Matrix constructors
 
 (defn new-matrix 
-  (^AMatrix [rows cols]
-    (Matrixx/newMatrix (int rows) (int cols))))
+  "Creates a new, mutable, zero-filled matrix with the given number of rows and columns" 
+  (^AMatrix [row-count column-count]
+    (Matrixx/newMatrix (int row-count) (int column-count))))
 
 (defn matrix
   "Creates a new matrix using the specified data, which should be a sequence of row vectors"
@@ -97,16 +98,21 @@
     (Matrixx/createIdentityMatrix (int dimensions))))
 
 (defn diagonal-matrix
+  "Creates a diagonal matrix, using the sequence of diagonal values provided" 
   (^AMatrix [diagonal-values]
     (mikera.matrixx.impl.DiagonalMatrix/create (double-array diagonal-values))))
 
 (defn scale-matrix
+  "Creates a diagonal scaling matrix" 
   (^AMatrix [scale-factors]
     (Matrixx/createScaleMatrix (double-array (seq scale-factors))))
   (^AMatrix [dimensions factor]
     (Matrixx/createScaleMatrix (int dimensions) (double factor))))
 
-(def scalar-matrix scale-matrix)
+(defn scalar-matrix 
+  "Creates a dioagonal scalar matrix (multiplies all components by same factor)"
+  (^AMatrix [dimensions factor]
+    (Matrixx/createScalarMatrix (int dimensions) (double factor))))
 
 (defn x-axis-rotation-matrix
   "Creates a rotation matrix with the given number of radians around the x axis"
