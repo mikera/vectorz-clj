@@ -5,7 +5,6 @@
   (:require [mikera.vectorz.core :as v])
   (:refer-clojure :exclude [* get set zero?]))
   
-
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* true)
 
@@ -81,7 +80,7 @@
     (Matrixx/newMatrix (int row-count) (int column-count))))
 
 (defn matrix
-  "Creates a new matrix using the specified data, which should be a sequence of row vectors"
+  "Creates a new, mutable matrix using the specified data, which should be a sequence of row vectors"
   ([rows]
     (let [vecs (vec (map v/vec rows))
           cc (apply max (map v/length vecs))
@@ -94,6 +93,7 @@
       mat)))
 
 (defn identity-matrix
+  "Returns an immutable identity matrix for the given number of dimensions."
   (^AMatrix [dimensions]
     (Matrixx/createIdentityMatrix (int dimensions))))
 
