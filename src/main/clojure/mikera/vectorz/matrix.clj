@@ -62,7 +62,7 @@
 
 (defn square?
   "Returns true if the matrix is a square matrix"
-  ([^AMatrix m]
+  ([^ATransform m]
     (.isSquare m)))
 
 (defn identity?
@@ -173,7 +173,7 @@
     (.inverse m)))
 
 (defn compose!
-  "Composes a transform with another transform (in-place)"
+  "Composes a transform with another transform (in-place). Second transform should be square."
   (^ATransform [^ATransform a ^ATransform b]
     (.composeWith a b)
     a))
