@@ -7,7 +7,8 @@ Specifically designed for games, simulations and machine learning.
 
 Specific features that may be appealing:
 
- - You can use either mutable or immutable versions of vector functions. i.e. you can use a nice functional style most of the time, but switch to faster mutable vectors when needed for performance.
+ - "Pure" functions for idiomatic Clojure style provided
+ - "Impure" functions that mutate vectors provided for performance when you need it. i.e. you can use a nice functional style most of the time, but switch to mutation when you hit a bottleneck.
  - Primitive-backed special purpose vectors and matrices for performance, e.g. Vector3 for 3D maths.
  - Flexible DSL-style functions for manipulating vectors and matrices, e.g. the ability to create a "view" into a subspace of a large vector.
  
