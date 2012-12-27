@@ -1,10 +1,16 @@
 vectorz-clj
 ===========
 
-Fast mutable vector library for Clojure, building on the vectorz library (https://github.com/mikera/vectorz).
+Fast vector library for Clojure, building on the vectorz library (https://github.com/mikera/vectorz).
 
-Specifically designed for games, simulations and machine learning.
+Specifically designed for games, simulations and machine learning. 
 
+Specific features that may be appealing:
+
+ - You can use either mutable or immutable versions of vector functions. i.e. you can use a nice functional style most of the time, but switch to faster mutable vectors when needed for performance.
+ - Primitive-backed special purpose vectors and matrices for performance, e.g. Vector3 for 3D maths.
+ - Flexible DSL-style functions for manipulating vectors and matrices, e.g. the ability to create a "view" into a subspace of a large vector.
+ 
 [![Build Status](https://travis-ci.org/mikera/vectorz-clj.png?branch=vectorz-clj-0.2.2)](https://travis-ci.org/mikera/vectorz-clj)
 
 ### Usage
@@ -47,4 +53,4 @@ vectorz-clj design goals:
  - DSL for vector manipulation that can do useful things like vector subranges etc.
  - Matrix functionality as required to complement the vector types
  
- vectorz-clj is implemented as a wrapper over the vectorz library, which provides the underlying data structures as well as a set of APIs that can be used from Java.
+vectorz-clj is implemented as a "Clojurized" wrapper over the vectorz library, which provides the underlying data structures as well as a set of APIs that can be used from Java.
