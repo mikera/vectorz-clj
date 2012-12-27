@@ -7,10 +7,10 @@ Specifically designed for games, simulations and machine learning.
 
 Specific features that may be appealing:
 
- - "Pure" functions for idiomatic Clojure style provided
- - "Impure" functions that mutate vectors provided for performance when you need it. i.e. you can use a nice functional style most of the time, but switch to mutation when you hit a bottleneck.
- - Primitive-backed special purpose vectors and matrices for performance, e.g. Vector3 for 3D maths.
- - Flexible DSL-style functions for manipulating vectors and matrices, e.g. the ability to create a "view" into a subspace of a large vector.
+ - **"Pure"** functions for idiomatic Clojure style are provided. These work as you expect, i.e. return new vectors without mutating their arguments.
+ - **"Impure"** functions that mutate vectors are available for performance when you need it. i.e. you can use a nice functional style most of the time, but switch to mutation when you hit a bottleneck.
+ - **Primitive-backed** special purpose vectors and matrices for performance, e.g. Vector3 for fast 3D maths.
+ - **Flexible DSL-style** functions for manipulating vectors and matrices, e.g. the ability to create a "view" into a subspace of a large vector.
  
 [![Build Status](https://travis-ci.org/mikera/vectorz-clj.png?branch=vectorz-clj-0.2.2)](https://travis-ci.org/mikera/vectorz-clj)
 
