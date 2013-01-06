@@ -3,7 +3,8 @@
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
-  (:import [mikera.vectorz AVector Vectorz Vector]))
+  (:import [mikera.vectorz AVector Vectorz Vector])
+  (:refer-clojure :exclude [vector?]))
 
 (extend-protocol PIndexedAccess
   mikera.vectorz.AVector

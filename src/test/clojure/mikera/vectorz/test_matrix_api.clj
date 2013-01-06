@@ -6,7 +6,8 @@
   (:require [mikera.vectorz.matrix :as m])
   (:require [mikera.vectorz.matrix-api])
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
-  (:import [mikera.vectorz AVector Vectorz Vector]))
+  (:import [mikera.vectorz AVector Vectorz Vector])
+  (:refer-clojure :exclude [vector? * - +]))
 
 ;; note - all the operators are core.matrix operators
 
