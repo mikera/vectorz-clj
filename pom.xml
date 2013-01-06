@@ -48,6 +48,11 @@
 			<version>0.1.4</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>mikera</groupId>
+			<artifactId>matrix-api</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 </project>
