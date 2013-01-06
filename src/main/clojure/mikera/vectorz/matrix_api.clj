@@ -64,13 +64,23 @@
     (normalise [a]
       (v/normalise a)))
     
+(defn vectorz-coerce [p]
+  (cond
+    (or (instance? AVector p) (instance? AMatrix p)) 
+      p
+    (== 1 (dimensionality p))
+      (try (Vectorz/toVector p) (catch Throwable e nil))
+    (== 2 (dimensionality p))
+      (try (Matrixx/toMatrix p) (catch Throwable e nil))
+    :else (error "Can't coerce to vectorz format: " (class p))))
+
 (extend-protocol PCoercion
   mikera.vectorz.AVector
     (coerce-param [m param]
-      (Vectorz/toVector param))
+      (vectorz-coerce param))
   mikera.matrixx.AMatrix
     (coerce-param [m param]
-      (Matrixx/toMatrix param)))
+      (vectorz-coerce param)))
 
 (extend-protocol PMatrixMultiply
   mikera.vectorz.AVector
