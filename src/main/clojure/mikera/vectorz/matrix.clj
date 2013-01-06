@@ -141,6 +141,13 @@
 ;; ============================================
 ;; matrix operations
 
+(defn scale
+  "Scales a matrix by a scalar factor"
+  (^AMatrix [^AMatrix m factor]
+    (let [^AMatrix m (clone m)]
+      (.addMultiple m m (- (double factor) 1.0))
+      m)))
+
 (defn input-dimensions 
   "Gets the number of input dimensions (columns) of a matrix or other transform"
   (^long [^ATransform m]
