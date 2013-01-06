@@ -80,7 +80,9 @@
       (v/scale m a))
   mikera.matrixx.AMatrix
     (matrix-multiply [m a]
-      (m/* m (coerce m a)))
+      (if (instance? mikera.vectorz.AVector a)
+        (.transform m ^AVector a)
+        (m/* m (coerce m a))))
     (scale [m a]
       (m/scale m a)))
 
