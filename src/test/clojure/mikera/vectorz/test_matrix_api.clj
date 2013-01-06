@@ -8,7 +8,13 @@
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
   (:import [mikera.vectorz AVector Vectorz Vector]))
 
-(deftest test-ops
+(deftest test-vector-ops
   (testing "addition"
     (is (= (v/of 1 2) (+ (v/of 1 1) [0 1])))
     (is (= [1.0 2.0] (+ [0 2] (v/of 1 0))))))
+
+(deftest test-matrix-ops
+  (testing "addition"
+    (is (= (m/matrix [[2 2] [2 2]]) (+ (m/matrix [[1 1] [2 0]]) 
+                                       (m/matrix [[1 1] [0 2]]))))))
+
