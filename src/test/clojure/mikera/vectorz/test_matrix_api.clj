@@ -5,6 +5,7 @@
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])
   (:require [mikera.vectorz.matrix-api])
+  (:require core.matrix.impl.persistent-vector)
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
   (:import [mikera.vectorz AVector Vectorz Vector])
   (:refer-clojure :exclude [vector? * - +]))
