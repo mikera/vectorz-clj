@@ -33,7 +33,11 @@
 (deftest test-matrix-ops
   (testing "addition"
     (is (= (m/matrix [[2 2] [2 2]]) (+ (m/matrix [[1 1] [2 0]]) 
-                                       (m/matrix [[1 1] [0 2]])))))
+                                       (m/matrix [[1 1] [0 2]]))))
+    (is (= (m/matrix [[2 2] [2 2]]) (+ (m/matrix [[1 1] [2 0]]) 
+                                       [[1 1] [0 2]])))
+    (is (= [[2.0 2.0] [2.0 2.0]] (+ [[1 1] [0 2]]
+                                    (m/matrix [[1 1] [2 0]])))))
   (testing "scaling"
     (is (= (m/matrix [[2 2] [2 2]]) (scale (m/matrix [[1 1] [1 1]]) 2))))
   
