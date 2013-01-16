@@ -65,7 +65,9 @@
     (is (equals [1 2] (first (slices (matrix [[1 2] [3 4]])))))
     (is (equals [3 4] (second (slices (matrix [[1 2] [3 4]])))))
     (is (equals [3 4] (slice (matrix [[1 2] [3 4]]) 0 1)))
-    (is (equals [2 4] (slice (matrix [[1 2] [3 4]]) 1 1))))) 
+    (is (equals [2 4] (slice (matrix [[1 2] [3 4]]) 1 1))))
+  (testing "slices of vector"
+    (is (= '(1.0 2.0 3.0) (slices (matrix [1 2 3])))))) 
 
 ;; verify scalar operators should still work on numbers!
 (deftest test-scalar-operators
