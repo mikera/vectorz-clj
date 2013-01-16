@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>mikera</groupId>
 			<artifactId>matrix-api</artifactId>
-			<version>0.0.3-SNAPSHOT</version>
+			<version>0.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>criterium</groupId>
