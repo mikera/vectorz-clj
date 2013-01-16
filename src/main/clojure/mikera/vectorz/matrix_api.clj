@@ -3,11 +3,13 @@
   (:use core.matrix.utils)
   (:require core.matrix.impl.persistent-vector)
   (:require [core.matrix.implementations :as imp])
+  (:require [core.matrix.multimethods :as mm])
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])
   (:require [core.matrix.protocols :as mp])
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
   (:import [mikera.vectorz AVector Vectorz Vector])
+  (:import [mikera.transformz ATransform])
   (:refer-clojure :exclude [vector?]))
 
 (set! *warn-on-reflection* true)
@@ -159,6 +161,17 @@
         (m/* m (coerce m a))))
     (scale [m a]
       (m/scale m a)))
+
+(extend-protocol mp/PVectorTransform
+  mikera.transformz.ATransform
+    (vector-transform [m v] 
+      (if (instance? AVector v) 
+        (.transform m ^AVector v)
+        (.transform m ^AVector (coerce m v))))
+    (vector-transform! [m v] 
+      (if (instance? AVector v) 
+        (.transformInPlace m ^AVector v)
+        (assign! v (transform m v)))))
 
 (extend-protocol mp/PDimensionInfo
   mikera.vectorz.AVector

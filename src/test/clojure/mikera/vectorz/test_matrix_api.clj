@@ -75,7 +75,7 @@
 (deftest test-construction
   (testing "1D"
     (is (= (v/of 1.0) (matrix [1]))))
-  (testing "1D"
+  (testing "2D"
     (is (= (m/matrix [[1 2] [3 4]]) (matrix [[1 2] [3 4]])))))
 
 (deftest test-vector-conversion
