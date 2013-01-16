@@ -2,6 +2,7 @@
   (:use [clojure test])
   (:use [core matrix])
   (:use core.matrix.operators)
+  (:require core.matrix.compliance-tester)
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])
   (:require [mikera.vectorz.matrix-api])
@@ -11,6 +12,8 @@
   (:refer-clojure :exclude [vector? * - +]))
 
 ;; note - all the operators are core.matrix operators
+
+(set-current-implementation :vectorz)
 
 (deftest test-vector-ops
   (testing "addition"
@@ -57,3 +60,19 @@
   (testing "subtraction"
     (is (== 2.0 (- 4 2.0)))
     (is (== 6 (- 10 2 2))))) 
+
+(deftest test-construction
+  (testing "1D"
+    (is (= (v/of 1.0) (matrix [1]))))
+  (testing "1D"
+    (is (= (m/matrix [[1 2] [3 4]]) (matrix [[1 2] [3 4]])))))
+
+(deftest test-vector-conversion
+  (testing "vector" 
+    (is (= [1.0] (to-nested-vectors (v/of 1.0)))))
+  (testing "vector" 
+    (is (= [[1.0]] (to-nested-vectors (m/matrix [[1.0]]))))))
+
+;; run compliance test
+(deftest compliance-test
+  (core.matrix.compliance-tester/compliance-test (v/of 1 2))) 
