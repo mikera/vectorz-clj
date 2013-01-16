@@ -48,10 +48,17 @@
     ))
 
 (deftest test-matrix-transform
-  (testing "vector transform"
+  (testing "vector multiple"
     (is (= (v/of 2 4) (* (m/matrix [[2 0] [0 2]]) (v/of 1 2))))
     (is (= (v/of 2 4) (* (m/scalar-matrix 2 2.0) (v/of 1 2))))
-    (is (= (v/of 2 4) (* (m/scalar-matrix 2 2.0) [1 2])))))
+    (is (= (v/of 2 4) (* (m/scalar-matrix 2 2.0) [1 2]))))
+  (testing "persistent vector transform"
+    (is (= (v/of 1 2) (transform (m/identity-matrix 2) [1 2]))))
+  (testing "transform in place"
+    (let [v (matrix [1 2])
+          m (matrix [[2 0] [0 2]])] 
+      (transform! m v)
+      (is (= (v/of 2 4) v)))))
 
 ;; verify scalar operators should still work on numbers!
 (deftest test-scalar-operators
