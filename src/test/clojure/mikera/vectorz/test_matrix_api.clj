@@ -60,6 +60,13 @@
       (transform! m v)
       (is (= (v/of 2 4) v)))))
 
+(deftest test-slices
+  (testing "slice row and column from matrix"
+    (is (equals [1 2] (first (slices (matrix [[1 2] [3 4]])))))
+    (is (equals [3 4] (second (slices (matrix [[1 2] [3 4]])))))
+    (is (equals [3 4] (slice (matrix [[1 2] [3 4]]) 0 1)))
+    (is (equals [2 4] (slice (matrix [[1 2] [3 4]]) 1 1))))) 
+
 ;; verify scalar operators should still work on numbers!
 (deftest test-scalar-operators
   (testing "addition"
@@ -83,6 +90,8 @@
     (is (= [1.0] (to-nested-vectors (v/of 1.0)))))
   (testing "vector" 
     (is (= [[1.0]] (to-nested-vectors (m/matrix [[1.0]]))))))
+
+
 
 ;; run compliance test
 (deftest compliance-test

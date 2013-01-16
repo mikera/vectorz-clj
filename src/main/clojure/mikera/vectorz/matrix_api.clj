@@ -101,8 +101,8 @@
       (.getRow m (int i)))
     (get-slice [m dimension i]
       (cond 
-        (== 0 i) (.getRow m (int i))
-        (== 1 i) (.getColumn m (int i))
+        (== 0 dimension) (.getRow m (int i))
+        (== 1 dimension) (.getColumn m (int i))
         :else (error "Can't get slice from matrix with dimension: " dimension))))
 
 (extend-protocol mp/PMatrixAdd
