@@ -22,6 +22,7 @@
            (cons sym
              '(
                 (implementation-key [m] :vectorz)
+                (supports-dimensionality? [m dims] (or (== dims 1) (== dims 2)))
                 (new-vector [m length] (Vectorz/newVector (int length)))
                 (new-matrix [m rows columns] (Matrixx/newMatrix (int rows) (int columns)))
                 (new-matrix-nd [m dims] 
@@ -185,6 +186,8 @@
       false)
     (column-count [m]
       1)
+    (get-shape [m]
+      (cons (long (.length m)) nil))
     (dimension-count [m x]
       (if (== x 0)
         (.length m)
@@ -200,6 +203,8 @@
       false)
     (column-count [m]
       (.columnCount m))
+    (get-shape [m]
+      (cons (long (.rowCount m)) (cons (long (.columnCount m)) nil)))
     (dimension-count [m x]
       (cond 
         (== x 0) (.rowCount m)
