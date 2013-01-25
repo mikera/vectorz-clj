@@ -15,6 +15,13 @@
 
 (set-current-implementation :vectorz)
 
+(deftest test-misc-regressions
+  (let [v1 (v/vec1 1.0)]
+    (is (matrix? v1))
+    (is (== 1 (dimensionality v1)))
+    (is (== 1 (ecount v1)))
+    (is (matrix? v1))))
+
 (deftest test-vector-ops
   (testing "addition"
     (is (= (v/of 1 2) (+ (v/of 1 1) [0 1])))

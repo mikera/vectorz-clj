@@ -72,13 +72,15 @@
       (if (== 1 (count indexes))
         (.set m (int (first indexes)) (double v))
         (error "Can't do " (count indexes) "-dimensional set on a 1D vector!")))
+    (is-mutable? [m] (.isFullyMutable m)) 
   AMatrix
     (set-1d [m row v] (error "Can't do 1-dimensional set on a 2D matrix!"))
     (set-2d [m row column v] (.set m (int row) (int column) (double v)))
     (set-nd [m indexes v]
       (if (== 2 (count indexes))
         (.set m (int (first indexes)) (int (second indexes)) (double v))
-        (error "Can't do " (count indexes) "-dimensional set on a 2D matrix!"))))
+        (error "Can't do " (count indexes) "-dimensional set on a 2D matrix!")))
+    (is-mutable? [m] (.isFullyMutable m)))
 
 
 (extend-protocol mp/PMatrixSlices
