@@ -1,6 +1,6 @@
 (ns mikera.vectorz.test-matrix-api
   (:use [clojure test])
-  (:use [core matrix])
+  (:use core.matrix)
   (:use core.matrix.operators)
   (:require core.matrix.compliance-tester)
   (:require [mikera.vectorz.core :as v])
@@ -17,10 +17,10 @@
 
 (deftest test-misc-regressions
   (let [v1 (v/vec1 1.0)]
-    (is (matrix? v1))
+    (is (array? v1))
     (is (== 1 (dimensionality v1)))
     (is (== 1 (ecount v1)))
-    (is (matrix? v1))))
+    (is (not (matrix? v1)))))
 
 (deftest test-vector-ops
   (testing "addition"
