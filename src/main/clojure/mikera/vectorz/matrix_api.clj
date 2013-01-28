@@ -182,7 +182,7 @@
     (== 2 (dimensionality p))
       (try (Matrixx/toMatrix p) (catch Throwable e nil))
     (number? p) (double p)
-    :else (error "Can't coerce to vectorz format: " (class p))))
+    :else nil))
 
 (extend-protocol mp/PCoercion
   mikera.vectorz.AVector
