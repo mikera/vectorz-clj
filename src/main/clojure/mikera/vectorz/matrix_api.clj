@@ -35,13 +35,52 @@
                                   (cond 
                                     (mp/is-scalar? data) 
                                       data
-                                    (matrix? data) 
+                                    (array? data) 
                                       (assign! (mp/new-matrix-nd m (shape data)) data)
                                     :default
-                                      (assign! (mp/new-matrix-nd m (shape data)) (mp/construct-matrix [] data)))))))
+                                      (let [vm (mp/construct-matrix [] data)] 
+                                        ;; (println m vm (shape vm))
+                                        (assign! (mp/new-matrix-nd m (shape vm)) vm)))))))
          ['mikera.vectorz.AVector 'mikera.matrixx.AMatrix]) ))
 
 
+(extend-protocol mp/PDimensionInfo
+  mikera.vectorz.AVector
+    (dimensionality [m]
+      1)
+    (row-count [m]
+      (.length m))
+    (is-vector? [m]
+      true)
+    (is-scalar? [m]
+      false)
+    (column-count [m]
+      1)
+    (get-shape [m]
+      (cons (long (.length m)) nil))
+    (dimension-count [m x]
+      (if (== x 0)
+        (.length m)
+        (error "Vector does not have dimension: " x)))
+  mikera.matrixx.AMatrix
+    (dimensionality [m]
+      2)
+    (row-count [m]
+      (.rowCount m))
+    (is-vector? [m]
+      false)
+    (is-scalar? [m]
+      false)
+    (column-count [m]
+      (.columnCount m))
+    (get-shape [m]
+      (cons (long (.rowCount m)) (cons (long (.columnCount m)) nil)))
+    (dimension-count [m x]
+      (cond 
+        (== x 0) (.rowCount m)
+        (== x 1) (.columnCount m)
+        :else (error "Matrix does not have dimension: " x))))
+    
 (extend-protocol mp/PIndexedAccess
   mikera.vectorz.AVector
     (get-1d [m x]
@@ -124,6 +163,7 @@
         (.addMultiple m (coerce m a) -1.0)
         m)))
 
+
 (extend-protocol mp/PVectorOps
   mikera.vectorz.AVector
     (vector-dot [a b]
@@ -141,6 +181,7 @@
       (try (Vectorz/toVector p) (catch Throwable e nil))
     (== 2 (dimensionality p))
       (try (Matrixx/toMatrix p) (catch Throwable e nil))
+    (number? p) (double p)
     :else (error "Can't coerce to vectorz format: " (class p))))
 
 (extend-protocol mp/PCoercion
@@ -176,43 +217,6 @@
         (.transformInPlace m ^AVector v)
         (assign! v (transform m v)))))
 
-(extend-protocol mp/PDimensionInfo
-  mikera.vectorz.AVector
-    (dimensionality [m]
-      1)
-    (row-count [m]
-      (.length m))
-    (is-vector? [m]
-      true)
-    (is-scalar? [m]
-      false)
-    (column-count [m]
-      1)
-    (get-shape [m]
-      (cons (long (.length m)) nil))
-    (dimension-count [m x]
-      (if (== x 0)
-        (.length m)
-        (error "Vector does not have dimension: " x)))
-  mikera.matrixx.AMatrix
-    (dimensionality [m]
-      2)
-    (row-count [m]
-      (.rowCount m))
-    (is-vector? [m]
-      false)
-    (is-scalar? [m]
-      false)
-    (column-count [m]
-      (.columnCount m))
-    (get-shape [m]
-      (cons (long (.rowCount m)) (cons (long (.columnCount m)) nil)))
-    (dimension-count [m x]
-      (cond 
-        (== x 0) (.rowCount m)
-        (== x 1) (.columnCount m)
-        :else (error "Matrix does not have dimension: " x))))
-    
 ;; registration
 
 (imp/register-implementation (v/of 0.0))

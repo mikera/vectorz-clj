@@ -3,6 +3,7 @@
   (:use core.matrix)
   (:use core.matrix.operators)
   (:require core.matrix.compliance-tester)
+  (:require [core.matrix.protocols :as mp])
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])
   (:require [mikera.vectorz.matrix-api])
@@ -20,7 +21,22 @@
     (is (array? v1))
     (is (== 1 (dimensionality v1)))
     (is (== 1 (ecount v1)))
-    (is (not (matrix? v1)))))
+    (is (not (matrix? v1))))
+  (let [m (coerce (matrix [[1 2]]) [[1 2] [3 4]])] 
+    (is (every? true? (map == (range 1 (inc (ecount m))) (eseq m)))))
+  (let [m (matrix [[1 2] [3 4]])] 
+    (is (== 2 (ecount (first (slices m)))))
+    (scale! (first (slices m)) 2.0)
+    (is (equals m [[2 4] [3 4]])))
+  (let [m (matrix [[0 0] [0 0]])] 
+    (assign! m [[1 2] [3 4]])
+    (is (equals m [[1 2] [3 4]]))
+    (assign! m [[0 0] [0 0]])
+    (is (equals m [[0 0] [0 0]]))
+    (mp/assign-array! m (double-array [2 4 6 8]))
+    (is (equals m [[2 4] [6 8]]))
+    (mp/assign-array! m (double-array 4))
+    (is (equals m [[0 0] [0 0]]))))
 
 (deftest test-vector-ops
   (testing "addition"
@@ -90,17 +106,23 @@
 
 (deftest test-construction
   (testing "1D"
-    (is (= (v/of 1.0) (matrix [1]))))
+    (is (= (v/of 1.0) (matrix [1])))
+    (is (instance? AVector (matrix [1]))))
   (testing "2D"
-    (is (= (m/matrix [[1 2] [3 4]]) (matrix [[1 2] [3 4]])))))
+    (is (= (m/matrix [[1 2] [3 4]]) (matrix [[1 2] [3 4]])))
+    (is (instance? AMatrix (matrix [[1]])))))
 
-(deftest test-vector-conversion
+(deftest test-conversion
   (testing "vector" 
     (is (= [1.0] (to-nested-vectors (v/of 1.0)))))
-  (testing "vector" 
-    (is (= [[1.0]] (to-nested-vectors (m/matrix [[1.0]]))))))
+  (testing "matrix" 
+    (is (= [[1.0]] (to-nested-vectors (m/matrix [[1.0]])))))
+  (testing "coercion"
+    (is (equals [[1 2] [3 4]] (coerce (m/matrix [[1.0]]) [[1 2] [3 4]])))))
 
-
+(deftest test-functional-ops
+  (testing "eseq"
+    (= [1.0 2.0 3.0 4.0] (eseq (matrix [[1 2] [3 4]])))))
 
 ;; run compliance test
 (deftest compliance-test
