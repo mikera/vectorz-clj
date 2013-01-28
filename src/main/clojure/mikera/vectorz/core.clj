@@ -39,8 +39,8 @@
   (^AVector [^AVector v]
     (.clone v)))
 
-(defn length
-  "Returns the length (number of components) of a vector"
+(defn ecount
+  "Returns the number of elements in a vector"
   (^long [^AVector v]
     (.length v)))
 

@@ -92,7 +92,7 @@
   "Creates a new, mutable matrix using the specified data, which should be a sequence of row vectors"
   ([rows]
     (let [vecs (vec (map v/vec rows))
-          cc (apply max (map v/length vecs))
+          cc (apply max (map v/ecount vecs))
           rc (count rows)
           mat (new-matrix rc cc)]
       (dotimes [i rc]
