@@ -51,7 +51,13 @@
     (as-double-array [m] (.getArray m))
   mikera.vectorz.AVector
     (to-double-array [m] (.toArray m))
-    (as-double-array [m] nil)) 
+    (as-double-array [m] nil)
+  mikera.matrixx.AMatrix
+    (to-double-array [m] (.toArray (.asVector m)))
+    (as-double-array [m] nil)
+  mikera.matrixx.MatrixMN
+    (to-double-array [m] (.toArray (.asVector m)))
+    (as-double-array [m] (.data m))) 
 
 (extend-protocol mp/PDimensionInfo
   mikera.vectorz.AVector
