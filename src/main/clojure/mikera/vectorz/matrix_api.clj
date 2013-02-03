@@ -44,6 +44,15 @@
          ['mikera.vectorz.AVector 'mikera.matrixx.AMatrix]) ))
 
 
+
+(extend-protocol mp/PDoubleArrayOutput
+  mikera.vectorz.Vector
+    (to-double-array [m] (.toArray m))
+    (as-double-array [m] (.getArray m))
+  mikera.vectorz.AVector
+    (to-double-array [m] (.toArray m))
+    (as-double-array [m] nil)) 
+
 (extend-protocol mp/PDimensionInfo
   mikera.vectorz.AVector
     (dimensionality [m]
