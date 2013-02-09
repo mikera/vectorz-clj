@@ -17,9 +17,38 @@ Specific features that may be appealing:
 
 ### Usage
 
-Follow the instructions to install with Leiningen / Maven from Clojars: https://clojars.org/net.mikera/vectorz-clj
+Follow the instructions to install with Leiningen / Maven from Clojars: 
 
-Vector Examples:
+ - https://clojars.org/net.mikera/vectorz-clj
+ 
+You can then use Vectorz as a standard core.matrix implementation. Example:
+
+```clojure
+    (use 'core.matrix)
+    (use 'core.matrix.operators)           ;; overrides *, + etc. for matrices
+    (set-current-implementation :vectorz)  ;; uses Vectorz as default matrix implementation
+    
+    ;; define a 2x2 Matrix
+    (def M (matrix [[1 2] [3 4]]))
+    M
+    => #<Matrix22 [[1.0,2.0][3.0,4.0]]>
+    
+    ;; define a length 2 vector (a 1D matrix is equivalent considered a vector in core.matrix)
+    (def v (matrix [1 2]))
+    v
+    => #<Vector2 [1.0,2.0]>
+    
+    ;; Matrix x Vector multiply
+    (* M v)
+    => #<Vector2 [5.0,11.0]>
+```
+
+Vectorz also provides specialised functions in `mikera.vectorz.core` that give access to 
+advanced features of Vectorz that are not necessarily available through the core.matrix API.
+This includes type hinted and primitive functions that will perform better when used on
+Vectorz vectors and matrices compared to using the general purpose core.matrix API.
+
+Here are some Vector Examples:
 
     (in-ns 'mikera.vectorz.core)
 
