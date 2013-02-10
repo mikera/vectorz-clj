@@ -15,6 +15,11 @@ Specific features that may be appealing:
  
 [![Build Status](https://travis-ci.org/mikera/vectorz-clj.png?branch=vectorz-clj-0.2.2)](https://travis-ci.org/mikera/vectorz-clj)
 
+### License
+
+Like vectorz, vectorz-clj is licensed under the LGPL license:
+
+ - http://www.gnu.org/licenses/lgpl.html
 
 ### Usage
 
