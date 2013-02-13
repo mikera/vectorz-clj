@@ -23,7 +23,7 @@
              '(
                 (implementation-key [m] :vectorz)
                 (supports-dimensionality? [m dims] (or (== dims 1) (== dims 2)))
-                (new-vector [m length] (Vectorz/newVector (int length)))
+                (new-vdef aector [m length] (Vectorz/newVector (int length)))
                 (new-matrix [m rows columns] (Matrixx/newMatrix (int rows) (int columns)))
                 (new-matrix-nd [m dims] 
                                (case (count dims)

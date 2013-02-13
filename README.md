@@ -51,8 +51,8 @@ You can then use Vectorz as a standard core.matrix implementation. Example:
 
 Vectorz also provides specialised functions in `mikera.vectorz.core` that give access to 
 advanced features of Vectorz that are not necessarily available through the core.matrix API.
-This includes type hinted and primitive functions that will perform better when used on
-Vectorz vectors and matrices compared to using the general purpose core.matrix API.
+This includes type hinted and primitive functions that will perform better than using 
+the general purpose core.matrix API.
 
 Here are some Vector Examples:
 
