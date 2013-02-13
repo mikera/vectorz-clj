@@ -207,6 +207,14 @@
     (coerce-param [m param]
       (vectorz-coerce param)))
 
+(extend-protocol mp/PConversion
+  mikera.vectorz.AVector
+    (convert-to-nested-vectors [m]
+      (into [] (seq m)))
+  mikera.matrixx.AMatrix
+    (convert-to-nested-vectors [m]
+      (mapv #(into [] %) (mp/get-major-slice-seq m))))
+
 (extend-protocol mp/PMatrixMultiply
   mikera.vectorz.AVector
     (matrix-multiply [m a]

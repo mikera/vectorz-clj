@@ -36,7 +36,12 @@
     (mp/assign-array! m (double-array [2 4 6 8]))
     (is (equals m [[2 4] [6 8]]))
     (mp/assign-array! m (double-array 4))
-    (is (equals m [[0 0] [0 0]]))))
+    (is (equals m [[0 0] [0 0]])))
+  (let [v (v/vec [1 2 3])]
+    (is (equals [2 4 6] (add v v)))))
+
+(deftest test-equals
+  (is (equals (v/of 1 2) [1 2])))
 
 (deftest test-vector-ops
   (testing "addition"
