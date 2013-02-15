@@ -254,6 +254,11 @@
       (mapv #(into [] %) (mp/get-major-slice-seq m))))
 
 (extend-protocol mp/PMatrixMultiply
+  mikera.vectorz.AScalar
+    (matrix-multiply [m a]
+      (mp/pre-scale a (.get m)))
+    (scale [m a]
+      (* (.get m) a))
   mikera.vectorz.AVector
     (matrix-multiply [m a]
       (mp/matrix-multiply (mikera.matrixx.impl.ColumnMatrix/wrap m) a))
