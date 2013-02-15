@@ -22,7 +22,7 @@
            (cons sym
              '(
                 (implementation-key [m] :vectorz)
-                (supports-dimensionality? [m dims] (or (== dims 1) (== dims 2)))
+                (supports-dimensionality? [m dims] (or (== dims 0) (== dims 1) (== dims 2)))
                 (new-vector [m length] (Vectorz/newVector (int length)))
                 (new-matrix [m rows columns] (Matrixx/newMatrix (int rows) (int columns)))
                 (new-matrix-nd [m dims] 
@@ -41,7 +41,7 @@
                                       (let [vm (mp/construct-matrix [] data)] 
                                         ;; (println m vm (shape vm))
                                         (assign! (mp/new-matrix-nd m (shape vm)) vm)))))))
-         ['mikera.vectorz.AVector 'mikera.matrixx.AMatrix]) ))
+         ['mikera.vectorz.AVector 'mikera.matrixx.AMatrix 'mikera.vectorz.AScalar 'mikera.arrayz.INDArray]) ))
 
 
 
@@ -60,6 +60,38 @@
     (as-double-array [m] (.data m))) 
 
 (extend-protocol mp/PDimensionInfo
+   mikera.arrayz.INDArray
+    (dimensionality [m]
+      (.dimensionality m))
+    (row-count [m]
+      (mp/dimension-count m 0))
+    (is-vector? [m]
+      (== 1 (.dimensionality m)))
+    (is-scalar? [m]
+      false)
+    (column-count [m]
+      (mp/dimension-count m 1))
+    (get-shape [m]
+      (.getShape m))
+    (dimension-count [m x]
+      (aget (.getShape m) (int x)))
+   mikera.vectorz.AScalar
+    (dimensionality [m]
+      0)
+    (row-count [m]
+      (error "Can't get row-count of a scalar"))
+    (is-vector? [m]
+      false)
+    (is-scalar? [m]
+      false)
+    (column-count [m]
+      (error "Can't get row-count of a scalar"))
+    (get-shape [m]
+      (.getShape m))
+    (dimension-count [m x]
+      (if (== x 0)
+        (.length m)
+        (error "Scalar does not have dimension: " x)))
   mikera.vectorz.AVector
     (dimensionality [m]
       1)
@@ -72,7 +104,7 @@
     (column-count [m]
       1)
     (get-shape [m]
-      (cons (long (.length m)) nil))
+      (.getShape m))
     (dimension-count [m x]
       (if (== x 0)
         (.length m)
@@ -89,7 +121,7 @@
     (column-count [m]
       (.columnCount m))
     (get-shape [m]
-      (cons (long (.rowCount m)) (cons (long (.columnCount m)) nil)))
+      (.getShape m))
     (dimension-count [m x]
       (cond 
         (== x 0) (.rowCount m)
