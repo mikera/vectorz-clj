@@ -201,6 +201,11 @@
         :else (error "Can't get slice from matrix with dimension: " dimension))))
 
 (extend-protocol mp/PMatrixAdd
+  mikera.vectorz.AScalar
+    (matrix-add [m a]
+      (+ (.get m) (double (coerce m a))))
+    (matrix-sub [m a]
+      (- (.get m) (double (coerce m a))))
   mikera.vectorz.AVector
     (matrix-add [m a]
       (v/add m ^AVector (coerce m a)))
