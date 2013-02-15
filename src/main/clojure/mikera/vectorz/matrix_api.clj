@@ -1,12 +1,12 @@
 (ns mikera.vectorz.matrix-api
-  (:use core.matrix)
-  (:use core.matrix.utils)
-  (:require core.matrix.impl.persistent-vector)
-  (:require [core.matrix.implementations :as imp])
-  (:require [core.matrix.multimethods :as mm])
+  (:use clojure.core.matrix)
+  (:use clojure.core.matrix.utils)
+  (:require clojure.core.matrix.impl.persistent-vector)
+  (:require [clojure.core.matrix.implementations :as imp])
+  (:require [clojure.core.matrix.multimethods :as mm])
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])
-  (:require [core.matrix.protocols :as mp])
+  (:require [clojure.core.matrix.protocols :as mp])
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
   (:import [mikera.vectorz AVector Vectorz Vector])
   (:import [mikera.transformz ATransform])
@@ -25,18 +25,20 @@
                 (supports-dimensionality? [m dims] (or (== dims 0) (== dims 1) (== dims 2)))
                 (new-vector [m length] (Vectorz/newVector (int length)))
                 (new-matrix [m rows columns] (Matrixx/newMatrix (int rows) (int columns)))
-                (new-matrix-nd [m dims] 
-                               (case (count dims)
+                (new-matrix-nd [m shape] 
+                               (case (count shape)
                                  0 0.0
-                                 1 (Vectorz/newVector (int (first dims)))
-                                 2 (Matrixx/newMatrix (int (first dims)) (int (second dims)))
-                                 (error "Can't create vectorz matrix with dimensionality: " (count dims))))
+                                 1 (Vectorz/newVector (int (first shape)))
+                                 2 (Matrixx/newMatrix (int (first shape)) (int (second shape)))
+                                 (error "Can't create vectorz matrix with dimensionality: " (count shape))))
                 (construct-matrix [m data]
                                   (cond 
                                     (mp/is-scalar? data) 
-                                      data
+                                      (double data)
                                     (array? data) 
-                                      (assign! (mp/new-matrix-nd m (shape data)) data)
+                                      (if (== 0 (mp/dimensionality data))
+                                        (double (mp/get-0d data))
+                                        (assign! (mp/new-matrix-nd m (shape data)) data))
                                     :default
                                       (let [vm (mp/construct-matrix [] data)] 
                                         ;; (println m vm (shape vm))
@@ -89,9 +91,7 @@
     (get-shape [m]
       (.getShape m))
     (dimension-count [m x]
-      (if (== x 0)
-        (.length m)
-        (error "Scalar does not have dimension: " x)))
+      (error "Scalar does not have dimension: " x))
   mikera.vectorz.AVector
     (dimensionality [m]
       1)
@@ -149,7 +149,13 @@
           (error "Can't get from AMatrix with more than 2 dimensions")
           (.get m (int x) (int y))))))
 
-
+(extend-protocol mp/PZeroDimensionAccess
+  mikera.vectorz.AScalar
+    (get-0d [m]
+      (.get m))
+    (set-0d! [m value]
+      (.set m (double value))))
+    
 (extend-protocol mp/PIndexedSetting
   AVector
     (set-1d [m row v] (.set m (int row) (double v)))
@@ -176,7 +182,7 @@
     (get-column [m i]
       (error "Can't access column of a 1D vector!"))
     (get-major-slice [m i]
-      (.get m (int i)))
+      (.slice m (int i)))
     (get-slice [m dimension i]
       (if (== 0 i)
         (.get m (int i))
@@ -187,7 +193,7 @@
     (get-column [m i]
       (.getColumn m (int i)))
     (get-major-slice [m i]
-      (.getRow m (int i)))
+      (.slice m (int i)))
     (get-slice [m dimension i]
       (cond 
         (== 0 dimension) (.getRow m (int i))

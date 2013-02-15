@@ -1,5 +1,5 @@
 (ns mikera.vectorz.benchmark-matrix
-  (:use core.matrix)
+  (:use clojure.core.matrix)
   (:require [criterium.core :as c])
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])

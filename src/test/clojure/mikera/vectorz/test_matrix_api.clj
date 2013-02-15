@@ -1,13 +1,13 @@
 (ns mikera.vectorz.test-matrix-api
   (:use [clojure test])
-  (:use core.matrix)
-  (:use core.matrix.operators)
-  (:require core.matrix.compliance-tester)
-  (:require [core.matrix.protocols :as mp])
+  (:use clojure.core.matrix)
+  (:use clojure.core.matrix.operators)
+  (:require clojure.core.matrix.compliance-tester)
+  (:require [clojure.core.matrix.protocols :as mp])
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])
   (:require [mikera.vectorz.matrix-api])
-  (:require core.matrix.impl.persistent-vector)
+  (:require clojure.core.matrix.impl.persistent-vector)
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
   (:import [mikera.vectorz AVector Vectorz Vector])
   (:refer-clojure :exclude [vector? * - +]))
@@ -95,7 +95,7 @@
     (is (equals [3 4] (slice (matrix [[1 2] [3 4]]) 0 1)))
     (is (equals [2 4] (slice (matrix [[1 2] [3 4]]) 1 1))))
   (testing "slices of vector"
-    (is (= '(1.0 2.0 3.0) (slices (matrix [1 2 3])))))) 
+    (is (equals '(1.0 2.0 3.0) (slices (matrix [1 2 3])))))) 
 
 ;; verify scalar operators should still work on numbers!
 (deftest test-scalar-operators
@@ -131,4 +131,4 @@
 
 ;; run compliance test
 (deftest compliance-test
-  (core.matrix.compliance-tester/compliance-test (v/of 1 2))) 
+  (clojure.core.matrix.compliance-tester/compliance-test (v/of 1 2))) 
