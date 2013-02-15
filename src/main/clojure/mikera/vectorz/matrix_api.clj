@@ -8,7 +8,7 @@
   (:require [mikera.vectorz.matrix :as m])
   (:require [clojure.core.matrix.protocols :as mp])
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
-  (:import [mikera.vectorz AVector Vectorz Vector])
+  (:import [mikera.vectorz AVector Vectorz Vector AScalar])
   (:import [mikera.transformz ATransform])
   (:refer-clojure :exclude [vector?]))
 
@@ -232,15 +232,20 @@
       (v/normalise a)))
     
 (defn vectorz-coerce [p]
-  (cond
-    (or (instance? AVector p) (instance? AMatrix p)) 
-      p
-    (== 1 (dimensionality p))
-      (try (Vectorz/toVector p) (catch Throwable e nil))
-    (== 2 (dimensionality p))
-      (try (Matrixx/toMatrix p) (catch Throwable e nil))
-    (number? p) (double p)
-    :else nil))
+  (let [dims (dimensionality p)]
+    (cond
+	    (== 0 dims)
+        (cond 
+          (number? p) (double p)
+          (instance? AScalar p) p
+          :else (double (mp/get-0d p)))
+	    (or (instance? AVector p) (instance? AMatrix p)) 
+	      p
+	    (== 1 (dimensionality p))
+	      (try (Vectorz/toVector p) (catch Throwable e nil))
+	    (== 2 (dimensionality p))
+	      (try (Matrixx/toMatrix p) (catch Throwable e nil))
+	    :else nil)))
 
 (extend-protocol mp/PCoercion
   mikera.vectorz.AVector
