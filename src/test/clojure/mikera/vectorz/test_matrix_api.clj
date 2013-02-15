@@ -129,6 +129,12 @@
   (testing "eseq"
     (= [1.0 2.0 3.0 4.0] (eseq (matrix [[1 2] [3 4]])))))
 
-;; run compliance test
+;; run compliance tests
+
+(deftest instance-tests
+  (clojure.core.matrix.compliance-tester/instance-test (v/of 1 2 3))
+  (clojure.core.matrix.compliance-tester/instance-test (first (slices (v/of 1 2 3))))
+  (clojure.core.matrix.compliance-tester/instance-test (array :vectorz [[1 2] [3 4]]))) 
+
 (deftest compliance-test
   (clojure.core.matrix.compliance-tester/compliance-test (v/of 1 2))) 
