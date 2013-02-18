@@ -129,7 +129,16 @@
         :else (error "Matrix does not have dimension: " x))))
     
 (extend-protocol mp/PIndexedAccess
-  mikera.vectorz.AVector
+   AScalar
+    (get-1d [m x]
+      (error "Can't access 1-dimensional index of a scalar"))
+    (get-2d [m x y]
+      (error "Can't access 2-dimensional index of a scalar"))
+    (get-nd [m indexes]
+      (if-let [ni (seq indexes)]
+        (error "Can't access multi-dimensional index of a scalar")
+        (.get m)))
+  AVector
     (get-1d [m x]
       (.get m (int x)))
     (get-2d [m x y]
@@ -138,7 +147,7 @@
       (if-let [ni (next indexes)]
         (error "Can't access multi-dimensional index of a vector")
         (.get m (int (first indexes)))))
-  mikera.matrixx.AMatrix
+  AMatrix
     (get-1d [m x]
       (.getRow m (int x)))
     (get-2d [m x y]
@@ -185,6 +194,13 @@
     (is-mutable? [m] (.isFullyMutable m)))
     
 (extend-protocol mp/PIndexedSettingMutable
+  AScalar
+    (set-1d! [m row v] (error "Can't do 1-dimensional set on a 0D array!"))
+    (set-2d! [m row column v] (error "Can't do 1-dimensional set on a 0D array!"))
+    (set-nd! [m indexes v]
+      (if (== 0 (count indexes))
+        (.set m (double v))
+        (error "Can't do " (count indexes) "-dimensional set on a 0D array!"))) 
   AVector
     (set-1d! [m row v] (.set m (int row) (double v)))
     (set-2d! [m row column v] (error "Can't do 2-dimensional set on a 1D vector!"))
@@ -285,6 +301,9 @@
 	    :else nil)))
 
 (extend-protocol mp/PCoercion
+  mikera.vectorz.AScalar
+    (coerce-param [m param]
+      (vectorz-coerce param))
   mikera.vectorz.AVector
     (coerce-param [m param]
       (vectorz-coerce param))
