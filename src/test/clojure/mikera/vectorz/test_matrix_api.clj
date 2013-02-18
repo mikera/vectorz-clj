@@ -1,4 +1,5 @@
 (ns mikera.vectorz.test-matrix-api
+  (:refer-clojure :exclude [vector? * - +])
   (:use [clojure test])
   (:use clojure.core.matrix)
   (:use clojure.core.matrix.operators)
@@ -9,8 +10,7 @@
   (:require [mikera.vectorz.matrix-api])
   (:require clojure.core.matrix.impl.persistent-vector)
   (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
-  (:import [mikera.vectorz AVector Vectorz Vector])
-  (:refer-clojure :exclude [vector? * - +]))
+  (:import [mikera.vectorz AVector Vectorz Vector]))
 
 ;; note - all the operators are core.matrix operators
 

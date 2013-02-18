@@ -155,37 +155,63 @@
       (.get m))
     (set-0d! [m value]
       (.set m (double value))))
-    
+
 (extend-protocol mp/PIndexedSetting
+  AScalar
+    (set-1d [m row v] (error "Can't do 2-dimensional set on a 0-d array!"))
+    (set-2d [m row column v] (error "Can't do 2-dimensional set on a 0-d array!"))
+    (set-nd [m indexes v]
+      (if (== 0 (count indexes))
+        (let [m (.clone m)] (.set m (double v)) m)
+        (error "Can't do " (count indexes) "-dimensional set on a 0-d array!"))) 
+    (is-mutable? [m] (.isFullyMutable m)) 
   AVector
-    (set-1d [m row v] (.set m (int row) (double v)))
+    (set-1d [m row v] 
+      (let [m (.clone m)] (.set m (int row) (double v)) m))
     (set-2d [m row column v] (error "Can't do 2-dimensional set on a 1D vector!"))
     (set-nd [m indexes v]
       (if (== 1 (count indexes))
-        (.set m (int (first indexes)) (double v))
-        (error "Can't do " (count indexes) "-dimensional set on a 1D vector!")))
+        (let [m (.clone m)] (.set m (int (first indexes)) (double v)) m)
+        (error "Can't do " (count indexes) "-dimensional set on a 1D vector!"))) 
     (is-mutable? [m] (.isFullyMutable m)) 
   AMatrix
     (set-1d [m row v] (error "Can't do 1-dimensional set on a 2D matrix!"))
-    (set-2d [m row column v] (.set m (int row) (int column) (double v)))
+    (set-2d [m row column v] 
+      (let [m (.clone m)] (.set m (int row) (int column) (double v))) m)
     (set-nd [m indexes v]
       (if (== 2 (count indexes))
-        (.set m (int (first indexes)) (int (second indexes)) (double v))
+        (let [m (.clone m)] (.set m (int (first indexes)) (int (second indexes)) (double v)))
         (error "Can't do " (count indexes) "-dimensional set on a 2D matrix!")))
     (is-mutable? [m] (.isFullyMutable m)))
+    
+(extend-protocol mp/PIndexedSettingMutable
+  AVector
+    (set-1d! [m row v] (.set m (int row) (double v)))
+    (set-2d! [m row column v] (error "Can't do 2-dimensional set on a 1D vector!"))
+    (set-nd! [m indexes v]
+      (if (== 1 (count indexes))
+        (.set m (int (first indexes)) (double v))
+        (error "Can't do " (count indexes) "-dimensional set on a 1D vector!"))) 
+  AMatrix
+    (set-1d! [m row v] (error "Can't do 1-dimensional set on a 2D matrix!"))
+    (set-2d! [m row column v] (.set m (int row) (int column) (double v)))
+    (set-nd! [m indexes v]
+      (if (== 2 (count indexes))
+        (.set m (int (first indexes)) (int (second indexes)) (double v))
+        (error "Can't do " (count indexes) "-dimensional set on a 2D matrix!"))))
 
 
 (extend-protocol mp/PMatrixSlices
   mikera.vectorz.AVector
     (get-row [m i]
-      (.get m (int i)))
+      (.slice m (int i)))
     (get-column [m i]
       (error "Can't access column of a 1D vector!"))
     (get-major-slice [m i]
       (.slice m (int i)))
     (get-slice [m dimension i]
       (if (== 0 i)
-        (.get m (int i))
+        (.slice m (int i))
         (error "Can't get slice from vector with dimension: " dimension)))
   mikera.matrixx.AMatrix
     (get-row [m i]
