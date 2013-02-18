@@ -77,7 +77,7 @@
       (.getShape m))
     (dimension-count [m x]
       (aget (.getShape m) (int x)))
-   mikera.vectorz.AScalar
+  mikera.vectorz.AScalar
     (dimensionality [m]
       0)
     (row-count [m]
@@ -85,7 +85,7 @@
     (is-vector? [m]
       false)
     (is-scalar? [m]
-      false)
+      false) ;; this isn't an immutable scalar value in the core.matrix sense
     (column-count [m]
       (error "Can't get row-count of a scalar"))
     (get-shape [m]
@@ -312,10 +312,13 @@
       (vectorz-coerce param)))
 
 (extend-protocol mp/PConversion
-  mikera.vectorz.AVector
+  AScalar
+    (convert-to-nested-vectors [m]
+      (.get m))  
+  AVector
     (convert-to-nested-vectors [m]
       (into [] (seq m)))
-  mikera.matrixx.AMatrix
+  AMatrix
     (convert-to-nested-vectors [m]
       (mapv #(into [] %) (mp/get-major-slice-seq m))))
 
