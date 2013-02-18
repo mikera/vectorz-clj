@@ -162,7 +162,7 @@
     (set-2d [m row column v] (error "Can't do 2-dimensional set on a 0-d array!"))
     (set-nd [m indexes v]
       (if (== 0 (count indexes))
-        (let [m (.clone m)] (.set m (double v)) m)
+        (let [^AScalar m (clone m)] (.set m (double v)) m)
         (error "Can't do " (count indexes) "-dimensional set on a 0-d array!"))) 
     (is-mutable? [m] (.isFullyMutable m)) 
   AVector
