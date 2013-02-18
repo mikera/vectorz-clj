@@ -48,6 +48,9 @@
 
 
 (extend-protocol mp/PDoubleArrayOutput
+  mikera.vectorz.AScalar
+    (to-double-array [m] (let [arr (double-array 1)] (aset arr (int 0) (.get m)) arr))
+    (as-double-array [m] nil)
   mikera.vectorz.Vector
     (to-double-array [m] (.toArray m))
     (as-double-array [m] (.getArray m))
