@@ -256,6 +256,17 @@
       (.magnitudeSquared a))
     (normalise [a]
       (v/normalise a)))
+
+(extend-protocol mp/PMatrixCloning
+	  mikera.vectorz.AScalar 
+      (clone [m]
+        (mikera.vectorz.impl.DoubleScalar. (.get m)))
+    mikera.vectorz.AVector
+	    (clone [m]
+	      (.clone m))
+	  mikera.matrixx.AMatrix
+	    (clone [m]
+	      (.clone m)))
     
 (defn vectorz-coerce [p]
   (let [dims (dimensionality p)]
