@@ -266,11 +266,12 @@
         (.addMultiple m (coerce m a) -1.0)
         m)))
 
-
 (extend-protocol mp/PVectorOps
   mikera.vectorz.AVector
     (vector-dot [a b]
       (.dotProduct a (coerce a b)))
+    (length [a]
+      (.magnitude a))
     (length-squared [a]
       (.magnitudeSquared a))
     (normalise [a]
