@@ -4,6 +4,8 @@
   (:use clojure.core.matrix.operators)
   (:require mikera.vectorz.matrix-api))
 
+;; in which we run a sequence of examples to demonstrate vectorz-clj features
+
 (defn example []
 
 ;; first up, tell core.matrix that we want to use vectorz as our default implementation
@@ -12,6 +14,8 @@
 
 ;; create a new 3D vector
 (def a (new-vector 3))
+a
+;; => #<Vector3 [0.0,0.0,0.0]>
 
 ;; check the class of our vector. it should be a Java class from the Vectorz packages
 (class a)
@@ -30,7 +34,6 @@
 ;; they are considered as valid matrices by core.matrix
 ;; Note 2: functions with a ! cause mutation
 (assign! a [1 2 3])
-a
 ;; => #<Vector3 [1.0,2.0,3.0]>
 
 
@@ -41,6 +44,6 @@ n
 
 ;; normalised vector should have a length of 1.0, or very close (subject to numerical error)
 (length n)
-;;=> 
+;;=> 1.0 
 
 )
