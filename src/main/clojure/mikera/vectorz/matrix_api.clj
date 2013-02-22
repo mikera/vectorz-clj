@@ -245,6 +245,11 @@
         (== 1 dimension) (.getColumn m (int i))
         :else (error "Can't get slice from matrix with dimension: " dimension))))
 
+(extend-protocol mp/PSubVector
+  mikera.vectorz.AVector
+    (subvector [m start length]
+      (.subVector m (int start) (int length)))) 
+
 (extend-protocol mp/PMatrixAdd
   mikera.vectorz.AScalar
     (matrix-add [m a]
