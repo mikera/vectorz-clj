@@ -11,7 +11,6 @@
 ;; first up, tell core.matrix that we want to use vectorz as our default implementation
 (set-current-implementation :vectorz)
 
-
 ;; create a new 3D vector
 (def a (new-vector 3))
 a

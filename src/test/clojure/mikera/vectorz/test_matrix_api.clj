@@ -9,7 +9,7 @@
   (:require [mikera.vectorz.matrix :as m])
   (:require [mikera.vectorz.matrix-api])
   (:require clojure.core.matrix.impl.persistent-vector)
-  (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
+  (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.vectorz AVector Vectorz Vector]))
 
 ;; note - all the operators are core.matrix operators

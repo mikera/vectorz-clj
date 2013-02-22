@@ -1,6 +1,6 @@
 (ns mikera.vectorz.affine
   (:import [mikera.vectorz AVector Vectorz Vector Vector3])
-  (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
+  (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.transformz ATransform])
   (:require [mikera.vectorz.core :as v]))
 
