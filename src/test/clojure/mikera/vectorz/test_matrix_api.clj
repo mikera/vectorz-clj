@@ -40,6 +40,17 @@
   (let [v (v/vec [1 2 3])]
     (is (equals [2 4 6] (add v v)))))
 
+(defn test-round-trip [m]
+  (is (equals m (read-string (print-str m)))))
+
+(deftest test-round-trips
+;  (test-round-trip (v/of 1 2))
+;  (test-round-trip (v/of 1 2 3 4 5))
+;  (test-round-trip (matrix :vectorz [[1 2 3] [4 5 6]]))
+;  (test-round-trip (matrix :vectorz [[1 2] [3 4]]))
+;  (test-round-trip (first (slices (v/of 1 2 3))))
+)
+
 (deftest test-equals
   (is (equals (v/of 1 2) [1 2])))
 

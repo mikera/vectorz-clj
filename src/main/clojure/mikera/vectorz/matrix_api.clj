@@ -361,11 +361,11 @@
         (.transformInPlace m ^AVector v)
         (assign! v (transform m v)))))
 
-;; printing
-;; we print in a form that can be constructed again
-(defmethod print-method AVector [x writer] (.write writer (str "#" (.getCanonicalName (class x)) (str x))))
-(defmethod print-method AScalar [x writer] (.write writer (str "#" (.getCanonicalName (class x)) (str x))))
-(defmethod print-method AMatrix [x writer] (.write writer (str "#" (.getCanonicalName (class x)) (str x))))
+;; TODO printing
+;; we want to print in a form that can be constructed again
+;;(defmethod print-method AVector [x writer] (.write writer (str "#" (.getCanonicalName (class x)) (str x))))
+;;(defmethod print-method AScalar [x writer] (.write writer (str "#" (.getCanonicalName (class x)) (str x))))
+;;(defmethod print-method AMatrix [x writer] (.write writer (str "#" (.getCanonicalName (class x)) (str x))))
 
 ;; registration
 
