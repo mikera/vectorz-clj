@@ -40,6 +40,10 @@
   (let [v (v/vec [1 2 3])]
     (is (equals [2 4 6] (add v v)))))
 
+(deftest test-inverse
+  (let [m (matrix :vectorz [[0.5 0] [0 2]])] 
+    (is (equals [[2 0] [0 0.5]] (inverse m)))))
+
 (defn test-round-trip [m]
   (is (equals m (read-string (print-str m)))))
 
