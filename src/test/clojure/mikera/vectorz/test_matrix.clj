@@ -2,7 +2,7 @@
   (:use [clojure test])
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])
-  (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
+  (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.vectorz AVector Vectorz Vector]))
 
 (deftest test-constructors

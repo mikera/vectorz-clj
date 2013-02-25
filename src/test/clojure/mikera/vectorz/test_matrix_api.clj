@@ -9,7 +9,7 @@
   (:require [mikera.vectorz.matrix :as m])
   (:require [mikera.vectorz.matrix-api])
   (:require clojure.core.matrix.impl.persistent-vector)
-  (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
+  (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.vectorz AVector Vectorz Vector]))
 
 ;; note - all the operators are core.matrix operators
@@ -39,6 +39,21 @@
     (is (equals m [[0 0] [0 0]])))
   (let [v (v/vec [1 2 3])]
     (is (equals [2 4 6] (add v v)))))
+
+(deftest test-inverse
+  (let [m (matrix :vectorz [[0.5 0] [0 2]])] 
+    (is (equals [[2 0] [0 0.5]] (inverse m)))))
+
+(defn test-round-trip [m]
+  (is (equals m (read-string (print-str m)))))
+
+(deftest test-round-trips
+;  (test-round-trip (v/of 1 2))
+;  (test-round-trip (v/of 1 2 3 4 5))
+;  (test-round-trip (matrix :vectorz [[1 2 3] [4 5 6]]))
+;  (test-round-trip (matrix :vectorz [[1 2] [3 4]]))
+;  (test-round-trip (first (slices (v/of 1 2 3))))
+)
 
 (deftest test-equals
   (is (equals (v/of 1 2) [1 2])))

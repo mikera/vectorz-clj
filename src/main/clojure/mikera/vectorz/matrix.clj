@@ -1,6 +1,6 @@
 (ns mikera.vectorz.matrix
   (:import [mikera.vectorz AVector Vectorz Vector Vector3])
-  (:import [mikera.matrixx AMatrix Matrixx MatrixMN])
+  (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.transformz Transformz ATransform AAffineTransform])
   (:require [mikera.vectorz.core :as v])
   (:refer-clojure :exclude [* get set zero?]))
