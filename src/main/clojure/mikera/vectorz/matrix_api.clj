@@ -8,7 +8,7 @@
   (:require [mikera.vectorz.matrix :as m])
   (:require [clojure.core.matrix.protocols :as mp])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
-  (:import [mikera.vectorz AVector Vectorz Vector AScalar])
+  (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3])
   (:import [mikera.transformz ATransform])
   (:refer-clojure :exclude [vector?]))
 
@@ -253,9 +253,9 @@
 (extend-protocol mp/PMatrixAdd
   mikera.vectorz.AScalar
     (matrix-add [m a]
-      (+ (.get m) (double (coerce m a))))
+      (+ (.get m) (double (mp/get-0d a))))
     (matrix-sub [m a]
-      (- (.get m) (double (coerce m a))))
+      (- (.get m) (double (mp/get-0d a))))
   mikera.vectorz.AVector
     (matrix-add [m a]
       (v/add m ^AVector (coerce m a)))
@@ -271,6 +271,23 @@
         (.addMultiple m (coerce m a) -1.0)
         m)))
 
+(extend-protocol mp/PMatrixAddMutable
+  mikera.vectorz.AScalar
+    (matrix-add! [m a]
+      (+ (.get m) (double (mp/get-0d a))))
+    (matrix-sub! [m a]
+      (- (.get m) (double (mp/get-0d a))))
+  mikera.vectorz.AVector
+    (matrix-add! [m a]
+      (.add m ^AVector (coerce m a)))
+    (matrix-sub! [m a]
+      (.sub m ^AVector (coerce m a)))
+  mikera.matrixx.AMatrix
+    (matrix-add! [m a]
+      (.add m ^AMatrix (coerce m a)))
+    (matrix-sub! [m a]
+      (.sub m ^AMatrix (coerce m a))))
+
 (extend-protocol mp/PVectorOps
   mikera.vectorz.AVector
     (vector-dot [a b]
@@ -282,16 +299,40 @@
     (normalise [a]
       (v/normalise a)))
 
+(extend-protocol mp/PMatrixOps
+  AMatrix
+    (trace [m]
+      (.trace m))
+    (determinant [m]
+      (.determinant m))
+    (inverse [m]
+      (.inverse m))
+    (negate [m]
+      (let [m (.clone m)]
+        (.scale m -1.0)
+        m))
+    (transpose [m]
+      (.getTranspose m)))
+
+(extend-protocol mp/PVectorCross
+  mikera.vectorz.AVector
+    (cross-product [a b]
+      (let [v (Vector3. a)]
+        (.crossProduct v ^AVector (mp/coerce-param a b))
+        v))
+    (cross-product! [a b]
+      (.crossProduct a ^AVector (mp/coerce-param a b)))) 
+
 (extend-protocol mp/PMatrixCloning
-	  mikera.vectorz.AScalar 
-      (clone [m]
-        (mikera.vectorz.impl.DoubleScalar. (.get m)))
-    mikera.vectorz.AVector
-	    (clone [m]
-	      (.clone m))
-	  mikera.matrixx.AMatrix
-	    (clone [m]
-	      (.clone m)))
+  mikera.vectorz.AScalar 
+    (clone [m]
+      (mikera.vectorz.impl.DoubleScalar. (.get m)))
+  mikera.vectorz.AVector
+    (clone [m]
+      (.clone m))
+  mikera.matrixx.AMatrix
+	  (clone [m]
+	    (.clone m)))
     
 (defn vectorz-coerce [p]
   (let [dims (dimensionality p)]

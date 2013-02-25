@@ -1,5 +1,7 @@
 (ns mikera.vectorz.benchmark-matrix
   (:use clojure.core.matrix)
+  (:use clojure.core.matrix.operators)
+  (:refer-clojure :exclude [+ - *])
   (:require [criterium.core :as c])
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])
@@ -26,5 +28,19 @@
         b [1 2 3]]
     (c/quick-bench (dotimes [i 1000] (add a b))))  
   
+  (let [a [1 2 3 4 5 6 7 8 9 10]
+        b [1 2 3 4 5 6 7 8 9 10]]
+    (c/quick-bench (dotimes [i 1000] (vec (map + a b)))))  
+  ;; => Execution time mean per addition : 1308 ns
+  
+  (let [a (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])
+        b (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])]
+    (c/quick-bench (dotimes [i 1000] (+ a b))))
+  ;; => Execution time mean per addition: 95 ns
+  
+  (let [a (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])
+        b (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])]
+    (c/quick-bench (dotimes [i 1000] (add! a b))))
+  ;; => Execution time mean per addition: 36 ns
 
 ) 
