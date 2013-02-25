@@ -30,8 +30,9 @@ Follow the instructions to install with Leiningen / Maven from Clojars:
 You can then use Vectorz as a standard core.matrix implementation. Example:
 
 ```clojure
-    (use 'core.matrix)
-    (use 'core.matrix.operators)           ;; overrides *, + etc. for matrices
+    (use 'clojure.core.matrix)
+    (use 'clojure.core.matrix.operators)           ;; overrides *, + etc. for matrices
+    
     (set-current-implementation :vectorz)  ;; uses Vectorz as default matrix implementation
     
     ;; define a 2x2 Matrix
@@ -49,13 +50,14 @@ You can then use Vectorz as a standard core.matrix implementation. Example:
     => #<Vector2 [5.0,11.0]>
 ```
 
-Vectorz also provides specialised functions in `mikera.vectorz.core` that give access to 
+Vectorz also provides specialized functions in `mikera.vectorz.core` that give access to 
 advanced features of Vectorz that are not necessarily available through the core.matrix API.
 This includes type hinted and primitive functions that will perform better than using 
 the general purpose core.matrix API.
 
 Here are some Vector Examples:
 
+```clojure
     (in-ns 'mikera.vectorz.core)
 
     (def a (vec [1 2 3]))
@@ -78,6 +80,7 @@ Here are some Vector Examples:
       (fill! (subvec v 3 4) 1.0)  ;; fill a subvector with ones
       v)
     => #<Vector [0.0,0.0,0.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0]>
+```
     
 ### Purpose
 
