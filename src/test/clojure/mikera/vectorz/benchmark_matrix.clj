@@ -5,7 +5,7 @@
   (:require [criterium.core :as c])
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])
-  (:import [mikera.vectorz Vector3]))
+  (:import [mikera.vectorz Vector3 Vectorz]))
 
 (defn benchmarks []
   ;; direct vectorz add
@@ -42,5 +42,10 @@
         b (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])]
     (c/quick-bench (dotimes [i 1000] (add! a b))))
   ;; => Execution time mean per addition: 36 ns
+  
+  (let [a (Vectorz/create [1 2 3 4 5 6 7 8 9 10])
+        b (Vectorz/create [1 2 3 4 5 6 7 8 9 10])]
+    (c/quick-bench (dotimes [i 1000] (.add a b))))
+  ;; => Execution time mean per addition: 11 ns
 
 ) 
