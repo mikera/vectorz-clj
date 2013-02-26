@@ -30,13 +30,13 @@
   
   (let [a [1 2 3 4 5 6 7 8 9 10]
         b [1 2 3 4 5 6 7 8 9 10]]
-    (c/quick-bench (dotimes [i 1000] (vec (map + a b)))))  
+    (c/quick-bench (dotimes [i 1000] (vec (map clojure.core/+ a b)))))  
   ;; => Execution time mean per addition : 1308 ns
   
   (let [a (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])
         b (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])]
     (c/quick-bench (dotimes [i 1000] (+ a b))))
-  ;; => Execution time mean per addition: 95 ns
+  ;; => Execution time mean per addition: 68 ns
   
   (let [a (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])
         b (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])]
