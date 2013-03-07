@@ -250,6 +250,17 @@
     (subvector [m start length]
       (.subVector m (int start) (int length)))) 
 
+(extend-protocol mp/PSummable
+  mikera.vectorz.AVector
+    (element-sum [m]
+      (.elementSum m))
+  mikera.matrixx.AMatrix
+    (element-sum [m]
+      (.elementSum m))
+  mikera.vectorz.AScalar
+    (element-sum [m]
+      (.get m)))
+
 (extend-protocol mp/PMatrixAdd
   mikera.vectorz.AScalar
     (matrix-add [m a]
