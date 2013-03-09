@@ -250,6 +250,12 @@
     (subvector [m start length]
       (.subVector m (int start) (int length)))) 
 
+(extend-protocol mp/PSubMatrix
+  mikera.vectorz.AVector
+    (submatrix [m index-ranges]
+      (let [[[start length]] index-ranges]
+        (.subVector m (int start) (int length))))) 
+
 (extend-protocol mp/PSummable
   mikera.vectorz.AVector
     (element-sum [m]
