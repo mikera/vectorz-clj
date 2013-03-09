@@ -250,6 +250,23 @@
     (subvector [m start length]
       (.subVector m (int start) (int length)))) 
 
+(extend-protocol mp/PSubMatrix
+  mikera.vectorz.AVector
+    (submatrix [m index-ranges]
+      (let [[[start length]] index-ranges]
+        (.subVector m (int start) (int length))))) 
+
+(extend-protocol mp/PSummable
+  mikera.vectorz.AVector
+    (element-sum [m]
+      (.elementSum m))
+  mikera.matrixx.AMatrix
+    (element-sum [m]
+      (.elementSum m))
+  mikera.vectorz.AScalar
+    (element-sum [m]
+      (.get m)))
+
 (extend-protocol mp/PMatrixAdd
   mikera.vectorz.AScalar
     (matrix-add [m a]
@@ -376,20 +393,34 @@
   mikera.vectorz.AScalar
     (matrix-multiply [m a]
       (mp/pre-scale a (.get m)))
-    (scale [m a]
-      (* (.get m) a))
   mikera.vectorz.AVector
     (matrix-multiply [m a]
       (mp/matrix-multiply (mikera.matrixx.impl.ColumnMatrix/wrap m) a))
-    (scale [m a]
-      (v/scale m a))
   mikera.matrixx.AMatrix
     (matrix-multiply [m a]
       (if (instance? mikera.vectorz.AVector a)
         (.transform m ^AVector a)
-        (m/* m (coerce m a))))
+        (m/* m (coerce m a)))))
+
+(extend-protocol mp/PMatrixScaling
+  mikera.vectorz.AVector
     (scale [m a]
-      (m/scale m a)))
+      (let [m (.clone m)] 
+        (.scale m (double a))
+        m))
+    (pre-scale [m a]
+      (let [m (.clone m)] 
+        (.scale m (double a))
+        m))
+  mikera.matrixx.AMatrix
+    (scale [m a]
+      (let [m (.clone m)] 
+        (.scale m (double a))
+        m))
+    (pre-scale [m a]
+      (let [m (.clone m)] 
+        (.scale m (double a))
+        m)))
 
 (extend-protocol mp/PVectorTransform
   mikera.transformz.ATransform
