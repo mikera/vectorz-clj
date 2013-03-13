@@ -40,6 +40,14 @@
   (let [v (v/vec [1 2 3])]
     (is (equals [2 4 6] (add v v)))))
 
+(deftest test-element-equality
+  (is (e= (matrix :vectorz [[0.5 0] [0 2]])
+          [[0.5 0.0] [0.0 2.0]]))
+ ;; TODO: enable this test once fixed version of core.matrix is released
+ ;; (is (not (e= (matrix :vectorz [[1 2] [3 4]])
+ ;;              [[5 6] [7 8]])))
+  )
+
 (deftest test-inverse
   (let [m (matrix :vectorz [[0.5 0] [0 2]])] 
     (is (equals [[2 0] [0 0.5]] (inverse m)))))
