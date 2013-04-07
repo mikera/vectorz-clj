@@ -394,22 +394,24 @@
 	  (clone [m]
 	    (.clone m)))
     
-(defn vectorz-coerce [p]
-  (let [dims (dimensionality p)]
-    (cond
-	    (instance? INDArray p) p
-      (== 0 dims)
-        (cond 
-          (number? p) (double p)
-          (instance? AScalar p) p
-          :else (double (mp/get-0d p)))
-	    (== 1 (dimensionality p))
-	      (try (Vectorz/toVector p) (catch Throwable e nil))
-	    (== 2 (dimensionality p))
-	      (try (Matrixx/toMatrix p) (catch Throwable e nil))
-	    :else 
-        (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
-          (and (seq sv) (sv 0) (SliceArray/create sv))))))
+(defn vectorz-coerce 
+  "Function to attempt conversion to Vectorz objects. May return nil if conversion fails."
+  ([p]
+	  (let [dims (dimensionality p)]
+	    (cond
+		    (instance? INDArray p) p
+	      (== 0 dims)
+	        (cond 
+	          (number? p) (double p)
+	          (instance? AScalar p) p
+	          :else (double (mp/get-0d p)))
+		    (== 1 (dimensionality p))
+		      (try (Vectorz/toVector p) (catch Throwable e nil))
+		    (== 2 (dimensionality p))
+		      (try (Matrixx/toMatrix p) (catch Throwable e nil))
+		    :else 
+	        (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
+	          (and (seq sv) (sv 0) (SliceArray/create sv)))))))
 
 (extend-protocol mp/PCoercion
   INDArray
