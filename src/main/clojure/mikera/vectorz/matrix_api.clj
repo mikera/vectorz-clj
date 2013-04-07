@@ -403,14 +403,13 @@
           (number? p) (double p)
           (instance? AScalar p) p
           :else (double (mp/get-0d p)))
-	    (or (instance? AVector p) (instance? AMatrix p)) 
-	      p
 	    (== 1 (dimensionality p))
 	      (try (Vectorz/toVector p) (catch Throwable e nil))
 	    (== 2 (dimensionality p))
 	      (try (Matrixx/toMatrix p) (catch Throwable e nil))
 	    :else 
-        (SliceArray/create ^List (mapv (fn [sl] (vectorz-coerce sl)) (slices p))))))
+        (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
+          (and (seq sv) (sv 0) (SliceArray/create sv))))))
 
 (extend-protocol mp/PCoercion
   INDArray
