@@ -246,10 +246,10 @@
     (.negate a)
     a))
 
-(defn absolute! 
+(defn abs! 
   "Computes the absolute value of a vector in place and returns it" 
   ([^AVector a]
-    (.absolute a)
+    (.abs a)
     a))
 
 (defn scale! 
@@ -331,10 +331,10 @@
   (^AVector [^AVector a]
     (negate! (clone a))))
 
-(defn absolute 
+(defn abs 
   "Computes the absolute value of a vector and returns it" 
   (^AVector [^AVector a]
-    (absolute! (clone a))))
+    (abs! (clone a))))
 
 (defn scale 
   "Scales a vector by a scalar numerical factor" 

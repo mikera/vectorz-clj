@@ -150,7 +150,11 @@
 
 (deftest test-functional-ops
   (testing "eseq"
-    (= [1.0 2.0 3.0 4.0] (eseq (matrix [[1 2] [3 4]])))))
+    (is (= [1.0 2.0 3.0 4.0] (eseq (matrix [[1 2] [3 4]]))))))
+
+(deftest test-maths-functions
+  (testing "abs"
+    (is (equals [1 2 3] (abs [-1 2 -3]))))) 
 
 ;; run compliance tests
 
