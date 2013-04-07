@@ -9,6 +9,7 @@
   (:require [mikera.vectorz.matrix :as m])
   (:require [mikera.vectorz.matrix-api])
   (:require clojure.core.matrix.impl.persistent-vector)
+  (:require [clojure.core.matrix.impl.wrappers :as wrap])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.vectorz AVector Vectorz Vector]))
 
@@ -39,6 +40,14 @@
     (is (equals m [[0 0] [0 0]])))
   (let [v (v/vec [1 2 3])]
     (is (equals [2 4 6] (add v v)))))
+
+(deftest test-ndarray
+  (is (equals [[[1]]] (matrix :vectorz [[[1]]])))
+  (is (equals [[[[1]]]] (matrix :vectorz [[[[1]]]])))
+  (is (equals [[[1]]] (slice (matrix :vectorz [[[[1]]]]) 0)))
+  (is (== 4 (dimensionality (matrix :vectorz [[[[1]]]]))))
+  (is (equals [[[1]]] (wrap/wrap-slice (matrix :vectorz [[[[1]]]]) 0)))
+  (is (equals [[[[1]]]] (wrap/wrap-nd (matrix :vectorz [[[[1]]]]))))) 
 
 (deftest test-element-equality
   (is (e= (matrix :vectorz [[0.5 0] [0 2]])
