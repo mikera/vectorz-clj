@@ -9,6 +9,8 @@
   (:require [clojure.core.matrix.protocols :as mp])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3])
+  (:import [mikera.arrayz SliceArray INDArray])
+  (:import [java.util List])
   (:import [mikera.transformz ATransform])
   (:refer-clojure :exclude [vector?]))
 
@@ -22,7 +24,7 @@
            (cons sym
              '(
                 (implementation-key [m] :vectorz)
-                (supports-dimensionality? [m dims] (or (== dims 0) (== dims 1) (== dims 2)))
+                (supports-dimensionality? [m dims] true)
                 (new-vector [m length] (Vectorz/newVector (int length)))
                 (new-matrix [m rows columns] (Matrixx/newMatrix (int rows) (int columns)))
                 (new-matrix-nd [m shape] 
@@ -30,7 +32,7 @@
                                  0 0.0
                                  1 (Vectorz/newVector (int (first shape)))
                                  2 (Matrixx/newMatrix (int (first shape)) (int (second shape)))
-                                 (error "Can't create vectorz matrix with dimensionality: " (count shape))))
+                                 (SliceArray/create ^List (mapv (fn [_] (mp/new-matrix-nd m (next shape))) (range (first shape))))))
                 (construct-matrix [m data]
                                   (cond 
                                     (mp/is-scalar? data) 
@@ -65,7 +67,7 @@
     (as-double-array [m] (.data m))) 
 
 (extend-protocol mp/PDimensionInfo
-   mikera.arrayz.INDArray
+   INDArray
     (dimensionality [m]
       (.dimensionality m))
     (row-count [m]
@@ -80,7 +82,7 @@
       (.getShape m))
     (dimension-count [m x]
       (aget (.getShape m) (int x)))
-  mikera.vectorz.AScalar
+  AScalar
     (dimensionality [m]
       0)
     (row-count [m]
@@ -95,7 +97,7 @@
       (.getShape m))
     (dimension-count [m x]
       (error "Scalar does not have dimension: " x))
-  mikera.vectorz.AVector
+  AVector
     (dimensionality [m]
       1)
     (row-count [m]
@@ -112,7 +114,7 @@
       (if (== x 0)
         (.length m)
         (error "Vector does not have dimension: " x)))
-  mikera.matrixx.AMatrix
+  AMatrix
     (dimensionality [m]
       2)
     (row-count [m]
@@ -132,6 +134,13 @@
         :else (error "Matrix does not have dimension: " x))))
     
 (extend-protocol mp/PIndexedAccess
+   INDArray
+    (get-1d [m x]
+      (.get m (int x)))
+    (get-2d [m x y]
+      (.get m (int x) (int y)))
+    (get-nd [m indexes]
+      (.get m (int-array indexes)))
    AScalar
     (get-1d [m x]
       (error "Can't access 1-dimensional index of a scalar"))
@@ -152,7 +161,7 @@
         (.get m (int (first indexes)))))
   AMatrix
     (get-1d [m x]
-      (.getRow m (int x)))
+      (error "Can't access 1-dimensional index of a matrix"))
     (get-2d [m x y]
       (.get m (int x) (int y)))
     (get-nd [m indexes]
@@ -162,13 +171,27 @@
           (.get m (int x) (int y))))))
 
 (extend-protocol mp/PZeroDimensionAccess
-  mikera.vectorz.AScalar
+  INDArray
+    (get-0d [m]
+      (.get m))
+    (set-0d! [m value]
+      (.set m (double value)))
+  AScalar
     (get-0d [m]
       (.get m))
     (set-0d! [m value]
       (.set m (double value))))
 
 (extend-protocol mp/PIndexedSetting
+  INDArray
+    (set-1d [m row v] 
+      (let [m (.clone m)] (.set m (int row) (double v)) m))
+    (set-2d [m row column v] 
+      (let [m (.clone m)] (.set m (int row) (int column) (double v)) m))
+    (set-nd [m indexes v]
+      (let [m (.clone m)] (.set m (int-array indexes) (double v)) m)) 
+    (is-mutable? [m] (.isFullyMutable m)) 
+  
   AScalar
     (set-1d [m row v] (error "Can't do 2-dimensional set on a 0-d array!"))
     (set-2d [m row column v] (error "Can't do 2-dimensional set on a 0-d array!"))
@@ -197,6 +220,13 @@
     (is-mutable? [m] (.isFullyMutable m)))
     
 (extend-protocol mp/PIndexedSettingMutable
+  INDArray
+    (set-1d! [m row v] 
+      (.set m (int row) (double v)))
+    (set-2d! [m row column v] 
+      (.set m (int row) (int column) (double v)))
+    (set-nd! [m indexes v]
+      (.set m (int-array indexes) (double v))) 
   AScalar
     (set-1d! [m row v] (error "Can't do 1-dimensional set on a 0D array!"))
     (set-2d! [m row column v] (error "Can't do 1-dimensional set on a 0D array!"))
@@ -221,7 +251,7 @@
 
 
 (extend-protocol mp/PMatrixSlices
-  mikera.vectorz.AVector
+  AVector
     (get-row [m i]
       (.slice m (int i)))
     (get-column [m i]
@@ -232,7 +262,7 @@
       (if (== 0 i)
         (.slice m (int i))
         (error "Can't get slice from vector with dimension: " dimension)))
-  mikera.matrixx.AMatrix
+  AMatrix
     (get-row [m i]
       (.getRow m (int i)))
     (get-column [m i]
@@ -244,6 +274,16 @@
         (== 0 dimension) (.getRow m (int i))
         (== 1 dimension) (.getColumn m (int i))
         :else (error "Can't get slice from matrix with dimension: " dimension))))
+
+(extend-protocol mp/PSliceView
+  INDArray
+    (get-major-slice-view [m i] 
+      (.slice m (int i))))
+
+(extend-protocol mp/PSliceSeq
+  INDArray  
+    (get-major-slice-seq [m] 
+      (map #(.slice m (int %)) (range (aget (.getShape m) 0)))))
 
 (extend-protocol mp/PSubVector
   mikera.vectorz.AVector
@@ -341,40 +381,40 @@
       (.crossProduct a ^AVector (mp/coerce-param a b)))) 
 
 (extend-protocol mp/PMatrixCloning
-  mikera.vectorz.AScalar 
-    (clone [m]
-      (mikera.vectorz.impl.DoubleScalar. (.get m)))
-  mikera.vectorz.AVector
+  INDArray
     (clone [m]
       (.clone m))
-  mikera.matrixx.AMatrix
+  AScalar 
+    (clone [m]
+      (.clone m))
+  AVector
+    (clone [m]
+      (.clone m))
+  AMatrix
 	  (clone [m]
 	    (.clone m)))
     
-(defn vectorz-coerce [p]
-  (let [dims (dimensionality p)]
-    (cond
-	    (== 0 dims)
-        (cond 
-          (number? p) (double p)
-          (instance? AScalar p) p
-          :else (double (mp/get-0d p)))
-	    (or (instance? AVector p) (instance? AMatrix p)) 
-	      p
-	    (== 1 (dimensionality p))
-	      (try (Vectorz/toVector p) (catch Throwable e nil))
-	    (== 2 (dimensionality p))
-	      (try (Matrixx/toMatrix p) (catch Throwable e nil))
-	    :else nil)))
+(defn vectorz-coerce 
+  "Function to attempt conversion to Vectorz objects. May return nil if conversion fails."
+  ([p]
+	  (let [dims (dimensionality p)]
+	    (cond
+		    (instance? INDArray p) p
+	      (== 0 dims)
+	        (cond 
+	          (number? p) (double p)
+	          (instance? AScalar p) p
+	          :else (double (mp/get-0d p)))
+		    (== 1 (dimensionality p))
+		      (try (Vectorz/toVector p) (catch Throwable e nil))
+		    (== 2 (dimensionality p))
+		      (try (Matrixx/toMatrix p) (catch Throwable e nil))
+		    :else 
+	        (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
+	          (and (seq sv) (sv 0) (SliceArray/create sv)))))))
 
 (extend-protocol mp/PCoercion
-  mikera.vectorz.AScalar
-    (coerce-param [m param]
-      (vectorz-coerce param))
-  mikera.vectorz.AVector
-    (coerce-param [m param]
-      (vectorz-coerce param))
-  mikera.matrixx.AMatrix
+  INDArray
     (coerce-param [m param]
       (vectorz-coerce param)))
 
