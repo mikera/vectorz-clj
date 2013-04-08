@@ -324,11 +324,11 @@
       (v/sub m ^AVector (coerce m a)))
   mikera.matrixx.AMatrix
     (matrix-add [m a]
-      (let [m (m/clone m)] 
+      (let [m (.clone m)] 
         (.add m (coerce m a))
         m))
     (matrix-sub [m a]
-      (let [m (m/clone m)] 
+      (let [m (.clone m)] 
         (.addMultiple m (coerce m a) -1.0)
         m)))
 
