@@ -410,9 +410,9 @@
 	          (instance? AScalar p) p
 	          :else (double (mp/get-0d p)))
 		    (== 1 (dimensionality p))
-		      (try (Vectorz/toVector p) (catch Throwable e nil))
+		      (try (Vectorz/toVector (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
 		    (== 2 (dimensionality p))
-		      (try (Matrixx/toMatrix p) (catch Throwable e nil))
+		      (try (Matrixx/toMatrix (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
 		    :else 
 	        (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
 	          (and (seq sv) (sv 0) (SliceArray/create sv)))))))
