@@ -46,6 +46,13 @@
         b (v/vec [1 1 4 0 0])]
     (is (equals [0 1 -1 0 0] (sub a b))))) 
 
+(deftest test-coerce
+  (let [a (v/vec [1 2 3 0 0])
+        b (v/vec [1 1 4 0 0])
+        r (sub a b)]
+    (is (equals [0 1 -1 0 0] (coerce [] r)))
+    (is (instance? clojure.lang.IPersistentVector (coerce [] r))))) 
+
 (deftest test-ndarray
   (is (equals [[[1]]] (matrix :vectorz [[[1]]])))
   (is (equals [[[[1]]]] (matrix :vectorz [[[[1]]]])))
@@ -156,7 +163,8 @@
 
 (deftest test-conversion
   (testing "vector" 
-    (is (= [1.0] (to-nested-vectors (v/of 1.0)))))
+    (is (= [1.0] (to-nested-vectors (v/of 1.0))))
+    (is (= [1.0] (coerce [] (v/of 1.0)))))
   (testing "matrix" 
     (is (= [[1.0]] (to-nested-vectors (m/matrix [[1.0]])))))
   (testing "coercion"
