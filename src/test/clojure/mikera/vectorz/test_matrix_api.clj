@@ -41,6 +41,11 @@
   (let [v (v/vec [1 2 3])]
     (is (equals [2 4 6] (add v v)))))
 
+(deftest test-sub
+  (let [a (v/vec [1 2 3 0 0])
+        b (v/vec [1 1 4 0 0])]
+    (is (equals [0 1 -1 0 0] (sub a b))))) 
+
 (deftest test-ndarray
   (is (equals [[[1]]] (matrix :vectorz [[[1]]])))
   (is (equals [[[[1]]]] (matrix :vectorz [[[[1]]]])))
