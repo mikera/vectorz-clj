@@ -17,6 +17,8 @@
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* true)
 
+(declare vectorz-coerce)
+
 (eval
   `(extend-protocol mp/PImplementation
      ~@(mapcat 
@@ -35,12 +37,14 @@
                                  (SliceArray/create ^List (mapv (fn [_] (mp/new-matrix-nd m (next shape))) (range (first shape))))))
                 (construct-matrix [m data]
                                   (cond 
+                                    (= :vectorz (mp/implementation-key data))
+                                      (.clone ^INDArray data)
                                     (mp/is-scalar? data) 
                                       (double data)
                                     (array? data) 
                                       (if (== 0 (mp/dimensionality data))
                                         (double (mp/get-0d data))
-                                        (assign! (mp/new-matrix-nd m (shape data)) data))
+                                        (vectorz-coerce data))
                                     :default
                                       (let [vm (mp/construct-matrix [] data)] 
                                         ;; (println m vm (shape vm))
