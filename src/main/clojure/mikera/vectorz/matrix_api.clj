@@ -369,7 +369,7 @@
         (.scale m -1.0)
         m))
     (transpose [m]
-      (.getTranspose m)))
+      (.clone (.getTranspose m))))
 
 (extend-protocol mp/PVectorCross
   mikera.vectorz.AVector
