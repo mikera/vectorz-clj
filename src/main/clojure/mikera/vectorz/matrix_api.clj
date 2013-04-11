@@ -17,7 +17,11 @@
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* true)
 
-(declare vectorz-coerce)
+(declare vectorz-coerce*)
+
+(defmacro vectorz-coerce [x]
+  `(let [x# ~x]
+     (if (instance? INDArray x#) x# (vectorz-coerce* x#))))
 
 (eval
   `(extend-protocol mp/PImplementation
@@ -398,7 +402,7 @@
 	  (clone [m]
 	    (.clone m)))
     
-(defn vectorz-coerce 
+(defn vectorz-coerce* 
   "Function to attempt conversion to Vectorz objects. May return nil if conversion fails."
   ([p]
 	  (let [dims (dimensionality p)]
