@@ -4,8 +4,6 @@
   (:require clojure.core.matrix.impl.persistent-vector)
   (:require [clojure.core.matrix.implementations :as imp])
   (:require [clojure.core.matrix.multimethods :as mm])
-  (:require [mikera.vectorz.core :as v])
-  (:require [mikera.vectorz.matrix :as m])
   (:require [clojure.core.matrix.protocols :as mp])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3])
@@ -21,7 +19,7 @@
 
 (defmacro vectorz-coerce [x]
   `(let [x# ~x]
-     (if (instance? INDArray x#) x# (vectorz-coerce* x#))))
+     ^INDArray (if (instance? INDArray x#) x# (vectorz-coerce* x#))))
 
 (eval
   `(extend-protocol mp/PImplementation
@@ -323,9 +321,13 @@
       (- (.get m) (double (mp/get-0d a))))
   mikera.vectorz.AVector
     (matrix-add [m a]
-      (v/add m ^AVector (coerce m a)))
+      (let [m (.clone m)
+            ^AVector a (vectorz-coerce a)] 
+        (.add m a) m))
     (matrix-sub [m a]
-      (v/sub m ^AVector (coerce m a)))
+      (let [m (.clone m)
+            ^AVector a (vectorz-coerce a)] 
+        (.sub m a) m))
   mikera.matrixx.AMatrix
     (matrix-add [m a]
       (let [m (.clone m)] 
@@ -362,7 +364,9 @@
     (length-squared [a]
       (.magnitudeSquared a))
     (normalise [a]
-      (v/normalise a)))
+      (let [a (.clone a)] 
+        (.normalise a)
+        a)))
 
 (extend-protocol mp/PMatrixOps
   AMatrix
@@ -404,7 +408,7 @@
     
 (defn vectorz-coerce* 
   "Function to attempt conversion to Vectorz objects. May return nil if conversion fails."
-  ([p]
+  (^INDArray [p]
 	  (let [dims (dimensionality p)]
 	    (cond
 		    (instance? INDArray p) p
@@ -438,17 +442,23 @@
       (mapv #(into [] %) (mp/get-major-slice-seq m))))
 
 (extend-protocol mp/PMatrixMultiply
-  mikera.vectorz.AScalar
+  AScalar
     (matrix-multiply [m a]
       (mp/pre-scale a (.get m)))
-  mikera.vectorz.AVector
+  AVector
     (matrix-multiply [m a]
-      (mp/matrix-multiply (mikera.matrixx.impl.ColumnMatrix/wrap m) a))
-  mikera.matrixx.AMatrix
+      (mp/matrix-multiply (mikera.matrixx.impl.ColumnMatrix/wrap m) (vectorz-coerce a)))
+  AMatrix
     (matrix-multiply [m a]
-      (if (instance? mikera.vectorz.AVector a)
-        (.transform m ^AVector a)
-        (m/* m (coerce m a)))))
+      (cond 
+        (instance? AVector a) 
+          (let [^AVector r (Vectorz/newVector (.rowCount m))] 
+            (.transform m ^AVector a r)
+            r)
+        (instance? AMatrix a) (.compose m ^AMatrix a) 
+        :else (if-let [va (or (vectorz-coerce a) (mp/coerce-param [] a))] 
+                (recur m va)
+                (error "Can't convert to vectorz representation: " a)))))
 
 (extend-protocol mp/PMatrixScaling
   mikera.vectorz.AVector
@@ -489,4 +499,4 @@
 
 ;; registration
 
-(imp/register-implementation (v/of 0.0))
+(imp/register-implementation (Vector/of (double-array 0.0)))
