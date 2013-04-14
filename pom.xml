@@ -59,6 +59,11 @@
 			<artifactId>clojure</artifactId>
 			<version>1.4.0</version>
 		</dependency>
+		<dependency>
+			<groupId>net.mikera</groupId>
+			<artifactId>core.matrix.stats</artifactId>
+			<version>0.0.1</version>
+		</dependency>
 	</dependencies>
 
 </project>
