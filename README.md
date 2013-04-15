@@ -11,7 +11,7 @@ Specific features that may be appealing:
  - **"Impure"** functions that mutate vectors are available for performance when you need it. i.e. you can use a nice functional style most of the time, but switch to mutation when you hit a bottleneck.
  - **Primitive-backed** special purpose vectors and matrices for performance, e.g. Vector3 for fast 3D maths.
  - **Flexible DSL-style** functions for manipulating vectors and matrices, e.g. the ability to create a "view" into a subspace of a large vector.
- - **`core.matrix`** fully supported
+ - **`core.matrix`** fully supported see: https://github.com/mikera/matrix-api
  - **Pure JVM code** - no native dependencies
  
 [![Build Status](https://travis-ci.org/mikera/vectorz-clj.png?branch=vectorz-clj-0.2.2)](https://travis-ci.org/mikera/vectorz-clj)
@@ -51,9 +51,9 @@ You can then use Vectorz as a standard core.matrix implementation. Example:
     => #<Vector2 [5.0,11.0]>
 ```
 
-Vectorz also provides some specialized functions in `mikera.vectorz.core` that give access to 
+Vectorz also provides some specialised functions in `mikera.vectorz.core` that give access to 
 advanced features of Vectorz that are not necessarily available through the core.matrix API.
-This includes type hinted and primitive functions that may perform better than using 
+These include type hinted and primitive functions that may perform better than using 
 the general purpose core.matrix API.
 
 Here are some Vector Examples:
