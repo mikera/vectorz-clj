@@ -182,6 +182,7 @@
 
 (deftest instance-tests
   (clojure.core.matrix.compliance-tester/instance-test (v/of 1 2 3))
+  (clojure.core.matrix.compliance-tester/instance-test (matrix :vectorz [[[1 2] [3 4]] [[5 6] [7 8]]]))
   (clojure.core.matrix.compliance-tester/instance-test (clone (first (slices (v/of 1 2 3)))))
   (clojure.core.matrix.compliance-tester/instance-test (first (slices (v/of 1 2 3))))
   (clojure.core.matrix.compliance-tester/instance-test (first (slices (v/of 1 2 3 4 5 6))))
