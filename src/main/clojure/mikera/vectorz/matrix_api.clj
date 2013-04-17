@@ -311,7 +311,10 @@
       (.elementSum m))
   AScalar
     (element-sum [m]
-      (.get m)))
+      (.get m))
+  INDArray 
+    (element-sum [m]
+      (reduce (fn [acc s] (+ acc (double (mp/element-sum s)))) 0.0 (.getSlices m))))
 
 (extend-protocol mp/PMatrixAdd
   mikera.vectorz.AScalar
@@ -472,7 +475,7 @@
 
 (defn vectorz-scale 
   "Scales a vectorz array, return a new scaled array"
-  (^INDArray [^INDArray m ^double a]
+  ([^INDArray m ^double a]
     (let [m (.clone m)] 
         (.scale m (double a))
         m)))
