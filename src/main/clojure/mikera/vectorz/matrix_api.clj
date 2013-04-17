@@ -113,7 +113,7 @@
     (is-scalar? [m]
       false)
     (column-count [m]
-      1)
+      (error "A vector does not have diminsion columns (dimension 1)"))
     (get-shape [m]
       (.getShape m))
     (dimension-count [m x]
