@@ -465,6 +465,11 @@
         (.innerProduct m a)
         (error "Can't convert to vectorz representation: " a))))
 
+(extend-protocol mp/PMatrixProducts
+  INDArray
+    (inner-product [m a] (.innerProduct m (vectorz-coerce a)))
+    (outer-product [m a] (.outerProduct m (vectorz-coerce a))))
+
 (defn vectorz-scale 
   "Scales a vectorz array, return a new scaled array"
   ([^INDArray m ^double a]
