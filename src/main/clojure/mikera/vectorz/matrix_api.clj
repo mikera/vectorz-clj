@@ -399,18 +399,10 @@
       (.crossProduct a ^AVector (mp/coerce-param a b)))) 
 
 (extend-protocol mp/PMatrixCloning
-  INDArray
-    (clone [m]
-      (.clone m))
-  AScalar 
-    (clone [m]
-      (.clone m))
-  AVector
-    (clone [m]
-      (.clone m))
-  AMatrix
-	  (clone [m]
-	    (.clone m)))
+  INDArray (clone [m] (.clone m))
+  AScalar (clone [m] (.clone m))
+  AVector (clone [m] (.clone m))
+  AMatrix	(clone [m] (.clone m)))
     
 (defn vectorz-coerce* 
   "Function to attempt conversion to Vectorz objects. May return nil if conversion fails."
