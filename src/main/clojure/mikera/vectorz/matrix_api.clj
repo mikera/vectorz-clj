@@ -6,6 +6,7 @@
   (:require [clojure.core.matrix.multimethods :as mm])
   (:require [clojure.core.matrix.protocols :as mp])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
+  (:import [mikera.matrixx.impl DiagonalMatrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3])
   (:import [mikera.arrayz SliceArray INDArray])
   (:import [java.util List])
@@ -55,7 +56,13 @@
                                         (assign! (mp/new-matrix-nd m (shape vm)) vm)))))))
          ['mikera.vectorz.AVector 'mikera.matrixx.AMatrix 'mikera.vectorz.AScalar 'mikera.arrayz.INDArray]) ))
 
+(extend-protocol mp/PTypeInfo
+  INDArray
+    (element-type [m] (Double/TYPE)))
 
+(extend-protocol mp/PMutableMatrixConstruction
+  INDArray
+    (mutable-matrix [m] (.clone m))) 
 
 (extend-protocol mp/PDoubleArrayOutput
   mikera.vectorz.AScalar
@@ -189,6 +196,13 @@
       (.get m))
     (set-0d! [m value]
       (.set m (double value))))
+
+(extend-protocol mp/PSpecialisedConstructors
+  INDArray
+    (identity-matrix [m dims] 
+      (Matrixx/createIdentityMatrix (int dims)))
+    (diagonal-matrix [m diagonal-values] 
+      (DiagonalMatrix/create (Vectorz/toVector diagonal-values))))
 
 (extend-protocol mp/PIndexedSetting
   INDArray
