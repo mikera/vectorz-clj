@@ -1,6 +1,6 @@
 (ns mikera.vectorz.large-matrix-benchmark
   (:use clojure.core.matrix)
-  (:use clojure.core.matrix.operators)
+  (:require [clojure.core.matrix.operators :refer [+ - *]])
   (:refer-clojure :exclude [+ - *])
   (:require [criterium.core :as c])
   (:require [mikera.vectorz.core :as v])
