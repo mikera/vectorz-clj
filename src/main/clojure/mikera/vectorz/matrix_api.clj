@@ -491,7 +491,7 @@
     (vector-transform [m v] 
       (if (instance? AVector v) 
         (.transform m ^AVector v)
-        (.transform m ^AVector (coerce m v))))
+        (.transform m ^AVector (vectorz-coerce v))))
     (vector-transform! [m v] 
       (if (instance? AVector v) 
         (.transformInPlace m ^AVector v)
