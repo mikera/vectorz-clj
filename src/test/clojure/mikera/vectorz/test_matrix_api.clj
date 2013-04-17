@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [vector? * - +])
   (:use [clojure test])
   (:use clojure.core.matrix)
-  (:use clojure.core.matrix.operators)
+  (:require [clojure.core.matrix.operators :refer [+ - *]])
   (:require clojure.core.matrix.compliance-tester)
   (:require [clojure.core.matrix.protocols :as mp])
   (:require [mikera.vectorz.core :as v])
