@@ -494,6 +494,16 @@
     (scale [m a] (vectorz-scale m a))
     (pre-scale [m a] (vectorz-scale m a)))
 
+(extend-protocol mp/PMatrixAdd
+  AVector
+    (matrix-add [m a] (let [m (.clone m)] (.add m (vectorz-coerce a)) m))
+    (matrix-sub [m a] (let [m (.clone m)] (.sub m (vectorz-coerce a)) m)))
+
+(extend-protocol mp/PMatrixAddMutable
+  AVector
+    (matrix-add! [m a] (.add m (vectorz-coerce a)) m)
+    (matrix-sub! [m a] (.sub m (vectorz-coerce a)) m))
+
 (extend-protocol mp/PVectorTransform
   mikera.transformz.ATransform
     (vector-transform [m v] 
