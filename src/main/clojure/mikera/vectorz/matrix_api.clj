@@ -513,7 +513,7 @@
     (matrix-sub! [m a] (.sub m (vectorz-coerce a)) m))
 
 (extend-protocol mp/PVectorTransform
-  mikera.transformz.ATransform
+  ATransform
     (vector-transform [m v] 
       (if (instance? AVector v) 
         (.transform m ^AVector v)
