@@ -292,24 +292,24 @@
       (map #(.slice m (int %)) (range (aget (.getShape m) 0)))))
 
 (extend-protocol mp/PSubVector
-  mikera.vectorz.AVector
+  AVector
     (subvector [m start length]
       (.subVector m (int start) (int length)))) 
 
 (extend-protocol mp/PSubMatrix
-  mikera.vectorz.AVector
+  AVector
     (submatrix [m index-ranges]
       (let [[[start length]] index-ranges]
         (.subVector m (int start) (int length))))) 
 
 (extend-protocol mp/PSummable
-  mikera.vectorz.AVector
+  AVector
     (element-sum [m]
       (.elementSum m))
-  mikera.matrixx.AMatrix
+  AMatrix
     (element-sum [m]
       (.elementSum m))
-  mikera.vectorz.AScalar
+  AScalar
     (element-sum [m]
       (.get m)))
 
@@ -472,7 +472,7 @@
 
 (defn vectorz-scale 
   "Scales a vectorz array, return a new scaled array"
-  ([^INDArray m ^double a]
+  (^INDArray [^INDArray m ^double a]
     (let [m (.clone m)] 
         (.scale m (double a))
         m)))
