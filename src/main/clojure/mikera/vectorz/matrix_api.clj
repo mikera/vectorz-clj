@@ -458,10 +458,15 @@
         (instance? AMatrix a) (.compose m ^AMatrix a) 
         :else (if-let [va (or (vectorz-coerce a) (mp/coerce-param [] a))] 
                 (recur m va)
-                (error "Can't convert to vectorz representation: " a)))))
+                (error "Can't convert to vectorz representation: " a))))
+  INDArray
+    (matrix-multiply [m a]
+      (if-let [^INDAArray a (vectorz-coerce a)]
+        (.innerProduct m a)
+        (error "Can't convert to vectorz representation: " a))))
 
 (extend-protocol mp/PMatrixScaling
-  mikera.vectorz.AVector
+  AVector
     (scale [m a]
       (let [m (.clone m)] 
         (.scale m (double a))
@@ -470,7 +475,7 @@
       (let [m (.clone m)] 
         (.scale m (double a))
         m))
-  mikera.matrixx.AMatrix
+  AMatrix
     (scale [m a]
       (let [m (.clone m)] 
         (.scale m (double a))
