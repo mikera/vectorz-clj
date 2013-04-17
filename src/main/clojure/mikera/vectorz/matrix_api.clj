@@ -465,25 +465,26 @@
         (.innerProduct m a)
         (error "Can't convert to vectorz representation: " a))))
 
-(extend-protocol mp/PMatrixScaling
-  AVector
-    (scale [m a]
-      (let [m (.clone m)] 
-        (.scale m (double a))
-        m))
-    (pre-scale [m a]
-      (let [m (.clone m)] 
-        (.scale m (double a))
-        m))
-  AMatrix
-    (scale [m a]
-      (let [m (.clone m)] 
-        (.scale m (double a))
-        m))
-    (pre-scale [m a]
-      (let [m (.clone m)] 
+(defn vectorz-scale 
+  "Scales a vectorz array, return a new scaled array"
+  ([^INDArray m ^double a]
+    (let [m (.clone m)] 
         (.scale m (double a))
         m)))
+
+(extend-protocol mp/PMatrixScaling
+  AScalar 
+    (scale [m a] (vectorz-scale m a))
+    (pre-scale [m a] (vectorz-scale m a))
+  AVector
+    (scale [m a] (vectorz-scale m a))
+    (pre-scale [m a] (vectorz-scale m a))
+  AMatrix
+    (scale [m a] (vectorz-scale m a))
+    (pre-scale [m a] (vectorz-scale m a))
+  INDArray
+    (scale [m a] (vectorz-scale m a))
+    (pre-scale [m a] (vectorz-scale m a)))
 
 (extend-protocol mp/PVectorTransform
   mikera.transformz.ATransform
