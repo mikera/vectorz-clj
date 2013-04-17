@@ -209,6 +209,11 @@
     (broadcast [m target-shape]
      (.broadcast m (int-array target-shape)))) 
 
+(extend-protocol mp/PReshaping
+  INDArray 
+    (reshape [m target-shape]
+      (.reshape m (int-array target-shape)))) 
+
 (extend-protocol mp/PIndexedSetting
   INDArray
     (set-1d [m row v] 
