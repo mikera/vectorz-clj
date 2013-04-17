@@ -18,8 +18,10 @@
 (declare vectorz-coerce*)
 
 (defmacro vectorz-coerce [x]
-  `(let [x# ~x]
-     ^INDArray (if (instance? INDArray x#) x# (vectorz-coerce* x#))))
+  (let [tagged-sym (vary-meta (gensym "res") assoc :tag 'mikera.arrayz.INDArray)] 
+    `(let [x# ~x
+           ~tagged-sym (if (instance? INDArray x#) x# (vectorz-coerce* x#))]
+         ~tagged-sym)))
 
 (eval
   `(extend-protocol mp/PImplementation
@@ -333,12 +335,13 @@
         (.sub m a) m))
   mikera.matrixx.AMatrix
     (matrix-add [m a]
-      (let [m (.clone m)] 
-        (.add m (coerce m a))
+      (let [^AMatrix m (.clone m)
+            ^INDArray a (vectorz-coerce a)] 
+        (.add m a)
         m))
     (matrix-sub [m a]
       (let [m (.clone m)] 
-        (.addMultiple m (coerce m a) -1.0)
+        (.addMultiple m (vectorz-coerce a) -1.0)
         m)))
 
 (extend-protocol mp/PMatrixAddMutable
