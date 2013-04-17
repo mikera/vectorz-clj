@@ -204,6 +204,11 @@
     (diagonal-matrix [m diagonal-values] 
       (DiagonalMatrix/create (Vectorz/toVector diagonal-values))))
 
+(extend-protocol mp/PBroadcast
+  INDArray 
+    (broadcast [m target-shape]
+     (.broadcast m (int-array target-shape)))) 
+
 (extend-protocol mp/PIndexedSetting
   INDArray
     (set-1d [m row v] 
