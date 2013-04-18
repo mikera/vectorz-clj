@@ -317,6 +317,47 @@
     (get-major-slice-seq [m] 
       (map #(.slice m (int %)) (range (aget (.getShape m) 0)))))
 
+(extend-protocol mp/PMatrixSubComponents
+  AMatrix
+    (main-diagonal [m]
+      (.getLeadingDiagonal m)))
+
+(extend-protocol mp/PAssignment
+  AScalar
+    (assign! 
+      [m source] (.set m (double (mp/get-0d source))))
+    (assign-array! 
+      ([m arr] (.set m (double (nth arr 0))))
+      ([m arr start length] (.set m (double (nth arr 0)))))
+  AVector
+    (assign! [m source] (.set m (vectorz-coerce source)))
+    (assign-array! 
+      ([m arr] (dotimes [i (count arr)] (.set m (int i) (double (nth arr i)))))
+      ([m arr start length] 
+        (let [length (long length) start (long start)] 
+          (dotimes [i length] (.set m (int i) (double (nth arr (+ i start))))))))
+    
+  INDArray
+    (assign! [m source] 
+      (.set m (vectorz-coerce source)))
+    (assign-array!
+      ([m arr]
+	      (let [alen (long (count arr))]
+	        (if (mp/is-vector? m)
+	          (dotimes [i alen]
+	            (mp/set-1d! m i (nth arr i)))
+	          (mp/assign-array! m arr 0 alen))))
+      ([m arr start length]
+	      (let [length (long length)
+              start (long start)]
+         (if (mp/is-vector? m)
+	          (dotimes [i length]
+	            (mp/set-1d! m i (nth arr (+ start i))))
+	          (let [ss (seq (mp/get-major-slice-seq m))
+	                skip (long (if ss (mp/element-count (first (mp/get-major-slice-seq m))) 0))]
+	            (doseq-indexed [s ss i]
+	              (mp/assign-array! s arr (+ start (* skip i)) skip))))))))
+
 (extend-protocol mp/PSubVector
   AVector
     (subvector [m start length]
@@ -405,13 +446,17 @@
     (determinant [m]
       (.determinant m))
     (inverse [m]
-      (.inverse m))
-    (negate [m]
-      (let [m (.clone m)]
-        (.scale m -1.0)
-        m))
-    (transpose [m]
-      (.clone (.getTranspose m))))
+      (.inverse m)))
+
+(extend-protocol mp/PNegation
+  AScalar (negate [m] (let [m (.clone m)] (.scale m -1.0) m))
+  AVector (negate [m] (let [m (.clone m)] (.scale m -1.0) m))
+  INDArray (negate [m] (let [m (.clone m)] (.scale m -1.0) m)))
+
+(extend-protocol mp/PTranspose
+  AScalar (transpose [m] (.clone m))
+  AVector (transpose [m] (.clone m))
+  AMatrix (transpose [m] (.clone (.getTranspose m)))) 
 
 (extend-protocol mp/PVectorCross
   mikera.vectorz.AVector
