@@ -519,7 +519,7 @@
       (mp/pre-scale a (.get m)))
   AVector
     (matrix-multiply [m a]
-      (mp/matrix-multiply (mikera.matrixx.impl.ColumnMatrix/wrap m) (vectorz-coerce a)))
+      (.innerProduct m (vectorz-coerce a)))
   AMatrix
     (matrix-multiply [m a]
       (cond 
@@ -528,9 +528,7 @@
             (.transform m ^AVector a r)
             r)
         (instance? AMatrix a) (.compose m ^AMatrix a) 
-        :else (if-let [va (or (vectorz-coerce a) (mp/coerce-param [] a))] 
-                (recur m va)
-                (error "Can't convert to vectorz representation: " a))))
+        :else (.innerProduct m (vectorz-coerce a))))
   INDArray
     (matrix-multiply [m a]
       (if-let [^INDAArray a (vectorz-coerce a)]
@@ -545,23 +543,21 @@
 (defn vectorz-scale 
   "Scales a vectorz array, return a new scaled array"
   ([^INDArray m ^double a]
-    (let [m (.clone m)] 
-        (.scale m (double a))
-        m)))
+    (let [m (.clone m)] (.scale m (double a)) m)))
 
 (extend-protocol mp/PMatrixScaling
   AScalar 
-    (scale [m a] (vectorz-scale m a))
-    (pre-scale [m a] (vectorz-scale m a))
+    (scale [m a] (vectorz-scale m (double a)))
+    (pre-scale [m a] (vectorz-scale m (double a)))
   AVector
-    (scale [m a] (vectorz-scale m a))
-    (pre-scale [m a] (vectorz-scale m a))
+    (scale [m a] (vectorz-scale m (double a)))
+    (pre-scale [m a] (vectorz-scale m (double a)))
   AMatrix
-    (scale [m a] (vectorz-scale m a))
-    (pre-scale [m a] (vectorz-scale m a))
+    (scale [m a] (vectorz-scale m (double a)))
+    (pre-scale [m a] (vectorz-scale m (double a)))
   INDArray
-    (scale [m a] (vectorz-scale m a))
-    (pre-scale [m a] (vectorz-scale m a)))
+    (scale [m a] (vectorz-scale m (double a)))
+    (pre-scale [m a] (vectorz-scale m (double a))))
 
 (extend-protocol mp/PMatrixAdd
   AVector

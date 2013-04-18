@@ -99,6 +99,7 @@
   (testing "scaling"
     (is (= (v/of 2 4) (* (v/of 1 2) 2)))
     (is (= (v/of 2 4) (scale (v/of 1 2) 2)))
+    (is (= (v/of 2 4) (scale (v/of 1 2) 2N)))
     (is (= (v/of 2 4) (scale (v/of 1 2) 2.0))))
   
   (testing "subtraction"
