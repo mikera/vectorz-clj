@@ -1,7 +1,7 @@
 (ns mikera.vectorz.examples
   (:refer-clojure :exclude [+ - *])
   (:use clojure.core.matrix)
-  (:use clojure.core.matrix.operators)
+  (:require [clojure.core.matrix.operators :refer [+ - *]])
   (:require mikera.vectorz.matrix-api))
 
 ;; in which we run a sequence of examples to demonstrate vectorz-clj features

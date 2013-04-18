@@ -1,8 +1,9 @@
 (ns mikera.vectorz.benchmark-matrix
   (:use clojure.core.matrix)
-  (:use clojure.core.matrix.operators)
-  (:refer-clojure :exclude [+ - *])
+  (:require [clojure.core.matrix.operators :refer [+ - *]])
+  (:refer-clojure :exclude [+ - * ])
   (:require [criterium.core :as c])
+  (:require [mikera.vectorz.matrix-api])
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])
   (:import [mikera.vectorz Vector3 Vectorz]))

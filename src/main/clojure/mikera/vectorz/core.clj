@@ -1,6 +1,7 @@
 (ns mikera.vectorz.core
   (:import [mikera.vectorz AVector Vectorz Vector Vector1 Vector2 Vector3 Vector4])
   (:import [mikera.transformz Transformz])
+  (:require [mikera.vectorz.matrix-api]) 
   (:refer-clojure :exclude [+ - * / vec vec? vector subvec get set to-array empty]))
 
 (set! *warn-on-reflection* true)

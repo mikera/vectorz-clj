@@ -11,7 +11,8 @@ Specific features that may be appealing:
  - **"Impure"** functions that mutate vectors are available for performance when you need it. i.e. you can use a nice functional style most of the time, but switch to mutation when you hit a bottleneck.
  - **Primitive-backed** special purpose vectors and matrices for performance, e.g. Vector3 for fast 3D maths.
  - **Flexible DSL-style** functions for manipulating vectors and matrices, e.g. the ability to create a "view" into a subspace of a large vector.
- - **`core.matrix`** fully supported
+ - **`core.matrix`** fully supported see: https://github.com/mikera/matrix-api
+ - **Pure JVM code** - no native dependencies
  
 [![Build Status](https://travis-ci.org/mikera/vectorz-clj.png?branch=vectorz-clj-0.2.2)](https://travis-ci.org/mikera/vectorz-clj)
 
@@ -50,9 +51,9 @@ You can then use Vectorz as a standard core.matrix implementation. Example:
     => #<Vector2 [5.0,11.0]>
 ```
 
-Vectorz also provides specialized functions in `mikera.vectorz.core` that give access to 
+Vectorz also provides some specialised functions in `mikera.vectorz.core` that give access to 
 advanced features of Vectorz that are not necessarily available through the core.matrix API.
-This includes type hinted and primitive functions that will perform better than using 
+These include type hinted and primitive functions that may perform better than using 
 the general purpose core.matrix API.
 
 Here are some Vector Examples:
@@ -81,16 +82,3 @@ Here are some Vector Examples:
       v)
     => #<Vector [0.0,0.0,0.0,1.0,1.0,1.0,1.0,0.0,0.0,0.0]>
 ```
-    
-### Purpose
-
-vectorz-clj design goals:
-
- - Pure JVM code (i.e. no native dependencies)
- - Very fast, mutable vectors ("as fast as you can get on the JVM")
- - Build upon a good abstraction for vectors (AVector)
- - Different concrete vector types, e.g. primitive vectors for 2D/3D graphics (Vector2 and Vector3)
- - DSL for vector manipulation that can do useful things like vector subranges etc.
- - Matrix functionality as required to complement the vector types
- 
-vectorz-clj is implemented as a "Clojurized" wrapper over the vectorz library, which provides the underlying data structures as well as a set of APIs that can be used from Java.

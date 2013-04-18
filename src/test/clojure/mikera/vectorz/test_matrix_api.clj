@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [vector? * - +])
   (:use [clojure test])
   (:use clojure.core.matrix)
-  (:use clojure.core.matrix.operators)
+  (:require [clojure.core.matrix.operators :refer [+ - *]])
   (:require clojure.core.matrix.compliance-tester)
   (:require [clojure.core.matrix.protocols :as mp])
   (:require [mikera.vectorz.core :as v])
@@ -41,6 +41,18 @@
   (let [v (v/vec [1 2 3])]
     (is (equals [2 4 6] (add v v)))))
 
+(deftest test-sub
+  (let [a (v/vec [1 2 3 0 0])
+        b (v/vec [1 1 4 0 0])]
+    (is (equals [0 1 -1 0 0] (sub a b))))) 
+
+(deftest test-coerce
+  (let [a (v/vec [1 2 3 0 0])
+        b (v/vec [1 1 4 0 0])
+        r (sub a b)]
+    (is (equals [0 1 -1 0 0] (coerce [] r)))
+    (is (instance? clojure.lang.IPersistentVector (coerce [] r))))) 
+
 (deftest test-ndarray
   (is (equals [[[1]]] (matrix :vectorz [[[1]]])))
   (is (equals [[[[1]]]] (matrix :vectorz [[[[1]]]])))
@@ -60,6 +72,9 @@
 (deftest test-inverse
   (let [m (matrix :vectorz [[0.5 0] [0 2]])] 
     (is (equals [[2 0] [0 0.5]] (inverse m)))))
+
+(deftest test-det
+  (is (== -1.0 (det (matrix :vectorz [[0 1] [1 0]])))))
 
 (defn test-round-trip [m]
   (is (equals m (read-string (print-str m)))))
@@ -84,6 +99,7 @@
   (testing "scaling"
     (is (= (v/of 2 4) (* (v/of 1 2) 2)))
     (is (= (v/of 2 4) (scale (v/of 1 2) 2)))
+    (is (= (v/of 2 4) (scale (v/of 1 2) 2N)))
     (is (= (v/of 2 4) (scale (v/of 1 2) 2.0))))
   
   (testing "subtraction"
@@ -151,7 +167,8 @@
 
 (deftest test-conversion
   (testing "vector" 
-    (is (= [1.0] (to-nested-vectors (v/of 1.0)))))
+    (is (= [1.0] (to-nested-vectors (v/of 1.0))))
+    (is (= [1.0] (coerce [] (v/of 1.0)))))
   (testing "matrix" 
     (is (= [[1.0]] (to-nested-vectors (m/matrix [[1.0]])))))
   (testing "coercion"
@@ -169,6 +186,7 @@
 
 (deftest instance-tests
   (clojure.core.matrix.compliance-tester/instance-test (v/of 1 2 3))
+  (clojure.core.matrix.compliance-tester/instance-test (matrix :vectorz [[[1 2] [3 4]] [[5 6] [7 8]]]))
   (clojure.core.matrix.compliance-tester/instance-test (clone (first (slices (v/of 1 2 3)))))
   (clojure.core.matrix.compliance-tester/instance-test (first (slices (v/of 1 2 3))))
   (clojure.core.matrix.compliance-tester/instance-test (first (slices (v/of 1 2 3 4 5 6))))
