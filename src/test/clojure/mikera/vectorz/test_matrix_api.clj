@@ -73,6 +73,9 @@
   (let [m (matrix :vectorz [[0.5 0] [0 2]])] 
     (is (equals [[2 0] [0 0.5]] (inverse m)))))
 
+(deftest test-det
+  (is (== -1.0 (det (matrix :vectorz [[0 1] [1 0]])))))
+
 (defn test-round-trip [m]
   (is (equals m (read-string (print-str m)))))
 
