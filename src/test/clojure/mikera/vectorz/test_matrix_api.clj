@@ -50,9 +50,19 @@
   (let [a (v/vec [1 2])
         b (v/vec [1 1])]
     (is (equals [2 5] (add-product b a a)))
-    (is (equals [3 9] (add-scaled-product b a a 2)))
+    (is (equals [3 9] (add-scaled-product b a [1 2] 2)))
     (is (equals [11 21] (add-product b a 10)))
     (is (equals [11 21] (add-product b 10 a))))) 
+
+(deftest test-add-product!
+  (let [a (v/vec [1 2])
+        b (v/vec [1 1])]
+    (add-product! b a a)
+    (is (equals [2 5] b))
+    (add-scaled! b a -1)
+    (is (equals [1 3] b))
+    (add-scaled-product! b [0 1] [3 4] 2)
+    (is (equals [1 11] b)))) 
 
 
 (deftest test-coerce
