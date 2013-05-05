@@ -16,13 +16,32 @@
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* true)
 
-(declare vectorz-coerce*)
+(declare vectorz-coerce* avector-coerce*)
+
+(defmacro tag-symbol [tag form]
+  (let [tagged-sym (vary-meta (gensym "res") assoc :tag tag)]
+    `(let [~tagged-sym ~form] ~tagged-sym)))
 
 (defmacro vectorz-coerce [x]
-  (let [tagged-sym (vary-meta (gensym "res") assoc :tag 'mikera.arrayz.INDArray)] 
-    `(let [x# ~x
-           ~tagged-sym (if (instance? INDArray x#) x# (vectorz-coerce* x#))]
-         ~tagged-sym)))
+  `(tag-symbol mikera.arrayz.INDArray
+               (let [x# ~x]
+                 (if (instance? INDArray x#) x# (vectorz-coerce* x#)))))
+
+(defmacro avector-coerce [x]
+  `(tag-symbol mikera.vectorz.AVector
+               (let [x# ~x] 
+                 (if (instance? AVector x#) x# (avector-coerce* x#)))))
+
+(defn avector-coerce* 
+  (^AVector [m]
+	  (try 
+	    (Vectorz/toVector m)
+	    (catch Throwable t
+	      (if (== 1 (mp/dimensionality m))
+	        (let [v (Vectorz/newVector (mp/dimension-count m 0))]
+	          (assign! v m)
+	          v)
+	        (error "Can't coerce to vector: wrong dimensionality: " (str m))))))) 
 
 (eval
   `(extend-protocol mp/PImplementation
@@ -544,6 +563,42 @@
   "Scales a vectorz array, return a new scaled array"
   ([^INDArray m ^double a]
     (let [m (.clone m)] (.scale m (double a)) m)))
+
+(extend-protocol mp/PAddProduct
+  AVector
+    (add-product [m a b]
+      (let [m (.clone m)]
+        (.addProduct m (avector-coerce a) (avector-coerce b))
+        m))) 
+
+(extend-protocol mp/PAddProductMutable
+  AVector
+    (add-product! [m a b]
+      (.addProduct m (avector-coerce a) (avector-coerce b)))) 
+
+(extend-protocol mp/PAddScaled
+  AVector
+    (add-scaled [m a factor]
+      (let [m (.clone m)] 
+        (.addMultiple m (avector-coerce a) (double factor))
+        m))) 
+
+(extend-protocol mp/PAddScaledMutable
+  AVector
+    (add-scaled! [m a factor]
+      (.addMultiple m (avector-coerce a) (double factor)))) 
+
+(extend-protocol mp/PAddScaledProduct
+  AVector
+    (add-scaled-product [m a b factor]
+      (let [m (.clone m)]
+        (.addProduct m (avector-coerce a) (avector-coerce b) (double factor))
+        m))) 
+
+(extend-protocol mp/PAddScaledProductMutable
+  AVector
+    (add-scaled-product! [m a b factor]
+      (.addProduct m (avector-coerce a) (avector-coerce b) (double factor)))) 
 
 (extend-protocol mp/PMatrixScaling
   AScalar 
