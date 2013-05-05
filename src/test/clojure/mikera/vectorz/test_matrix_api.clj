@@ -11,7 +11,8 @@
   (:require clojure.core.matrix.impl.persistent-vector)
   (:require [clojure.core.matrix.impl.wrappers :as wrap])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
-  (:import [mikera.vectorz AVector Vectorz Vector]))
+  (:import [mikera.vectorz AVector Vectorz Vector])
+  (:import [mikera.arrayz INDArray]))
 
 ;; note - all the operators are core.matrix operators
 
@@ -40,6 +41,11 @@
     (is (equals m [[0 0] [0 0]])))
   (let [v (v/vec [1 2 3])]
     (is (equals [2 4 6] (add v v)))))
+
+(deftest test-new-array
+  (is (instance? AVector (new-array :vectorz [10])))
+  (is (instance? AMatrix (new-array :vectorz [10 10])))
+  (is (instance? INDArray (new-array :vectorz [3 4 5 6])))) 
 
 (deftest test-sub
   (let [a (v/vec [1 2 3 0 0])
