@@ -46,6 +46,13 @@
         b (v/vec [1 1 4 0 0])]
     (is (equals [0 1 -1 0 0] (sub a b))))) 
 
+(deftest test-add-product
+  (let [a (v/vec [1 2])
+        b (v/vec [1 1])]
+    (is (equals [2 5] (add-product b a a)))
+    (is (equals [11 21] (add-product b a 10))))) 
+
+
 (deftest test-coerce
   (let [a (v/vec [1 2 3 0 0])
         b (v/vec [1 1 4 0 0])

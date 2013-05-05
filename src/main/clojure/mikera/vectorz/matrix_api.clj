@@ -27,21 +27,20 @@
                (let [x# ~x]
                  (if (instance? INDArray x#) x# (vectorz-coerce* x#)))))
 
-(defmacro avector-coerce [x]
+(defmacro avector-coerce [m x]
   `(tag-symbol mikera.vectorz.AVector
                (let [x# ~x] 
-                 (if (instance? AVector x#) x# (avector-coerce* x#)))))
+                 (if (instance? AVector x#) x# (avector-coerce* ~m x#)))))
 
 (defn avector-coerce* 
-  (^AVector [m]
-	  (try 
-	    (Vectorz/toVector m)
-	    (catch Throwable t
-	      (if (== 1 (mp/dimensionality m))
-	        (let [v (Vectorz/newVector (mp/dimension-count m 0))]
-	          (assign! v m)
-	          v)
-	        (error "Can't coerce to vector: wrong dimensionality: " (str m))))))) 
+  (^AVector [^AVector v m]
+	  (cond
+      (number? m) 
+        (let [r (Vectorz/newVector (.length v))] (.fill r (double m)) r)
+	    (== (mp/dimensionality m) 1)
+        (let [r (Vectorz/newVector (.length v))]
+              (assign! r m) r)
+      :else (Vectorz/toVector m)))) 
 
 (eval
   `(extend-protocol mp/PImplementation
@@ -568,37 +567,37 @@
   AVector
     (add-product [m a b]
       (let [m (.clone m)]
-        (.addProduct m (avector-coerce a) (avector-coerce b))
+        (.addProduct m (avector-coerce m a) (avector-coerce m b))
         m))) 
 
 (extend-protocol mp/PAddProductMutable
   AVector
     (add-product! [m a b]
-      (.addProduct m (avector-coerce a) (avector-coerce b)))) 
+      (.addProduct m (avector-coerce m a) (avector-coerce m b)))) 
 
 (extend-protocol mp/PAddScaled
   AVector
     (add-scaled [m a factor]
       (let [m (.clone m)] 
-        (.addMultiple m (avector-coerce a) (double factor))
+        (.addMultiple m (avector-coerce m a) (double factor))
         m))) 
 
 (extend-protocol mp/PAddScaledMutable
   AVector
     (add-scaled! [m a factor]
-      (.addMultiple m (avector-coerce a) (double factor)))) 
+      (.addMultiple m (avector-coerce m a) (double factor)))) 
 
 (extend-protocol mp/PAddScaledProduct
   AVector
     (add-scaled-product [m a b factor]
       (let [m (.clone m)]
-        (.addProduct m (avector-coerce a) (avector-coerce b) (double factor))
+        (.addProduct m (avector-coerce m a) (avector-coerce m b) (double factor))
         m))) 
 
 (extend-protocol mp/PAddScaledProductMutable
   AVector
     (add-scaled-product! [m a b factor]
-      (.addProduct m (avector-coerce a) (avector-coerce b) (double factor)))) 
+      (.addProduct m (avector-coerce m a) (avector-coerce m b) (double factor)))) 
 
 (extend-protocol mp/PMatrixScaling
   AScalar 
