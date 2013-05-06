@@ -14,6 +14,8 @@ Specific features that may be appealing:
  - **`core.matrix`** fully supported see: https://github.com/mikera/matrix-api
  - **Pure JVM code** - no native dependencies
  
+vectorz-clj requires Clojure 1.4 or above 
+ 
 [![Build Status](https://travis-ci.org/mikera/vectorz-clj.png?branch=vectorz-clj-0.2.2)](https://travis-ci.org/mikera/vectorz-clj)
 
 ### License
