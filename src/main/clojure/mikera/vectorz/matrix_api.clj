@@ -348,7 +348,10 @@
       ([m arr] (.set m (double (nth arr 0))))
       ([m arr start length] (.set m (double (nth arr 0)))))
   AVector
-    (assign! [m source] (.set m (vectorz-coerce source)))
+    (assign! [m source] 
+      (if (number? source) 
+        (.fill m (double source))
+        (.set m (vectorz-coerce source))))
     (assign-array! 
       ([m arr] (dotimes [i (count arr)] (.set m (int i) (double (nth arr i)))))
       ([m arr start length] 
