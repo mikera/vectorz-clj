@@ -32,6 +32,13 @@
                (let [x# ~x] 
                  (if (instance? AVector x#) x# (avector-coerce* ~m x#)))))
 
+(defmacro with-clone [[sym exp] & body]
+  (let []
+    (when-not (symbol? sym) (error "Symbol required for with-clone binding"))
+    `(let [~sym (.clone ~exp)]
+       ~@body
+       ~sym)))
+
 (defn avector-coerce* 
   (^AVector [^AVector v m]
 	  (cond
@@ -636,6 +643,31 @@
       (if (instance? AVector v) 
         (.transformInPlace m ^AVector v)
         (assign! v (transform m v)))))
+
+;; TODO: math function implementations
+;(extend-protocol mp/PMathsFunctions
+;  AVector
+;    (abs [m] (with-clone [m m] (.abs m)))
+;	  (acos Math/acos)
+;	  (asin Math/asin)
+;	  (atan Math/atan)
+;	  (cbrt Math/cbrt)
+;	  (ceil Math/ceil)
+;	  (cos Math/cos)
+;	  (cosh Math/cosh)
+;	  (exp Math/exp)
+;	  (floor Math/floor)
+;	  (log Math/log)
+;	  (log10 Math/log10)
+;	  (round Math/rint)
+;	  (signum Math/signum)
+;	  (sin Math/sin)
+;	  (sinh Math/sinh)
+;	  (sqrt Math/sqrt)
+;	  (tan Math/tan)
+;	  (tanh Math/tanh)
+;   	(to-degrees Math/toDegrees)
+;	  (to-radians Math/toRadians))
 
 ;; TODO printing
 ;; we want to print in a form that can be constructed again
