@@ -3,9 +3,9 @@ vectorz-clj
 
 Fast vector library for Clojure, building on the vectorz library (https://github.com/mikera/vectorz).
 
-Specifically designed for games, simulations and machine learning. 
+Designed for games, simulations and machine learning. 
 
-Specific features that may be appealing:
+Important features:
 
  - **"Pure"** functions for idiomatic Clojure style are provided. These work as you expect, i.e. return new vectors without mutating their arguments.
  - **"Impure"** functions that mutate vectors are available for performance when you need it. i.e. you can use a nice functional style most of the time, but switch to mutation when you hit a bottleneck.
