@@ -511,10 +511,13 @@
 	        (cond 
 	          (number? p) (double p)
 	          (instance? AScalar p) p
-	          :else (double (mp/get-0d p)))
-		    (== 1 (dimensionality p))
+            (nil? p) nil
+	          :else (do
+                   ;; (println (str "Coercing " p))
+                   (double (mp/get-0d p))))
+		    (== 1 dims)
 		      (try (Vectorz/toVector (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
-		    (== 2 (dimensionality p))
+		    (== 2 dims)
 		      (try (Matrixx/toMatrix (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
 		    :else 
 	        (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]

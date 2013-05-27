@@ -197,19 +197,27 @@
   (testing "matrix" 
     (is (= [[1.0]] (to-nested-vectors (m/matrix [[1.0]])))))
   (testing "coercion"
-    (is (equals [[1 2] [3 4]] (coerce (m/matrix [[1.0]]) [[1 2] [3 4]])))))
+    (is (equals [[1 2] [3 4]] (coerce (m/matrix [[1.0]]) [[1 2] [3 4]])))
+    (is (number? (coerce :vectorz 10)))
+    (is (instance? AVector (coerce :vectorz [1 2 3])))
+    (is (instance? AMatrix (coerce :vectorz [[1 2] [3 4]])))))
 
 (deftest test-functional-ops
   (testing "eseq"
-    (is (= [1.0 2.0 3.0 4.0] (eseq (matrix [[1 2] [3 4]]))))))
+    (is (= [1.0 2.0 3.0 4.0] (eseq (matrix [[1 2] [3 4]]))))
+    (is (== 1 (first (eseq (v/of 1 2)))))))
 
 (deftest test-maths-functions
   (testing "abs"
     (is (equals [1 2 3] (abs [-1 2 -3]))))) 
 
+(deftest test-assign
+  (is (e== [2 2] (assign (v/of 1 2) 2)))) 
+
 ;; run compliance tests
 
 (deftest instance-tests
+  (clojure.core.matrix.compliance-tester/instance-test (v/of 1 2))
   (clojure.core.matrix.compliance-tester/instance-test (v/of 1 2 3))
   (clojure.core.matrix.compliance-tester/instance-test (matrix :vectorz [[[1 2] [3 4]] [[5 6] [7 8]]]))
   (clojure.core.matrix.compliance-tester/instance-test (clone (first (slices (v/of 1 2 3)))))
