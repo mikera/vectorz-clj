@@ -478,7 +478,7 @@
 
 (extend-protocol mp/PNegation
   AScalar (negate [m] (let [m (.clone m)] (.scale m -1.0) m))
-  AVector (negate [m] (let [m (.clone m)] (.scale m -1.0) m))
+  AVector (negate [m] (let [m (.clone m)] (.negate m) m))
   INDArray (negate [m] (let [m (.clone m)] (.scale m -1.0) m)))
 
 (extend-protocol mp/PTranspose
