@@ -7,8 +7,8 @@ Designed for games, simulations and machine learning.
 
 Important features:
 
- - **"Pure"** functions for idiomatic Clojure style are provided. These work as you expect, i.e. return new vectors without mutating their arguments.
- - **"Impure"** functions that mutate vectors are available for performance when you need it. i.e. you can use a nice functional style most of the time, but switch to mutation when you hit a bottleneck.
+ - **"Pure"** functions for idiomatic Clojure style are provided. These return new vectors without mutating their arguments.
+ - **"Impure"** functions that mutate vectors are available for performance when you need it: i.e. you can use a nice functional style most of the time, but switch to mutation when you hit a bottleneck.
  - **Primitive-backed** special purpose vectors and matrices for performance, e.g. Vector3 for fast 3D maths.
  - **Flexible DSL-style** functions for manipulating vectors and matrices, e.g. the ability to create a "view" into a subspace of a large vector.
  - **`core.matrix`** fully supported see: https://github.com/mikera/matrix-api
@@ -30,7 +30,7 @@ Follow the instructions to install with Leiningen / Maven from Clojars:
 
  - https://clojars.org/net.mikera/vectorz-clj
  
-You can then use Vectorz as a standard core.matrix implementation. Example:
+You can then use Vectorz as a standard `core.matrix` implementation. Example:
 
 ```clojure
     (use 'clojure.core.matrix)
