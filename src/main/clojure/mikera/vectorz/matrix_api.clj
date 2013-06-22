@@ -316,7 +316,7 @@
     (get-major-slice [m i]
       (.slice m (int i)))
     (get-slice [m dimension i]
-      (if (== 0 i)
+      (if (== 0 dimension)
         (.slice m (int i))
         (error "Can't get slice from vector with dimension: " dimension)))
   AMatrix
@@ -409,7 +409,7 @@
       (.get m))
   INDArray 
     (element-sum [m]
-      (reduce (fn [acc s] (+ acc (double (mp/element-sum s)))) 0.0 (.getSlices m))))
+      (reduce + (map mp/element-sum (slices m)))))
 
 (extend-protocol mp/PMatrixAdd
   mikera.vectorz.AScalar
@@ -477,7 +477,6 @@
       (.inverse m)))
 
 (extend-protocol mp/PNegation
-  AScalar (negate [m] (let [m (.clone m)] (.scale m -1.0) m))
   AVector (negate [m] (let [m (.clone m)] (.negate m) m))
   INDArray (negate [m] (let [m (.clone m)] (.scale m -1.0) m)))
 
