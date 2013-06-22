@@ -458,7 +458,7 @@
       (.sub m ^AMatrix (coerce m a))))
 
 (extend-protocol mp/PVectorOps
-  mikera.vectorz.AVector
+  AVector
     (vector-dot [a b]
       (.dotProduct a (coerce a b)))
     (length [a]
@@ -489,7 +489,7 @@
   AMatrix (transpose [m] (.clone (.getTranspose m)))) 
 
 (extend-protocol mp/PVectorCross
-  mikera.vectorz.AVector
+  AVector
     (cross-product [a b]
       (let [v (Vector3. a)]
         (.crossProduct v ^AVector (mp/coerce-param a b))
