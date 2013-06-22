@@ -80,9 +80,9 @@
 (defn of 
   "Creates a vector from its numerical components"
   ([& xs]
-    (let [ss (seq xs)
-           len (int (count ss))
-           v (Vectorz/newVector len)]
+    (let [len (int (count xs))
+          ss (seq xs)
+          ^AVector v (Vectorz/newVector len)]
        (loop [i (int 0) ss ss]
          (if ss
            (do

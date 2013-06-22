@@ -7,7 +7,7 @@
   (:require [clojure.core.matrix.protocols :as mp])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.matrixx.impl DiagonalMatrix])
-  (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3])
+  (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
   (:import [mikera.arrayz SliceArray INDArray])
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
@@ -16,13 +16,38 @@
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* true)
 
-(declare vectorz-coerce*)
+(declare vectorz-coerce* avector-coerce*)
+
+(defmacro tag-symbol [tag form]
+  (let [tagged-sym (vary-meta (gensym "res") assoc :tag tag)]
+    `(let [~tagged-sym ~form] ~tagged-sym)))
 
 (defmacro vectorz-coerce [x]
-  (let [tagged-sym (vary-meta (gensym "res") assoc :tag 'mikera.arrayz.INDArray)] 
-    `(let [x# ~x
-           ~tagged-sym (if (instance? INDArray x#) x# (vectorz-coerce* x#))]
-         ~tagged-sym)))
+  `(tag-symbol mikera.arrayz.INDArray
+               (let [x# ~x]
+                 (if (instance? INDArray x#) x# (vectorz-coerce* x#)))))
+
+(defmacro avector-coerce [m x]
+  `(tag-symbol mikera.vectorz.AVector
+               (let [x# ~x] 
+                 (if (instance? AVector x#) x# (avector-coerce* ~m x#)))))
+
+(defmacro with-clone [[sym exp] & body]
+  (let []
+    (when-not (symbol? sym) (error "Symbol required for with-clone binding"))
+    `(let [~sym (.clone ~(if exp exp sym))]
+       ~@body
+       ~sym)))
+
+(defn avector-coerce* 
+  (^AVector [^AVector v m]
+	  (cond
+      (number? m) 
+        (let [r (Vectorz/newVector (.length v))] (.fill r (double m)) r)
+	    (== (mp/dimensionality m) 1)
+        (let [r (Vectorz/newVector (.length v))]
+              (assign! r m) r)
+      :else (Vectorz/toVector m)))) 
 
 (eval
   `(extend-protocol mp/PImplementation
@@ -85,29 +110,21 @@
    INDArray
     (dimensionality [m]
       (.dimensionality m))
-    (row-count [m]
-      (mp/dimension-count m 0))
     (is-vector? [m]
       (== 1 (.dimensionality m)))
     (is-scalar? [m]
       false)
-    (column-count [m]
-      (mp/dimension-count m 1))
     (get-shape [m]
       (.getShape m))
     (dimension-count [m x]
-      (aget (.getShape m) (int x)))
+      (.getShape m (int x)))
   AScalar
     (dimensionality [m]
       0)
-    (row-count [m]
-      (error "Can't get row-count of a scalar"))
     (is-vector? [m]
       false)
     (is-scalar? [m]
       false) ;; this isn't an immutable scalar value in the core.matrix sense
-    (column-count [m]
-      (error "Can't get row-count of a scalar"))
     (get-shape [m]
       (.getShape m))
     (dimension-count [m x]
@@ -115,14 +132,10 @@
   AVector
     (dimensionality [m]
       1)
-    (row-count [m]
-      (.length m))
     (is-vector? [m]
       true)
     (is-scalar? [m]
       false)
-    (column-count [m]
-      (error "A vector does not have diminsion columns (dimension 1)"))
     (get-shape [m]
       (.getShape m))
     (dimension-count [m x]
@@ -132,21 +145,18 @@
   AMatrix
     (dimensionality [m]
       2)
-    (row-count [m]
-      (.rowCount m))
     (is-vector? [m]
       false)
     (is-scalar? [m]
       false)
-    (column-count [m]
-      (.columnCount m))
     (get-shape [m]
       (.getShape m))
     (dimension-count [m x]
-      (cond 
-        (== x 0) (.rowCount m)
-        (== x 1) (.columnCount m)
-        :else (error "Matrix does not have dimension: " x))))
+      (let [x (int x)]
+        (cond 
+          (== x 0) (.rowCount m)
+          (== x 1) (.columnCount m)
+          :else (error "Matrix does not have dimension: " x)))))
     
 (extend-protocol mp/PIndexedAccess
    INDArray
@@ -217,11 +227,11 @@
 (extend-protocol mp/PIndexedSetting
   INDArray
     (set-1d [m row v] 
-      (let [m (.clone m)] (.set m (int row) (double v)) m))
+      (with-clone [m] (.set m (int row) (double v))))
     (set-2d [m row column v] 
-      (let [m (.clone m)] (.set m (int row) (int column) (double v)) m))
+      (with-clone [m] (.set m (int row) (int column) (double v))))
     (set-nd [m indexes v]
-      (let [m (.clone m)] (.set m (int-array indexes) (double v)) m)) 
+      (with-clone [m] (.set m (int-array indexes) (double v)))) 
     (is-mutable? [m] (.isFullyMutable m)) 
   
   AScalar
@@ -229,7 +239,7 @@
     (set-2d [m row column v] (error "Can't do 2-dimensional set on a 0-d array!"))
     (set-nd [m indexes v]
       (if (== 0 (count indexes))
-        (let [^AScalar m (clone m)] (.set m (double v)) m)
+        (mikera.vectorz.impl.DoubleScalar. (double v))
         (error "Can't do " (count indexes) "-dimensional set on a 0-d array!"))) 
     (is-mutable? [m] (.isFullyMutable m)) 
   AVector
@@ -283,15 +293,29 @@
 
 
 (extend-protocol mp/PMatrixSlices
+  INDArray
+    (get-row [m i]
+      (if (== 2 (mp/dimensionality m))
+        (.slice m (int i))
+        (error "Can't get row of array with dimensionslty: " (mp/dimensionality m))))
+    (get-column [m i]
+      (if (== 2 (mp/dimensionality m))
+        (.slice m (int 1) (int i))
+        (error "Can't get column of array with dimensionslty: " (mp/dimensionality m))))
+    (get-major-slice [m i]
+      (.slice m (int i)))
+    (get-slice [m dimension i]
+      (let [dimension (int dimension)]
+        (.slice m dimension (int i))))
   AVector
     (get-row [m i]
-      (.slice m (int i)))
+      (error "Can't access row of a 1D vector!"))
     (get-column [m i]
       (error "Can't access column of a 1D vector!"))
     (get-major-slice [m i]
       (.slice m (int i)))
     (get-slice [m dimension i]
-      (if (== 0 i)
+      (if (== 0 dimension)
         (.slice m (int i))
         (error "Can't get slice from vector with dimension: " dimension)))
   AMatrix
@@ -302,10 +326,11 @@
     (get-major-slice [m i]
       (.slice m (int i)))
     (get-slice [m dimension i]
-      (cond 
-        (== 0 dimension) (.getRow m (int i))
-        (== 1 dimension) (.getColumn m (int i))
-        :else (error "Can't get slice from matrix with dimension: " dimension))))
+      (let [dimensions (int dimension)]
+        (cond 
+          (== 0 dimension) (.getRow m (int i))
+          (== 1 dimension) (.getColumn m (int i))
+          :else (error "Can't get slice from matrix with dimension: " dimension)))))
 
 (extend-protocol mp/PSliceView
   INDArray
@@ -315,7 +340,7 @@
 (extend-protocol mp/PSliceSeq
   INDArray  
     (get-major-slice-seq [m] 
-      (map #(.slice m (int %)) (range (aget (.getShape m) 0)))))
+      (seq (.getSliceViews m))))
 
 (extend-protocol mp/PMatrixSubComponents
   AMatrix
@@ -330,7 +355,10 @@
       ([m arr] (.set m (double (nth arr 0))))
       ([m arr start length] (.set m (double (nth arr 0)))))
   AVector
-    (assign! [m source] (.set m (vectorz-coerce source)))
+    (assign! [m source] 
+      (if (number? source) 
+        (.fill m (double source))
+        (.set m (vectorz-coerce source))))
     (assign-array! 
       ([m arr] (dotimes [i (count arr)] (.set m (int i) (double (nth arr i)))))
       ([m arr start length] 
@@ -381,7 +409,7 @@
       (.get m))
   INDArray 
     (element-sum [m]
-      (reduce (fn [acc s] (+ acc (double (mp/element-sum s)))) 0.0 (.getSlices m))))
+      (.elementSum m)))
 
 (extend-protocol mp/PMatrixAdd
   mikera.vectorz.AScalar
@@ -406,28 +434,33 @@
         m))
     (matrix-sub [m a]
       (let [m (.clone m)] 
-        (.addMultiple m (vectorz-coerce a) -1.0)
+        (.sub m (vectorz-coerce a))
         m)))
 
 (extend-protocol mp/PMatrixAddMutable
-  mikera.vectorz.AScalar
+  INDArray
     (matrix-add! [m a]
-      (+ (.get m) (double (mp/get-0d a))))
+      (.add m (vectorz-coerce a)))
     (matrix-sub! [m a]
-      (- (.get m) (double (mp/get-0d a))))
-  mikera.vectorz.AVector
+      (.sub m (vectorz-coerce a)))
+  AScalar
+    (matrix-add! [m a]
+      (.add m (double (mp/get-0d a))))
+    (matrix-sub! [m a]
+      (.sub m (double (mp/get-0d a))))
+  AVector
     (matrix-add! [m a]
       (.add m ^AVector (coerce m a)))
     (matrix-sub! [m a]
       (.sub m ^AVector (coerce m a)))
-  mikera.matrixx.AMatrix
+  AMatrix
     (matrix-add! [m a]
       (.add m ^AMatrix (coerce m a)))
     (matrix-sub! [m a]
       (.sub m ^AMatrix (coerce m a))))
 
 (extend-protocol mp/PVectorOps
-  mikera.vectorz.AVector
+  AVector
     (vector-dot [a b]
       (.dotProduct a (coerce a b)))
     (length [a]
@@ -449,17 +482,18 @@
       (.inverse m)))
 
 (extend-protocol mp/PNegation
-  AScalar (negate [m] (let [m (.clone m)] (.scale m -1.0) m))
-  AVector (negate [m] (let [m (.clone m)] (.scale m -1.0) m))
-  INDArray (negate [m] (let [m (.clone m)] (.scale m -1.0) m)))
+  AScalar (negate [m] (with-clone [m] (.negate m)))
+  AVector (negate [m] (with-clone [m] (.negate m)))
+  AMatrix (negate [m] (with-clone [m] (.negate m)))
+  INDArray (negate [m] (with-clone [m] (.scale m -1.0))))
 
 (extend-protocol mp/PTranspose
-  AScalar (transpose [m] (.clone m))
-  AVector (transpose [m] (.clone m))
-  AMatrix (transpose [m] (.clone (.getTranspose m)))) 
+  AScalar (transpose [m] m)
+  AVector (transpose [m] m)
+  AMatrix (transpose [m] (.getTranspose m))) 
 
 (extend-protocol mp/PVectorCross
-  mikera.vectorz.AVector
+  AVector
     (cross-product [a b]
       (let [v (Vector3. a)]
         (.crossProduct v ^AVector (mp/coerce-param a b))
@@ -483,10 +517,13 @@
 	        (cond 
 	          (number? p) (double p)
 	          (instance? AScalar p) p
-	          :else (double (mp/get-0d p)))
-		    (== 1 (dimensionality p))
+            (nil? p) nil
+	          :else (do
+                   ;; (println (str "Coercing " p))
+                   (double (mp/get-0d p))))
+		    (== 1 dims)
 		      (try (Vectorz/toVector (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
-		    (== 2 (dimensionality p))
+		    (== 2 dims)
 		      (try (Matrixx/toMatrix (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
 		    :else 
 	        (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
@@ -511,15 +548,19 @@
     (convert-to-nested-vectors [m]
       (if (== 0 (.dimensionality m))
         (mp/get-0d m)
-        (mapv #(mp/convert-to-nested-vectors %) (.getSlices m)))))
+        (mapv mp/convert-to-nested-vectors (.getSlices m)))))
 
 (extend-protocol mp/PMatrixMultiply
   AScalar
     (matrix-multiply [m a]
       (mp/pre-scale a (.get m)))
+    (element-multiply [m a]
+      (mp/pre-scale a (.get m)))
   AVector
     (matrix-multiply [m a]
       (.innerProduct m (vectorz-coerce a)))
+    (element-multiply [m a]
+      (with-clone [m] (.multiply m (vectorz-coerce a))))
   AMatrix
     (matrix-multiply [m a]
       (cond 
@@ -529,11 +570,17 @@
             r)
         (instance? AMatrix a) (.compose m ^AMatrix a) 
         :else (.innerProduct m (vectorz-coerce a))))
+    (element-multiply [m a]
+      (with-clone [m] 
+        (.multiply m (vectorz-coerce a))))
   INDArray
     (matrix-multiply [m a]
       (if-let [^INDAArray a (vectorz-coerce a)]
         (.innerProduct m a)
-        (error "Can't convert to vectorz representation: " a))))
+        (error "Can't convert to vectorz representation: " a)))
+    (element-multiply [m a]
+      (with-clone [m] 
+        (.multiply m (vectorz-coerce a)))))
 
 (extend-protocol mp/PMatrixProducts
   INDArray
@@ -543,7 +590,40 @@
 (defn vectorz-scale 
   "Scales a vectorz array, return a new scaled array"
   ([^INDArray m ^double a]
-    (let [m (.clone m)] (.scale m (double a)) m)))
+    (with-clone [m] (.scale m (double a)))))
+
+(extend-protocol mp/PAddProduct
+  AVector
+    (add-product [m a b]
+      (with-clone [m]
+        (.addProduct m (avector-coerce m a) (avector-coerce m b))))) 
+
+(extend-protocol mp/PAddProductMutable
+  AVector
+    (add-product! [m a b]
+      (.addProduct m (avector-coerce m a) (avector-coerce m b)))) 
+
+(extend-protocol mp/PAddScaled
+  AVector
+    (add-scaled [m a factor]
+      (with-clone [m] 
+        (.addMultiple m (avector-coerce m a) (double factor))))) 
+
+(extend-protocol mp/PAddScaledMutable
+  AVector
+    (add-scaled! [m a factor]
+      (.addMultiple m (avector-coerce m a) (double factor)))) 
+
+(extend-protocol mp/PAddScaledProduct
+  AVector
+    (add-scaled-product [m a b factor]
+      (with-clone [m]
+        (.addProduct m (avector-coerce m a) (avector-coerce m b) (double factor))))) 
+
+(extend-protocol mp/PAddScaledProductMutable
+  AVector
+    (add-scaled-product! [m a b factor]
+      (.addProduct m (avector-coerce m a) (avector-coerce m b) (double factor)))) 
 
 (extend-protocol mp/PMatrixScaling
   AScalar 
@@ -561,8 +641,8 @@
 
 (extend-protocol mp/PMatrixAdd
   AVector
-    (matrix-add [m a] (let [m (.clone m)] (.add m (vectorz-coerce a)) m))
-    (matrix-sub [m a] (let [m (.clone m)] (.sub m (vectorz-coerce a)) m)))
+    (matrix-add [m a] (with-clone [m] (.add m (vectorz-coerce a))))
+    (matrix-sub [m a] (with-clone [m] (.sub m (vectorz-coerce a)))))
 
 (extend-protocol mp/PMatrixAddMutable
   AVector
@@ -579,6 +659,70 @@
       (if (instance? AVector v) 
         (.transformInPlace m ^AVector v)
         (assign! v (transform m v)))))
+
+(def math-op-mapping
+  '[(abs Ops/ABS)
+	  (acos Ops/ACOS)
+	  (asin Ops/ASIN)
+	  (atan Ops/ATAN)
+	  (cbrt Ops/CBRT)
+	  (ceil Ops/CEIL)
+	  (cos Ops/COS)
+	  (cosh Ops/COSH)
+	  (exp Ops/EXP)
+	  (floor Ops/FLOOR)
+	  (log Ops/LOG)
+	  (log10 Ops/LOG10)
+	  (round Ops/RINT)
+	  (signum Ops/SIGNUM)
+	  (sin Ops/SIN)
+	  (sinh Ops/SINH)
+	  (sqrt Ops/SQRT)
+	  (tan Ops/TAN)
+	  (tanh Ops/TANH)
+   	(to-degrees Ops/TO_DEGREES)
+	  (to-radians Ops/TO_RADIANS)])
+
+(eval
+`(extend-protocol mp/PMathsFunctions
+   INDArray
+    ~@(map 
+       (fn [[fname op]] 
+         `(~fname [~'m] (with-clone [~'m] (.applyTo ~op ~'m)))) 
+       math-op-mapping)
+   AMatrix
+    ~@(map 
+       (fn [[fname op]] 
+         `(~fname [~'m]
+                  (with-clone [~'m] (.applyTo ~op ~'m)))) 
+       math-op-mapping)
+   AVector
+    ~@(map 
+       (fn [[fname op]] 
+         `(~fname [~'m]
+                  (with-clone [~'m] (.applyTo ~op ~'m)))) 
+       math-op-mapping)))
+
+(eval
+`(extend-protocol mp/PMathsFunctionsMutable
+   INDArray
+    ~@(map 
+       (fn [[fname op]] 
+         (let [fname (symbol (str fname "!"))]
+           `(~fname [~'m] (.applyTo ~op ~'m)))) 
+       math-op-mapping)
+   AMatrix
+    ~@(map 
+       (fn [[fname op]] 
+         (let [fname (symbol (str fname "!"))]
+           `(~fname [~'m] (.applyTo ~op ~'m)))) 
+       math-op-mapping)
+   AVector
+    ~@(map 
+       (fn [[fname op]] 
+         (let [fname (symbol (str fname "!"))]
+           `(~fname [~'m] (.applyTo ~op ~'m)))) 
+       math-op-mapping)))
 
 ;; TODO printing
 ;; we want to print in a form that can be constructed again
