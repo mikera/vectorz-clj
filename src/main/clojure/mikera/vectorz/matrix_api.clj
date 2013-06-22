@@ -438,9 +438,9 @@
 (extend-protocol mp/PMatrixAddMutable
   mikera.vectorz.AScalar
     (matrix-add! [m a]
-      (+ (.get m) (double (mp/get-0d a))))
+      (.add m (double (mp/get-0d a))))
     (matrix-sub! [m a]
-      (- (.get m) (double (mp/get-0d a))))
+      (.sub m (double (mp/get-0d a))))
   mikera.vectorz.AVector
     (matrix-add! [m a]
       (.add m ^AVector (coerce m a)))
