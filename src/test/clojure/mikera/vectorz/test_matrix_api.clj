@@ -42,6 +42,14 @@
   (let [v (v/vec [1 2 3])]
     (is (equals [2 4 6] (add v v)))))
 
+(deftest test-mutability
+  (let [v (v/of 1 2)]
+    (is (mutable? v))
+    (is (mutable? (first (slices v)))))
+  (let [v (new-array :vectorz [3 4 5 6])]
+    (is (mutable? v))
+    (is (mutable? (first (slices v))))))
+
 (deftest test-new-array
   (is (instance? AVector (new-array :vectorz [10])))
   (is (instance? AMatrix (new-array :vectorz [10 10])))

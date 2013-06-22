@@ -338,7 +338,7 @@
 (extend-protocol mp/PSliceSeq
   INDArray  
     (get-major-slice-seq [m] 
-      (map #(.slice m (int %)) (range (aget (.getShape m) 0)))))
+      (seq (.getSliceViews m))))
 
 (extend-protocol mp/PMatrixSubComponents
   AMatrix
@@ -407,7 +407,7 @@
       (.get m))
   INDArray 
     (element-sum [m]
-      (reduce + (map mp/element-sum (slices m)))))
+      (.elementSum m)))
 
 (extend-protocol mp/PMatrixAdd
   mikera.vectorz.AScalar
