@@ -35,7 +35,7 @@
 (defmacro with-clone [[sym exp] & body]
   (let []
     (when-not (symbol? sym) (error "Symbol required for with-clone binding"))
-    `(let [~sym (.clone ~exp)]
+    `(let [~sym (.clone ~(if exp exp sym))]
        ~@body
        ~sym)))
 
@@ -226,11 +226,11 @@
 (extend-protocol mp/PIndexedSetting
   INDArray
     (set-1d [m row v] 
-      (let [m (.clone m)] (.set m (int row) (double v)) m))
+      (with-clone [m] (.set m (int row) (double v))))
     (set-2d [m row column v] 
-      (let [m (.clone m)] (.set m (int row) (int column) (double v)) m))
+      (with-clone [m] (.set m (int row) (int column) (double v))))
     (set-nd [m indexes v]
-      (let [m (.clone m)] (.set m (int-array indexes) (double v)) m)) 
+      (with-clone [m] (.set m (int-array indexes) (double v)))) 
     (is-mutable? [m] (.isFullyMutable m)) 
   
   AScalar
@@ -238,7 +238,7 @@
     (set-2d [m row column v] (error "Can't do 2-dimensional set on a 0-d array!"))
     (set-nd [m indexes v]
       (if (== 0 (count indexes))
-        (let [^AScalar m (clone m)] (.set m (double v)) m)
+        (mikera.vectorz.impl.DoubleScalar. (double v))
         (error "Can't do " (count indexes) "-dimensional set on a 0-d array!"))) 
     (is-mutable? [m] (.isFullyMutable m)) 
   AVector
@@ -480,8 +480,9 @@
       (.inverse m)))
 
 (extend-protocol mp/PNegation
-  AVector (negate [m] (let [m (.clone m)] (.negate m) m))
-  INDArray (negate [m] (let [m (.clone m)] (.scale m -1.0) m)))
+  AScalar (negate [m] (with-clone [m] (.negate m)))
+  AVector (negate [m] (with-clone [m] (.negate m)))
+  INDArray (negate [m] (with-clone [m] (.scale m -1.0))))
 
 (extend-protocol mp/PTranspose
   AScalar (transpose [m] (.clone m))
@@ -576,14 +577,13 @@
 (defn vectorz-scale 
   "Scales a vectorz array, return a new scaled array"
   ([^INDArray m ^double a]
-    (let [m (.clone m)] (.scale m (double a)) m)))
+    (with-clone [m] (.scale m (double a)))))
 
 (extend-protocol mp/PAddProduct
   AVector
     (add-product [m a b]
-      (let [m (.clone m)]
-        (.addProduct m (avector-coerce m a) (avector-coerce m b))
-        m))) 
+      (with-clone [m]
+        (.addProduct m (avector-coerce m a) (avector-coerce m b))))) 
 
 (extend-protocol mp/PAddProductMutable
   AVector
@@ -593,9 +593,8 @@
 (extend-protocol mp/PAddScaled
   AVector
     (add-scaled [m a factor]
-      (let [m (.clone m)] 
-        (.addMultiple m (avector-coerce m a) (double factor))
-        m))) 
+      (with-clone [m] 
+        (.addMultiple m (avector-coerce m a) (double factor))))) 
 
 (extend-protocol mp/PAddScaledMutable
   AVector
@@ -605,9 +604,8 @@
 (extend-protocol mp/PAddScaledProduct
   AVector
     (add-scaled-product [m a b factor]
-      (let [m (.clone m)]
-        (.addProduct m (avector-coerce m a) (avector-coerce m b) (double factor))
-        m))) 
+      (with-clone [m]
+        (.addProduct m (avector-coerce m a) (avector-coerce m b) (double factor))))) 
 
 (extend-protocol mp/PAddScaledProductMutable
   AVector
@@ -630,8 +628,8 @@
 
 (extend-protocol mp/PMatrixAdd
   AVector
-    (matrix-add [m a] (let [m (.clone m)] (.add m (vectorz-coerce a)) m))
-    (matrix-sub [m a] (let [m (.clone m)] (.sub m (vectorz-coerce a)) m)))
+    (matrix-add [m a] (with-clone [m] (.add m (vectorz-coerce a))))
+    (matrix-sub [m a] (with-clone [m] (.sub m (vectorz-coerce a)))))
 
 (extend-protocol mp/PMatrixAddMutable
   AVector
