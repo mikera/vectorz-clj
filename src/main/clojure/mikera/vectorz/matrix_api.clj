@@ -121,7 +121,7 @@
     (get-shape [m]
       (.getShape m))
     (dimension-count [m x]
-      (aget (.getShape m) (int x)))
+      (.getShape m (int x)))
   AScalar
     (dimensionality [m]
       0)
