@@ -294,7 +294,7 @@
 (extend-protocol mp/PMatrixSlices
   AVector
     (get-row [m i]
-      (.slice m (int i)))
+      (error "Can't access row of a 1D vector!"))
     (get-column [m i]
       (error "Can't access column of a 1D vector!"))
     (get-major-slice [m i]
