@@ -152,10 +152,11 @@
     (get-shape [m]
       (.getShape m))
     (dimension-count [m x]
-      (cond 
-        (== x 0) (.rowCount m)
-        (== x 1) (.columnCount m)
-        :else (error "Matrix does not have dimension: " x))))
+      (let [x (int x)]
+        (cond 
+          (== x 0) (.rowCount m)
+          (== x 1) (.columnCount m)
+          :else (error "Matrix does not have dimension: " x)))))
     
 (extend-protocol mp/PIndexedAccess
    INDArray
@@ -483,6 +484,7 @@
 (extend-protocol mp/PNegation
   AScalar (negate [m] (with-clone [m] (.negate m)))
   AVector (negate [m] (with-clone [m] (.negate m)))
+  AMatrix (negate [m] (with-clone [m] (.negate m)))
   INDArray (negate [m] (with-clone [m] (.scale m -1.0))))
 
 (extend-protocol mp/PTranspose
