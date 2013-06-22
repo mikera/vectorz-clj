@@ -1,5 +1,6 @@
 (ns mikera.vectorz.benchmark-matrix
   (:use clojure.core.matrix)
+  (:use clojure.core.matrix.stats)
   (:require [clojure.core.matrix.operators :refer [+ - *]])
   (:refer-clojure :exclude [+ - * ])
   (:require [criterium.core :as c])
@@ -7,6 +8,8 @@
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])
   (:import [mikera.vectorz Vector3 Vectorz]))
+
+(set-current-implementation :vectorz)
 
 (defn benchmarks []
   ;; direct vectorz add

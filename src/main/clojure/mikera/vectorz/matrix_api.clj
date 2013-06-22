@@ -551,9 +551,13 @@
   AScalar
     (matrix-multiply [m a]
       (mp/pre-scale a (.get m)))
+    (element-multiply [m a]
+      (mp/pre-scale a (.get m)))
   AVector
     (matrix-multiply [m a]
       (.innerProduct m (vectorz-coerce a)))
+    (element-multiply [m a]
+      (with-clone [m] (.multiply m (vectorz-coerce a))))
   AMatrix
     (matrix-multiply [m a]
       (cond 
@@ -563,11 +567,17 @@
             r)
         (instance? AMatrix a) (.compose m ^AMatrix a) 
         :else (.innerProduct m (vectorz-coerce a))))
+    (element-multiply [m a]
+      (with-clone [m] 
+        (.multiply m (vectorz-coerce a))))
   INDArray
     (matrix-multiply [m a]
       (if-let [^INDAArray a (vectorz-coerce a)]
         (.innerProduct m a)
-        (error "Can't convert to vectorz representation: " a))))
+        (error "Can't convert to vectorz representation: " a)))
+    (element-multiply [m a]
+      (with-clone [m] 
+        (.multiply m (vectorz-coerce a)))))
 
 (extend-protocol mp/PMatrixProducts
   INDArray
