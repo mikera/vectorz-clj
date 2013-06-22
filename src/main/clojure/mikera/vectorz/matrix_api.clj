@@ -685,13 +685,40 @@
    INDArray
     ~@(map 
        (fn [[fname op]] 
-         `(~fname [~'m] (with-clone [~'m] (.applyTo ~op ~'m)))) 
+         `(~fname [~'m] (with-clone [~'m] (.applyOp ~'m ~op)))) 
+       math-op-mapping)
+   AMatrix
+    ~@(map 
+       (fn [[fname op]] 
+         `(~fname [~'m]
+                  (with-clone [~'m] (.applyOp ~'m ~op)))) 
        math-op-mapping)
    AVector
     ~@(map 
        (fn [[fname op]] 
          `(~fname [~'m]
-                  (with-clone [~'m] (.applyTo ~op ~'m)))) 
+                  (with-clone [~'m] (.applyOp ~'m ~op)))) 
+       math-op-mapping)))
+
+(eval
+`(extend-protocol mp/PMathsFunctionsMutable
+   INDArray
+    ~@(map 
+       (fn [[fname op]] 
+         (let [fname (symbol (str fname "!"))]
+           `(~fname [~'m] (.applyOp ~'m ~op)))) 
+       math-op-mapping)
+   AMatrix
+    ~@(map 
+       (fn [[fname op]] 
+         (let [fname (symbol (str fname "!"))]
+           `(~fname [~'m] (.applyOp ~'m ~op)))) 
+       math-op-mapping)
+   AVector
+    ~@(map 
+       (fn [[fname op]] 
+         (let [fname (symbol (str fname "!"))]
+           `(~fname [~'m](.applyOp ~'m ~op)))) 
        math-op-mapping)))
 
 ;; TODO printing
