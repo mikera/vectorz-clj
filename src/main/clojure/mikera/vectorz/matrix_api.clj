@@ -110,14 +110,10 @@
    INDArray
     (dimensionality [m]
       (.dimensionality m))
-    (row-count [m]
-      (mp/dimension-count m 0))
     (is-vector? [m]
       (== 1 (.dimensionality m)))
     (is-scalar? [m]
       false)
-    (column-count [m]
-      (mp/dimension-count m 1))
     (get-shape [m]
       (.getShape m))
     (dimension-count [m x]
@@ -125,14 +121,10 @@
   AScalar
     (dimensionality [m]
       0)
-    (row-count [m]
-      (error "Can't get row-count of a scalar"))
     (is-vector? [m]
       false)
     (is-scalar? [m]
       false) ;; this isn't an immutable scalar value in the core.matrix sense
-    (column-count [m]
-      (error "Can't get row-count of a scalar"))
     (get-shape [m]
       (.getShape m))
     (dimension-count [m x]
@@ -140,14 +132,10 @@
   AVector
     (dimensionality [m]
       1)
-    (row-count [m]
-      (.length m))
     (is-vector? [m]
       true)
     (is-scalar? [m]
       false)
-    (column-count [m]
-      (error "A vector does not have diminsion columns (dimension 1)"))
     (get-shape [m]
       (.getShape m))
     (dimension-count [m x]
@@ -157,14 +145,10 @@
   AMatrix
     (dimensionality [m]
       2)
-    (row-count [m]
-      (.rowCount m))
     (is-vector? [m]
       false)
     (is-scalar? [m]
       false)
-    (column-count [m]
-      (.columnCount m))
     (get-shape [m]
       (.getShape m))
     (dimension-count [m x]
