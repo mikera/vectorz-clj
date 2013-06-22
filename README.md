@@ -16,7 +16,7 @@ Important features:
  
 vectorz-clj requires Clojure 1.4 or above, and an up to date version of core.matrix
  
-[![Build Status](https://travis-ci.org/mikera/vectorz-clj.png?branch=vectorz-clj-0.2.2)](https://travis-ci.org/mikera/vectorz-clj)
+[![Build Status](https://travis-ci.org/mikera/vectorz-clj.png?branch=develop)](https://travis-ci.org/mikera/vectorz-clj)
 
 ### License
 
@@ -36,14 +36,14 @@ You can then use Vectorz as a standard `core.matrix` implementation. Example:
     (use 'clojure.core.matrix)
     (use 'clojure.core.matrix.operators)           ;; overrides *, + etc. for matrices
     
-    (set-current-implementation :vectorz)  ;; uses Vectorz as default matrix implementation
+    (set-current-implementation :vectorz)  ;; use Vectorz as default matrix implementation
     
     ;; define a 2x2 Matrix
     (def M (matrix [[1 2] [3 4]]))
     M
     => #<Matrix22 [[1.0,2.0][3.0,4.0]]>
     
-    ;; define a length 2 vector (a 1D matrix is equivalent considered a vector in core.matrix)
+    ;; define a length 2 vector (a 1D matrix is considered equivalent to a vector in core.matrix)
     (def v (matrix [1 2]))
     v
     => #<Vector2 [1.0,2.0]>
