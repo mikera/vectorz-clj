@@ -436,17 +436,22 @@
         m)))
 
 (extend-protocol mp/PMatrixAddMutable
-  mikera.vectorz.AScalar
+  INDArray
+    (matrix-add! [m a]
+      (.add m (vectorz-coerce a)))
+    (matrix-sub! [m a]
+      (.sub m (vectorz-coerce a)))
+  AScalar
     (matrix-add! [m a]
       (.add m (double (mp/get-0d a))))
     (matrix-sub! [m a]
       (.sub m (double (mp/get-0d a))))
-  mikera.vectorz.AVector
+  AVector
     (matrix-add! [m a]
       (.add m ^AVector (coerce m a)))
     (matrix-sub! [m a]
       (.sub m ^AVector (coerce m a)))
-  mikera.matrixx.AMatrix
+  AMatrix
     (matrix-add! [m a]
       (.add m ^AMatrix (coerce m a)))
     (matrix-sub! [m a]
