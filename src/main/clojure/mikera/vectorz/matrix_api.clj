@@ -485,9 +485,9 @@
   INDArray (negate [m] (with-clone [m] (.scale m -1.0))))
 
 (extend-protocol mp/PTranspose
-  AScalar (transpose [m] (.clone m))
-  AVector (transpose [m] (.clone m))
-  AMatrix (transpose [m] (.clone (.getTranspose m)))) 
+  AScalar (transpose [m] m)
+  AVector (transpose [m] m)
+  AMatrix (transpose [m] (.getTranspose m))) 
 
 (extend-protocol mp/PVectorCross
   AVector
