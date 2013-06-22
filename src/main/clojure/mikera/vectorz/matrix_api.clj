@@ -544,7 +544,7 @@
     (convert-to-nested-vectors [m]
       (if (== 0 (.dimensionality m))
         (mp/get-0d m)
-        (mapv #(mp/convert-to-nested-vectors %) (.getSlices m)))))
+        (mapv mp/convert-to-nested-vectors (.getSlices m)))))
 
 (extend-protocol mp/PMatrixMultiply
   AScalar
