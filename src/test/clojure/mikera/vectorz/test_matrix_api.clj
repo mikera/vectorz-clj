@@ -84,7 +84,9 @@
         b (v/vec [1 1 4 0 0])
         r (sub a b)]
     (is (equals [0 1 -1 0 0] (coerce [] r)))
-    (is (instance? clojure.lang.IPersistentVector (coerce [] r))))) 
+    (is (instance? clojure.lang.IPersistentVector (coerce [] r)))
+    ;; (is (instance? INDArray (coerce :vectorz 10.0))) ;; TODO: what should this be??
+    )) 
 
 (deftest test-ndarray
   (is (equals [[[1]]] (matrix :vectorz [[[1]]])))
@@ -110,14 +112,16 @@
   (is (== -1.0 (det (matrix :vectorz [[0 1] [1 0]])))))
 
 (defn test-round-trip [m]
-  (is (equals m (read-string (print-str m)))))
+  (is (equals m (read-string (.toString m))))
+  ;; TODO edn round-tripping?
+  )
 
 (deftest test-round-trips
-;  (test-round-trip (v/of 1 2))
-;  (test-round-trip (v/of 1 2 3 4 5))
-;  (test-round-trip (matrix :vectorz [[1 2 3] [4 5 6]]))
-;  (test-round-trip (matrix :vectorz [[1 2] [3 4]]))
-;  (test-round-trip (first (slices (v/of 1 2 3))))
+  (test-round-trip (v/of 1 2))
+  (test-round-trip (v/of 1 2 3 4 5))
+  (test-round-trip (matrix :vectorz [[1 2 3] [4 5 6]]))
+  (test-round-trip (matrix :vectorz [[1 2] [3 4]]))
+  (test-round-trip (first (slices (v/of 1 2 3))))
 )
 
 (deftest test-equals
