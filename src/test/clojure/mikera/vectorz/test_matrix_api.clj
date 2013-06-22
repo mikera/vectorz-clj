@@ -217,7 +217,8 @@
 
 (deftest test-maths-functions
   (testing "abs"
-    (is (equals [1 2 3] (abs [-1 2 -3]))))) 
+    (is (equals [1 2 3] (abs [-1 2 -3])))
+    (is (equals [1 2 3] (abs (v/of -1 2 -3)))))) 
 
 (deftest test-assign
   (is (e== [2 2] (assign (v/of 1 2) 2)))) 

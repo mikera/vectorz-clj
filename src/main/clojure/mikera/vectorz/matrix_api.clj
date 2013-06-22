@@ -7,7 +7,7 @@
   (:require [clojure.core.matrix.protocols :as mp])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.matrixx.impl DiagonalMatrix])
-  (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3])
+  (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
   (:import [mikera.arrayz SliceArray INDArray])
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
@@ -647,30 +647,42 @@
         (.transformInPlace m ^AVector v)
         (assign! v (transform m v)))))
 
-;; TODO: math function implementations
-;(extend-protocol mp/PMathsFunctions
-;  AVector
-;    (abs [m] (with-clone [m m] (.abs m)))
-;	  (acos Math/acos)
-;	  (asin Math/asin)
-;	  (atan Math/atan)
-;	  (cbrt Math/cbrt)
-;	  (ceil Math/ceil)
-;	  (cos Math/cos)
-;	  (cosh Math/cosh)
-;	  (exp Math/exp)
-;	  (floor Math/floor)
-;	  (log Math/log)
-;	  (log10 Math/log10)
-;	  (round Math/rint)
-;	  (signum Math/signum)
-;	  (sin Math/sin)
-;	  (sinh Math/sinh)
-;	  (sqrt Math/sqrt)
-;	  (tan Math/tan)
-;	  (tanh Math/tanh)
-;   	(to-degrees Math/toDegrees)
-;	  (to-radians Math/toRadians))
+(def math-op-mapping
+  '[(abs Ops/ABS)
+	  (acos Ops/ACOS)
+	  (asin Ops/ASIN)
+	  (atan Ops/ATAN)
+	  (cbrt Ops/CBRT)
+	  (ceil Ops/CEIL)
+	  (cos Ops/COS)
+	  (cosh Ops/COSH)
+	  (exp Ops/EXP)
+	  (floor Ops/FLOOR)
+	  (log Ops/LOG)
+	  (log10 Ops/LOG10)
+	  (round Ops/RINT)
+	  (signum Ops/SIGNUM)
+	  (sin Ops/SIN)
+	  (sinh Ops/SINH)
+	  (sqrt Ops/SQRT)
+	  (tan Ops/TAN)
+	  (tanh Ops/TANH)
+   	(to-degrees Ops/TO_DEGREES)
+	  (to-radians Ops/TO_RADIANS)])
+
+(eval
+`(extend-protocol mp/PMathsFunctions
+   INDArray
+    ~@(map 
+       (fn [[fname op]] 
+         `(~fname [~'m] (with-clone [~'m] (.applyTo ~op ~'m)))) 
+       math-op-mapping)
+   AVector
+    ~@(map 
+       (fn [[fname op]] 
+         `(~fname [~'m]
+                  (with-clone [~'m] (.applyTo ~op ~'m)))) 
+       math-op-mapping)))
 
 ;; TODO printing
 ;; we want to print in a form that can be constructed again
