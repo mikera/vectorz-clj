@@ -35,11 +35,15 @@
   
   (let [m (matrix (map (fn [r] (range 100)) (range 100)))]
     (c/quick-bench (abs! m))) 
-  ;; ~1ns per element
+  ;; ~1.0ns per element
   
   (let [m (matrix (map (fn [r] (range 100)) (range 100)))]
+    (c/quick-bench (sqrt! m))) 
+  ;; ~3.4ns per element
+
+  (let [m (matrix (map (fn [r] (range 100)) (range 100)))]
     (c/quick-bench (cbrt! m))) 
-  ;; ~25ns per element
+  ;; ~19ns per element
 
 
 ) 
