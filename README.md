@@ -3,7 +3,13 @@ vectorz-clj
 
 Fast vector library for Clojure, building on the vectorz library (https://github.com/mikera/vectorz).
 
-Designed for games, simulations and machine learning. 
+vectorz-clj is designed so that you don't have to compromise, offering both:
+
+ - High performance (about as fast as you can get on the JVM)
+ - An idiomatic high-level Clojure API.
+
+The library was originally designed for games, simulations and machine learning applications, 
+but should be applicable for any situations where you need numerical `double` arrays.
 
 Important features:
 
