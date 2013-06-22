@@ -292,6 +292,20 @@
 
 
 (extend-protocol mp/PMatrixSlices
+  INDArray
+    (get-row [m i]
+      (if (== 2 (mp/dimensionality m))
+        (.slice m (int i))
+        (error "Can't get row of array with dimensionslty: " (mp/dimensionality m))))
+    (get-column [m i]
+      (if (== 2 (mp/dimensionality m))
+        (.slice m (int 1) (int i))
+        (error "Can't get column of array with dimensionslty: " (mp/dimensionality m))))
+    (get-major-slice [m i]
+      (.slice m (int i)))
+    (get-slice [m dimension i]
+      (let [dimension (int dimension)]
+        (.slice m dimension (int i))))
   AVector
     (get-row [m i]
       (error "Can't access row of a 1D vector!"))
