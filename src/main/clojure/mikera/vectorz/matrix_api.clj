@@ -432,7 +432,7 @@
         m))
     (matrix-sub [m a]
       (let [m (.clone m)] 
-        (.addMultiple m (vectorz-coerce a) -1.0)
+        (.sub m (vectorz-coerce a))
         m)))
 
 (extend-protocol mp/PMatrixAddMutable
