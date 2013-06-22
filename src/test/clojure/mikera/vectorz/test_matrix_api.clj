@@ -225,13 +225,19 @@
     (is (equals [1 2 3] (abs (v/of -1 2 -3)))))) 
 
 (deftest test-assign
-  (is (e== [2 2] (assign (v/of 1 2) 2)))) 
+  (is (e== [2 2] (assign (v/of 1 2) 2)))
+  (let [m (array :vectorz [1 2 3 4 5 6])]
+    (is (e== [1 2 3] (subvector m 0 3)))
+    (is (e== [4 5 6] (subvector m 3 3)))
+    (assign! (subvector m 0 3) (subvector m 3 3))
+    (is (e== [4 5 6 4 5 6] m)))) 
 
 ;; run compliance tests
 
 (deftest instance-tests
   (clojure.core.matrix.compliance-tester/instance-test (v/of 1 2))
   (clojure.core.matrix.compliance-tester/instance-test (v/of 1 2 3))
+  (clojure.core.matrix.compliance-tester/instance-test (v/of 1 2 3 4 5 6 7))
   (clojure.core.matrix.compliance-tester/instance-test (matrix :vectorz [[[1 2] [3 4]] [[5 6] [7 8]]]))
   (clojure.core.matrix.compliance-tester/instance-test (clone (first (slices (v/of 1 2 3)))))
   (clojure.core.matrix.compliance-tester/instance-test (first (slices (v/of 1 2 3))))
