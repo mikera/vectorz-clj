@@ -8,6 +8,7 @@
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.matrixx.impl DiagonalMatrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
+  (:import [mikera.vectorz.impl DoubleScalar])
   (:import [mikera.arrayz SliceArray INDArray])
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
@@ -27,10 +28,12 @@
                (let [x# ~x]
                  (if (instance? INDArray x#) x# (vectorz-coerce* x#)))))
 
-(defmacro avector-coerce [m x]
-  `(tag-symbol mikera.vectorz.AVector
-               (let [x# ~x] 
-                 (if (instance? AVector x#) x# (avector-coerce* ~m x#)))))
+(defmacro avector-coerce 
+  "Coerces an argument x to an AVector instance, of same size as m"
+  ([m x]
+    `(tag-symbol mikera.vectorz.AVector
+                 (let [x# ~x] 
+                   (if (instance? AVector x#) x# (avector-coerce* ~m x#))))))
 
 (defmacro with-clone [[sym exp] & body]
   (let []
@@ -44,9 +47,11 @@
 	  (cond
       (number? m) 
         (let [r (Vectorz/newVector (.length v))] (.fill r (double m)) r)
-	    (== (mp/dimensionality m) 1)
-        (let [r (Vectorz/newVector (.length v))]
-              (assign! r m) r)
+	    (instance? AVector m) m
+      (== (mp/dimensionality m) 1)
+        (let [len (.length v)
+              r (Vectorz/newVector len)]
+          (assign! r m) r)
       :else (Vectorz/toVector m)))) 
 
 (eval
@@ -356,9 +361,16 @@
       ([m arr start length] (.set m (double (nth arr 0)))))
   AVector
     (assign! [m source] 
-      (if (number? source) 
-        (.fill m (double source))
-        (.set m (vectorz-coerce source))))
+      (cond 
+        (number? source) 
+           (.fill m (double source))
+        (instance? INDArray source) 
+           (.set m ^INDArray source)
+        (== 0 (mp/dimensionality source))
+           (.fill m (mp/get-0d source))
+        :else 
+           (dotimes [i (.length m)]
+             (.set m i (double (mp/get-1d source i))))))
     (assign-array! 
       ([m arr] (dotimes [i (count arr)] (.set m (int i) (double (nth arr i)))))
       ([m arr start length] 
@@ -450,9 +462,9 @@
       (.sub m (double (mp/get-0d a))))
   AVector
     (matrix-add! [m a]
-      (.add m ^AVector (coerce m a)))
+      (.add m (avector-coerce m a)))
     (matrix-sub! [m a]
-      (.sub m ^AVector (coerce m a)))
+      (.sub m (avector-coerce m a)))
   AMatrix
     (matrix-add! [m a]
       (.add m ^AMatrix (coerce m a)))
@@ -515,7 +527,7 @@
 		    (instance? INDArray p) p
 	      (== 0 dims)
 	        (cond 
-	          (number? p) (double p)
+	          (number? p) (DoubleScalar. (.doubleValue ^Number p))
 	          (instance? AScalar p) p
             (nil? p) nil
 	          :else (do
@@ -532,7 +544,9 @@
 (extend-protocol mp/PCoercion
   INDArray
     (coerce-param [m param]
-      (vectorz-coerce param)))
+      (if (number? param)
+        param
+        (vectorz-coerce param))))
 
 (extend-protocol mp/PConversion
   AScalar
