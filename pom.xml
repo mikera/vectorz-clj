@@ -65,6 +65,11 @@
 			<version>0.1.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>net.mikera</groupId>
+			<artifactId>clojure-utils</artifactId>
+			<version>0.2.2</version>
+		</dependency>
 	</dependencies>
 
 </project>
