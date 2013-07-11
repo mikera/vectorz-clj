@@ -1,7 +1,9 @@
 (ns mikera.vectorz.core
   (:import [mikera.vectorz AVector Vectorz Vector Vector1 Vector2 Vector3 Vector4])
+  (:import [mikera.arrayz INDArray])
   (:import [mikera.transformz Transformz])
   (:require [mikera.vectorz.matrix-api]) 
+  (:require [mikera.cljutils.error :refer [error]]) 
   (:refer-clojure :exclude [+ - * / vec vec? vector subvec get set to-array empty]))
 
 (set! *warn-on-reflection* true)
@@ -30,11 +32,6 @@
 ;; ==================================================
 ;; basic functions
 
-(defmacro error
-  "Throws a vectorz error with the provided message(s)"
-  ([& vals]
-    `(throw (mikera.vectorz.util.VectorzException. (str ~@vals)))))
-
 (defn clone
   "Creates a (mutable) clone of a vector. May not be exactly the same class as the original vector."
   (^AVector [^AVector v]
@@ -48,7 +45,12 @@
 (defn vec?
   "Returns true if v is a vector (i.e. an instance of mikera.vectorz.AVector)"
   ([v]
-    (instance? mikera.vectorz.AVector v)))
+    (instance? AVector v)))
+
+(defn vectorz?
+  "Returns true if v is a vectorz class (i.e. an instance of mikera.arrayz.INDArray)"
+  ([a]
+    (instance? INDArray a)))
 
 (defn get
   "Returns the component of a vector at a specific index position"

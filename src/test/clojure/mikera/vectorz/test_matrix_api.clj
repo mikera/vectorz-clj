@@ -11,6 +11,7 @@
   (:require clojure.core.matrix.impl.persistent-vector)
   (:require [clojure.core.matrix.impl.wrappers :as wrap])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
+  (:import [mikera.vectorz.impl DoubleScalar])
   (:import [mikera.vectorz AVector Vectorz Vector])
   (:import [mikera.arrayz INDArray]))
 
@@ -42,11 +43,16 @@
   (let [v (v/vec [1 2 3])]
     (is (equals [2 4 6] (add v v)))))
 
+(deftest test-scalar-add
+  (is (equals [2 3 4] (add 1 (array :vectorz [1 2 3]))))
+  (is (equals [2 3 4] (add (array :vectorz [1 2 3]) 1 0)))) 
+
 (deftest test-mutability
   (let [v (v/of 1 2)]
     (is (mutable? v))
     (is (mutable? (first (slices v)))))
   (let [v (new-array :vectorz [3 4 5 6])]
+    (is (v/vectorz? v))
     (is (mutable? v))
     (is (mutable? (first (slices v))))))
 
@@ -231,6 +237,23 @@
     (is (e== [4 5 6] (subvector m 3 3)))
     (assign! (subvector m 0 3) (subvector m 3 3))
     (is (e== [4 5 6 4 5 6] m)))) 
+
+;; vectorz operations hould return a vectorz datatype
+(deftest test-vectorz-results
+  (is (v/vectorz? (+ (v/of 1 2) [1 2])))
+  (is (v/vectorz? (+ (v/of 1 2) 1)))
+  (is (v/vectorz? (- 2 (v/of 1 2))))
+  (is (v/vectorz? (* (v/of 1 2) 2.0)))
+  (is (v/vectorz? (emap inc (v/of 1 2))))
+  (is (v/vectorz? (array [[[1]]])))
+  (is (v/vectorz? (to-vector (array [[[1]]]))))
+  (is (v/vectorz? (identity-matrix 3)))
+  (is (v/vectorz? (reshape (identity-matrix 3) [5 1])))
+  (is (v/vectorz? (slice (identity-matrix 3) 1)))
+  (is (v/vectorz? (* (identity-matrix 3) [1 2 3])))
+  (is (v/vectorz? (inner-product (v/of 1 2) [1 2])))
+  (is (v/vectorz? (outer-product (v/of 1 2) [1 2])))
+  (is (v/vectorz? (add! (DoubleScalar. 1.0) 10)))) 
 
 ;; run compliance tests
 
