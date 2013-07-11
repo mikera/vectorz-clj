@@ -238,13 +238,18 @@
     (assign! (subvector m 0 3) (subvector m 3 3))
     (is (e== [4 5 6 4 5 6] m)))) 
 
+;; vectorz operations hould return a vectorz datatype
 (deftest test-vectorz-results
   (is (v/vectorz? (+ (v/of 1 2) [1 2])))
   (is (v/vectorz? (+ (v/of 1 2) 1)))
+  (is (v/vectorz? (- 2 (v/of 1 2))))
   (is (v/vectorz? (* (v/of 1 2) 2.0)))
   (is (v/vectorz? (emap inc (v/of 1 2))))
   (is (v/vectorz? (array [[[1]]])))
+  (is (v/vectorz? (to-vector (array [[[1]]]))))
   (is (v/vectorz? (identity-matrix 3)))
+  (is (v/vectorz? (reshape (identity-matrix 3) [5 1])))
+  (is (v/vectorz? (slice (identity-matrix 3) 1)))
   (is (v/vectorz? (* (identity-matrix 3) [1 2 3])))
   (is (v/vectorz? (inner-product (v/of 1 2) [1 2])))
   (is (v/vectorz? (outer-product (v/of 1 2) [1 2])))
