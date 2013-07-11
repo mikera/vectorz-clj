@@ -42,6 +42,10 @@
   (let [v (v/vec [1 2 3])]
     (is (equals [2 4 6] (add v v)))))
 
+(deftest test-scalar-add
+  (is (equals [2 3 4] (add 1 (array :vectorz [1 2 3]))))
+  (is (equals [2 3 4] (add (array :vectorz [1 2 3]) 1 0)))) 
+
 (deftest test-mutability
   (let [v (v/of 1 2)]
     (is (mutable? v))
