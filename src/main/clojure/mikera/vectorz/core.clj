@@ -1,5 +1,6 @@
 (ns mikera.vectorz.core
   (:import [mikera.vectorz AVector Vectorz Vector Vector1 Vector2 Vector3 Vector4])
+  (:import [mikera.arrayz INDArray])
   (:import [mikera.transformz Transformz])
   (:require [mikera.vectorz.matrix-api]) 
   (:require [mikera.cljutils.error :refer [error]]) 
@@ -44,7 +45,12 @@
 (defn vec?
   "Returns true if v is a vector (i.e. an instance of mikera.vectorz.AVector)"
   ([v]
-    (instance? mikera.vectorz.AVector v)))
+    (instance? AVector v)))
+
+(defn vectorz?
+  "Returns true if v is a vectorz class (i.e. an instance of mikera.arrayz.INDArray)"
+  ([a]
+    (instance? INDArray a)))
 
 (defn get
   "Returns the component of a vector at a specific index position"
