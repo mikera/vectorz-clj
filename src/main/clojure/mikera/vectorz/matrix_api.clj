@@ -683,6 +683,27 @@
         (.transformInPlace m ^AVector v)
         (assign! v (transform m v)))))
 
+;; TODO: enable on next core.matrix release post 0.8.0
+;(extend-protocol mp/PSquare
+;  INDArray
+;    (square [m]
+;      (let [result (.clone m)]
+;        (.multiply result m)
+;        result))
+;  AVector
+;    (square [m]
+;      (let [result (.clone m)]
+;        (.square m)
+;        result)))
+
+(extend-protocol mp/PElementCount
+  INDArray
+    (element-count [m]
+      (.elementCount m))
+  AVector
+    (element-count [m]
+      (.elementCount m)))
+
 (def math-op-mapping
   '[(abs Ops/ABS)
 	  (acos Ops/ACOS)
