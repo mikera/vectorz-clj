@@ -571,7 +571,7 @@
   INDArray (negate [m] (with-clone [m] (.negate m))))
 
 (extend-protocol mp/PTranspose
-  INDArray (transpose [m] (vectorz-coerce (transpose (coerce [] m))))
+  INDArray (transpose [m] (.getTranspose m))
   AScalar (transpose [m] m)
   AVector (transpose [m] m)
   AMatrix (transpose [m] (.getTranspose m))) 
