@@ -131,19 +131,25 @@
       (.scale m (double (mp/get-0d a)))))
 
 (extend-protocol mp/PDoubleArrayOutput
-  mikera.vectorz.AScalar
+  INDArray
+    (to-double-array [m] 
+      (let [arr (double-array (.elementCount m))] 
+        (.getElements m arr (int 0))
+        arr))
+    (as-double-array [m] nil)
+  AScalar
     (to-double-array [m] (let [arr (double-array 1)] (aset arr (int 0) (.get m)) arr))
     (as-double-array [m] nil)
-  mikera.vectorz.Vector
+  Vector
     (to-double-array [m] (.toArray m))
     (as-double-array [m] (.getArray m))
-  mikera.vectorz.AVector
+  AVector
     (to-double-array [m] (.toArray m))
     (as-double-array [m] nil)
-  mikera.matrixx.AMatrix
+  AMatrix
     (to-double-array [m] (.toArray (.asVector m)))
     (as-double-array [m] nil)
-  mikera.matrixx.Matrix
+  Matrix
     (to-double-array [m] (.toArray (.asVector m)))
     (as-double-array [m] (.data m))) 
 
