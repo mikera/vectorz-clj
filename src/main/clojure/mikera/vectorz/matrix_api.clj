@@ -711,12 +711,12 @@
 
 (extend-protocol mp/PMatrixOps
   AMatrix
-  (trace [m]
-    (.trace m))
-  (determinant [m]
-    (.determinant m))
-  (inverse [m]
-    (.inverse m)))
+    (trace [m]
+      (.trace m))
+    (determinant [m]
+      (.determinant m))
+    (inverse [m]
+      (.inverse m)))
 
 ;; TODO: enable on next core.matrix release post 0.8.0
 ;(extend-protocol mp/PSquare
@@ -733,6 +733,9 @@
 
 (extend-protocol mp/PElementCount
   INDArray
+    (element-count [m]
+      (.elementCount m))
+  AMatrix
     (element-count [m]
       (.elementCount m))
   AVector
