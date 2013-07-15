@@ -175,6 +175,11 @@
     (to-vector [m]
       (.clone m)))
 
+(extend-protocol mp/PMutableFill
+  INDArray
+  (fill!
+    [m value]
+    (.set m (double (mp/get-0d value)))))
 
 (extend-protocol mp/PDimensionInfo
    INDArray
