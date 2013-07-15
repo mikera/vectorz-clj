@@ -704,6 +704,11 @@
         (.transformInPlace m ^AVector v)
         (assign! v (transform m v)))))
 
+(extend-protocol mp/PMutableVectorOps
+  AVector
+    (normalise! [a]
+      (.normalise a)))
+
 ;; TODO: enable on next core.matrix release post 0.8.0
 ;(extend-protocol mp/PSquare
 ;  INDArray
