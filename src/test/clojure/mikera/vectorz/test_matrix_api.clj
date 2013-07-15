@@ -47,6 +47,14 @@
   (is (equals [2 3 4] (add 1 (array :vectorz [1 2 3]))))
   (is (equals [2 3 4] (add (array :vectorz [1 2 3]) 1 0)))) 
 
+(deftest test-ecount
+  (is (== 1 (ecount (DoubleScalar. 10))))
+  (is (== 2 (ecount (v/of 1 2))))
+  (is (== 0 (ecount (Vector/of (double-array 0)))))
+  (is (== 0 (ecount (coerce :vectorz []))))
+  (is (== 4 (ecount (coerce :vectorz [[1 2] [3 4]]))))
+  (is (== 8 (ecount (coerce :vectorz [[[1 2] [3 4]] [[1 2] [3 4]]]))))) 
+
 (deftest test-mutability
   (let [v (v/of 1 2)]
     (is (mutable? v))
@@ -223,7 +231,15 @@
 (deftest test-functional-ops
   (testing "eseq"
     (is (= [1.0 2.0 3.0 4.0] (eseq (matrix [[1 2] [3 4]]))))
-    (is (== 1 (first (eseq (v/of 1 2)))))))
+    (is (empty? (eseq (coerce :vectorz []))))  
+    (is (= [10.0] (eseq (array :vectorz 10))))  
+    (is (= [10.0] (eseq (array :vectorz [[[10]]]))))  
+    (is (== 1 (first (eseq (v/of 1 2))))))
+  (testing "emap"
+    (is (equals [1 2] (emap inc (v/of 0 1))))
+    (is (equals [1 3] (emap + (v/of 0 1) [1 2])))
+    ;; (is (equals [2 3] (emap + (v/of 0 1) 2))) shouldn't work - no broadcast support in emap?
+    (is (equals [3 6] (emap + (v/of 0 1) [1 2] (v/of 2 3))))))
 
 (deftest test-maths-functions
   (testing "abs"
