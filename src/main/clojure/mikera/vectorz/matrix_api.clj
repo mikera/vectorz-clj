@@ -123,6 +123,11 @@
     (scale! [m a]
       (.scale m (double (mp/get-0d a))))
     (pre-scale! [m a]
+      (.scale m (double (mp/get-0d a))))
+  AVector
+    (scale! [m a]
+      (.scale m (double (mp/get-0d a))))
+    (pre-scale! [m a]
       (.scale m (double (mp/get-0d a)))))
 
 (extend-protocol mp/PDoubleArrayOutput
