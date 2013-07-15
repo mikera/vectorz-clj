@@ -176,11 +176,11 @@
       (.clone m)))
 
 ; TODO: wait for next core.matrix after 0.8.0
-;(extend-protocol mp/PMutableFill
-;  INDArray
-;  (fill!
-;    [m value]
-;    (.set m (double (mp/get-0d value)))))
+(extend-protocol mp/PMutableFill
+  INDArray
+  (fill!
+    [m value]
+    (.fill m (double (mp/get-0d value)))))
 
 (extend-protocol mp/PDimensionInfo
    INDArray
@@ -739,17 +739,17 @@
       (.inverse m)))
 
 ;; TODO: enable on next core.matrix release post 0.8.0
-;(extend-protocol mp/PSquare
-;  INDArray
-;    (square [m]
-;      (let [result (.clone m)]
-;        (.multiply result m)
-;        result))
-;  AVector
-;    (square [m]
-;      (let [result (.clone m)]
-;        (.square m)
-;        result)))
+(extend-protocol mp/PSquare
+  INDArray
+    (square [m]
+      (let [result (.clone m)]
+        (.multiply result m)
+        result))
+  AVector
+    (square [m]
+      (let [result (.clone m)]
+        (.square result)
+        result)))
 
 (extend-protocol mp/PElementCount
   INDArray
