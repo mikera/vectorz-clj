@@ -639,7 +639,7 @@
         (.multiply m (vectorz-coerce a))))
   INDArray
     (matrix-multiply [m a]
-      (if-let [^INDAArray a (vectorz-coerce a)]
+      (if-let [^INDArray a (vectorz-coerce a)]
         (.innerProduct m a)
         (error "Can't convert to vectorz representation: " a)))
     (element-multiply [m a]
@@ -738,18 +738,13 @@
     (inverse [m]
       (.inverse m)))
 
-;; TODO: enable on next core.matrix release post 0.8.0
 (extend-protocol mp/PSquare
   INDArray
     (square [m]
-      (let [result (.clone m)]
-        (.multiply result m)
-        result))
+      (with-clone [m] (.square m)))
   AVector
     (square [m]
-      (let [result (.clone m)]
-        (.square result)
-        result)))
+      (with-clone [m] (.square m))))
 
 (extend-protocol mp/PElementCount
   INDArray
