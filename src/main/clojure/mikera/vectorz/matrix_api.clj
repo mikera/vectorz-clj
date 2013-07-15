@@ -315,7 +315,7 @@
     (set-2d [m row column v] (error "Can't do 2-dimensional set on a 0-d array!"))
     (set-nd [m indexes v]
       (if (== 0 (count indexes))
-        (mikera.vectorz.impl.DoubleScalar. (double v))
+        (DoubleScalar/create (double v))
         (error "Can't do " (count indexes) "-dimensional set on a 0-d array!"))) 
     (is-mutable? [m] (.isFullyMutable m)) 
   AVector
@@ -568,7 +568,7 @@
   AScalar (negate [m] (with-clone [m] (.negate m)))
   AVector (negate [m] (with-clone [m] (.negate m)))
   AMatrix (negate [m] (with-clone [m] (.negate m)))
-  INDArray (negate [m] (with-clone [m] (.scale m -1.0))))
+  INDArray (negate [m] (with-clone [m] (.negate m))))
 
 (extend-protocol mp/PTranspose
   INDArray (transpose [m] (vectorz-coerce (transpose (coerce [] m))))
