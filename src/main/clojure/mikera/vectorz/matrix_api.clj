@@ -709,6 +709,15 @@
     (normalise! [a]
       (.normalise a)))
 
+(extend-protocol mp/PMatrixOps
+  AMatrix
+  (trace [m]
+    (.trace m))
+  (determinant [m]
+    (.determinant m))
+  (inverse [m]
+    (.inverse m)))
+
 ;; TODO: enable on next core.matrix release post 0.8.0
 ;(extend-protocol mp/PSquare
 ;  INDArray
