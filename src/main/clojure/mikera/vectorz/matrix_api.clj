@@ -111,6 +111,15 @@
     (to-double-array [m] (.toArray (.asVector m)))
     (as-double-array [m] (.data m))) 
 
+(extend-protocol mp/PVectorisable
+  INDArray
+    (to-vector [m]
+      (.toVector m))
+  AVector
+    (to-vector [m]
+      (.clone m)))
+
+
 (extend-protocol mp/PDimensionInfo
    INDArray
     (dimensionality [m]
