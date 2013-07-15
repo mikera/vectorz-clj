@@ -118,6 +118,13 @@
   INDArray
     (mutable-matrix [m] (.clone m))) 
 
+(extend-protocol mp/PMatrixMutableScaling
+  INDArray
+    (scale! [m a]
+      (.scale m (double (mp/get-0d a))))
+    (pre-scale! [m a]
+      (.scale m (double (mp/get-0d a)))))
+
 (extend-protocol mp/PDoubleArrayOutput
   mikera.vectorz.AScalar
     (to-double-array [m] (let [arr (double-array 1)] (aset arr (int 0) (.get m)) arr))
