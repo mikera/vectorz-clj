@@ -9,7 +9,7 @@
   (:import [mikera.matrixx.impl DiagonalMatrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
   (:import [mikera.vectorz.impl DoubleScalar])
-  (:import [mikera.arrayz SliceArray INDArray])
+  (:import [mikera.arrayz Arrayz SliceArray INDArray])
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
   (:refer-clojure :exclude [vector?]))
@@ -33,7 +33,11 @@
   ([m x]
     `(tag-symbol mikera.vectorz.AVector
                  (let [x# ~x] 
-                   (if (instance? AVector x#) x# (avector-coerce* ~m x#))))))
+                   (if (instance? AVector x#) x# (avector-coerce* ~m x#)))))
+  ([x]
+    `(tag-symbol mikera.vectorz.AVector
+                 (let [x# ~x] 
+                   (if (instance? AVector x#) x# (avector-coerce* x#))))))
 
 (defmacro with-clone [[sym exp] & body]
   (let []
@@ -52,7 +56,41 @@
         (let [len (.length v)
               r (Vectorz/newVector len)]
           (assign! r m) r)
+      :else (Vectorz/toVector m)))
+  ([m]
+    (cond
+      (number? m) 
+        (let [r (Vectorz/newVector 1)] (.fill r (double m)) r)
+	    (instance? AVector m) m
+      (== (mp/dimensionality m) 1)
+        (let [len (ecount m)
+              r (Vectorz/newVector len)]
+          (assign! r m) r)
       :else (Vectorz/toVector m)))) 
+
+    
+(defn vectorz-coerce* 
+  "Function to attempt conversion to Vectorz objects. May return nil if conversion fails."
+  (^INDArray [p]
+	  (let [dims (dimensionality p)]
+	    (cond
+		    (instance? INDArray p) p
+	      (== 0 dims)
+	        (cond 
+	          (number? p) (DoubleScalar. (.doubleValue ^Number p))
+	          (instance? AScalar p) p
+            (nil? p) nil
+	          :else (do
+                   ;; (println (str "Coercing " p))
+                   (DoubleScalar. (double (mp/get-0d p)))))
+		    (== 1 dims)
+		      (try (Vectorz/toVector (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
+		    (== 2 dims)
+		      (try (Matrixx/toMatrix (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
+		    :else 
+	        (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
+	          (and (seq sv) (sv 0) (SliceArray/create sv)))))))
+
 
 (eval
   `(extend-protocol mp/PImplementation
@@ -72,7 +110,7 @@
                                  (SliceArray/create ^List (mapv (fn [_] (mp/new-matrix-nd m (next shape))) (range (first shape))))))
                 (construct-matrix [m data]
                                   (cond 
-                                    (= :vectorz (mp/implementation-key data))
+                                    (instance? INDArray data)
                                       (.clone ^INDArray data)
                                     (mp/is-scalar? data) 
                                       (double data)
@@ -94,22 +132,55 @@
   INDArray
     (mutable-matrix [m] (.clone m))) 
 
+(extend-protocol mp/PMatrixMutableScaling
+  INDArray
+    (scale! [m a]
+      (.scale m (double (mp/get-0d a))))
+    (pre-scale! [m a]
+      (.scale m (double (mp/get-0d a))))
+  AVector
+    (scale! [m a]
+      (.scale m (double (mp/get-0d a))))
+    (pre-scale! [m a]
+      (.scale m (double (mp/get-0d a)))))
+
 (extend-protocol mp/PDoubleArrayOutput
-  mikera.vectorz.AScalar
+  INDArray
+    (to-double-array [m] 
+      (let [arr (double-array (.elementCount m))] 
+        (.getElements m arr (int 0))
+        arr))
+    (as-double-array [m] nil)
+  AScalar
     (to-double-array [m] (let [arr (double-array 1)] (aset arr (int 0) (.get m)) arr))
     (as-double-array [m] nil)
-  mikera.vectorz.Vector
+  Vector
     (to-double-array [m] (.toArray m))
     (as-double-array [m] (.getArray m))
-  mikera.vectorz.AVector
+  AVector
     (to-double-array [m] (.toArray m))
     (as-double-array [m] nil)
-  mikera.matrixx.AMatrix
+  AMatrix
     (to-double-array [m] (.toArray (.asVector m)))
     (as-double-array [m] nil)
-  mikera.matrixx.Matrix
+  Matrix
     (to-double-array [m] (.toArray (.asVector m)))
     (as-double-array [m] (.data m))) 
+
+(extend-protocol mp/PVectorisable
+  INDArray
+    (to-vector [m]
+      (.toVector m))
+  AVector
+    (to-vector [m]
+      (.clone m)))
+
+; TODO: wait for next core.matrix after 0.8.0
+(extend-protocol mp/PMutableFill
+  INDArray
+  (fill!
+    [m value]
+    (.fill m (double (mp/get-0d value)))))
 
 (extend-protocol mp/PDimensionInfo
    INDArray
@@ -244,7 +315,7 @@
     (set-2d [m row column v] (error "Can't do 2-dimensional set on a 0-d array!"))
     (set-nd [m indexes v]
       (if (== 0 (count indexes))
-        (mikera.vectorz.impl.DoubleScalar. (double v))
+        (DoubleScalar/create (double v))
         (error "Can't do " (count indexes) "-dimensional set on a 0-d array!"))) 
     (is-mutable? [m] (.isFullyMutable m)) 
   AVector
@@ -497,9 +568,10 @@
   AScalar (negate [m] (with-clone [m] (.negate m)))
   AVector (negate [m] (with-clone [m] (.negate m)))
   AMatrix (negate [m] (with-clone [m] (.negate m)))
-  INDArray (negate [m] (with-clone [m] (.scale m -1.0))))
+  INDArray (negate [m] (with-clone [m] (.negate m))))
 
 (extend-protocol mp/PTranspose
+  INDArray (transpose [m] (.getTranspose m))
   AScalar (transpose [m] m)
   AVector (transpose [m] m)
   AMatrix (transpose [m] (.getTranspose m))) 
@@ -518,28 +590,6 @@
   AScalar (clone [m] (.clone m))
   AVector (clone [m] (.clone m))
   AMatrix	(clone [m] (.clone m)))
-    
-(defn vectorz-coerce* 
-  "Function to attempt conversion to Vectorz objects. May return nil if conversion fails."
-  (^INDArray [p]
-	  (let [dims (dimensionality p)]
-	    (cond
-		    (instance? INDArray p) p
-	      (== 0 dims)
-	        (cond 
-	          (number? p) (DoubleScalar. (.doubleValue ^Number p))
-	          (instance? AScalar p) p
-            (nil? p) nil
-	          :else (do
-                   ;; (println (str "Coercing " p))
-                   (double (mp/get-0d p))))
-		    (== 1 dims)
-		      (try (Vectorz/toVector (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
-		    (== 2 dims)
-		      (try (Matrixx/toMatrix (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
-		    :else 
-	        (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
-	          (and (seq sv) (sv 0) (SliceArray/create sv)))))))
 
 (extend-protocol mp/PCoercion
   INDArray
@@ -589,7 +639,7 @@
         (.multiply m (vectorz-coerce a))))
   INDArray
     (matrix-multiply [m a]
-      (if-let [^INDAArray a (vectorz-coerce a)]
+      (if-let [^INDArray a (vectorz-coerce a)]
         (.innerProduct m a)
         (error "Can't convert to vectorz representation: " a)))
     (element-multiply [m a]
@@ -674,6 +724,111 @@
         (.transformInPlace m ^AVector v)
         (assign! v (transform m v)))))
 
+(extend-protocol mp/PMutableVectorOps
+  AVector
+    (normalise! [a]
+      (.normalise a)))
+
+(extend-protocol mp/PMatrixOps
+  AMatrix
+    (trace [m]
+      (.trace m))
+    (determinant [m]
+      (.determinant m))
+    (inverse [m]
+      (.inverse m)))
+
+(extend-protocol mp/PSquare
+  INDArray
+    (square [m]
+      (with-clone [m] (.square m)))
+  AVector
+    (square [m]
+      (with-clone [m] (.square m))))
+
+(extend-protocol mp/PElementCount
+  INDArray
+    (element-count [m]
+      (.elementCount m))
+  AMatrix
+    (element-count [m]
+      (.elementCount m))
+  AVector
+    (element-count [m]
+      (.elementCount m))
+  AScalar 
+    (element-count [m]
+      1))
+
+(extend-protocol mp/PSliceJoin
+  AVector
+    (join [m a] 
+          (.join m (avector-coerce a))))
+
+(extend-protocol mp/PVectorView
+  INDArray
+    (as-vector [m]
+      (.asVector m))
+  AVector
+    (as-vector [m]
+      m))
+
+(extend-protocol mp/PFunctionalOperations
+  INDArray
+  (element-seq
+    [m]
+    (let [ec (.elementCount m)
+          ^doubles data (double-array ec)]
+      (.getElements m data (int 0))
+      (seq data)))
+  (element-map
+    ([m f]
+      (let [ec (.elementCount m)
+            ^doubles data (double-array ec)
+            ^ints sh (.getShape m)]
+        (.getElements m data (int 0))
+        (dotimes [i ec] (aset data i (double (f (aget data i))))) 
+        (Arrayz/createFromVector (Vector/wrap data) sh)))
+    ([m f a]
+      (let [ec (.elementCount m)
+            a (vectorz-coerce a) 
+            ^doubles data (double-array ec)
+            ^doubles data2 (double-array ec)
+            ^ints sh (.getShape m)]
+        (when-not (== ec (.elementCount a)) (error "Arrays do do have matching number of elements")) 
+        (.getElements m data (int 0))
+        (.getElements a data2 (int 0))
+        (dotimes [i ec] (aset data i (double (f (aget data i) (aget data2 i))))) 
+        (Arrayz/createFromVector (Vector/wrap data) sh)))
+    ([m f a more]
+      (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
+  (element-map!
+    ([m f]
+      (let [ec (.elementCount m)
+            ^doubles data (double-array ec)
+            ^ints sh (.getShape m)]
+        (.getElements m data (int 0))
+        (dotimes [i ec] (aset data i (double (f (aget data i))))) 
+        (.setElements m data)))
+    ([m f a]
+      (let [ec (.elementCount m)
+            a (vectorz-coerce a) 
+            ^doubles data (double-array ec)
+            ^doubles data2 (double-array ec)
+            ^ints sh (.getShape m)]
+        (when-not (== ec (.elementCount a)) (error "Arrays do do have matching number of elements")) 
+        (.getElements m data (int 0))
+        (.getElements a data2 (int 0))
+        (dotimes [i ec] (aset data i (double (f (aget data i) (aget data2 i))))) 
+        (.setElements m data)))
+    ([m f a more]
+      (mp/assign! m (mp/element-map m f a more))))
+  (element-reduce
+    ([m f]
+      (reduce f (mp/element-seq m)))
+    ([m f init]
+      (reduce f init (mp/element-seq m)))))
+
 (def math-op-mapping
   '[(abs Ops/ABS)
 	  (acos Ops/ACOS)
@@ -746,4 +901,4 @@
 
 ;; registration
 
-(imp/register-implementation (Vector/of (double-array 0.0)))
+(imp/register-implementation (Vector/of (double-array [0])))
