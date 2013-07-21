@@ -439,7 +439,7 @@
         (instance? INDArray source) 
            (.set m ^INDArray source)
         (== 0 (mp/dimensionality source))
-           (.fill m (mp/get-0d source))
+           (.fill m (double-coerce source))
         :else 
            (dotimes [i (.length m)]
              (.set m i (double (mp/get-1d source i))))))
@@ -498,9 +498,9 @@
 (extend-protocol mp/PMatrixAdd
   mikera.vectorz.AScalar
     (matrix-add [m a]
-      (+ (.get m) (double (mp/get-0d a))))
+      (+ (.get m) (double-coerce a)))
     (matrix-sub [m a]
-      (- (.get m) (double (mp/get-0d a))))
+      (- (.get m) (double-coerce a)))
   mikera.vectorz.AVector
     (matrix-add [m a]
       (let [m (.clone m)
