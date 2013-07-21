@@ -11,7 +11,7 @@
   (:require clojure.core.matrix.impl.persistent-vector)
   (:require [clojure.core.matrix.impl.wrappers :as wrap])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
-  (:import [mikera.vectorz.impl DoubleScalar])
+  (:import [mikera.vectorz Scalar])
   (:import [mikera.vectorz AVector Vectorz Vector])
   (:import [mikera.arrayz INDArray]))
 
@@ -51,7 +51,7 @@
   (is (equals [2 3 4] (add (array :vectorz [1 2 3]) 1 0)))) 
 
 (deftest test-ecount
-  (is (== 1 (ecount (DoubleScalar. 10))))
+  (is (== 1 (ecount (Scalar. 10))))
   (is (== 2 (ecount (v/of 1 2))))
   (is (== 0 (ecount (Vector/of (double-array 0)))))
   (is (== 0 (count (eseq (Vector/of (double-array 0))))))
@@ -273,7 +273,7 @@
   (is (v/vectorz? (* (identity-matrix 3) [1 2 3])))
   (is (v/vectorz? (inner-product (v/of 1 2) [1 2])))
   (is (v/vectorz? (outer-product (v/of 1 2) [1 2])))
-  (is (v/vectorz? (add! (DoubleScalar. 1.0) 10)))) 
+  (is (v/vectorz? (add! (Scalar. 1.0) 10)))) 
 
 ;; run compliance tests
 

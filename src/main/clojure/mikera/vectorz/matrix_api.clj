@@ -8,7 +8,7 @@
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.matrixx.impl DiagonalMatrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
-  (:import [mikera.vectorz.impl DoubleScalar])
+  (:import [mikera.vectorz Scalar])
   (:import [mikera.arrayz Arrayz SliceArray INDArray])
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
@@ -77,12 +77,12 @@
 		    (instance? INDArray p) p
 	      (== 0 dims)
 	        (cond 
-	          (number? p) (DoubleScalar. (.doubleValue ^Number p))
+	          (number? p) (Scalar. (.doubleValue ^Number p))
 	          (instance? AScalar p) p
             (nil? p) nil
 	          :else (do
                    ;; (println (str "Coercing " p))
-                   (DoubleScalar. (double (mp/get-0d p)))))
+                   (Scalar. (double (mp/get-0d p)))))
 		    (== 1 dims)
 		      (try (Vectorz/toVector (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
 		    (== 2 dims)
@@ -146,25 +146,22 @@
 
 (extend-protocol mp/PDoubleArrayOutput
   INDArray
-    (to-double-array [m] 
-      (let [arr (double-array (.elementCount m))] 
-        (.getElements m arr (int 0))
-        arr))
+    (to-double-array [m] (.toDoubleArray m))
     (as-double-array [m] nil)
   AScalar
     (to-double-array [m] (let [arr (double-array 1)] (aset arr (int 0) (.get m)) arr))
     (as-double-array [m] nil)
   Vector
-    (to-double-array [m] (.toArray m))
+    (to-double-array [m] (.toDoubleArray m))
     (as-double-array [m] (.getArray m))
   AVector
-    (to-double-array [m] (.toArray m))
+    (to-double-array [m] (.toDoubleArray m))
     (as-double-array [m] nil)
   AMatrix
-    (to-double-array [m] (.toArray (.asVector m)))
+    (to-double-array [m] (.toDoubleArray (.asVector m)))
     (as-double-array [m] nil)
   Matrix
-    (to-double-array [m] (.toArray (.asVector m)))
+    (to-double-array [m] (.toDoubleArray (.asVector m)))
     (as-double-array [m] (.data m))) 
 
 (extend-protocol mp/PVectorisable
@@ -315,7 +312,7 @@
     (set-2d [m row column v] (error "Can't do 2-dimensional set on a 0-d array!"))
     (set-nd [m indexes v]
       (if (== 0 (count indexes))
-        (DoubleScalar/create (double v))
+        (Scalar/create (double v))
         (error "Can't do " (count indexes) "-dimensional set on a 0-d array!"))) 
     (is-mutable? [m] (.isFullyMutable m)) 
   AVector
@@ -545,7 +542,7 @@
 (extend-protocol mp/PVectorOps
   AVector
     (vector-dot [a b]
-      (.dotProduct a (coerce a b)))
+      (.dotProduct a (avector-coerce a b)))
     (length [a]
       (.magnitude a))
     (length-squared [a]
