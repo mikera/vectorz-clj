@@ -23,13 +23,15 @@
   (let [tagged-sym (vary-meta (gensym "res") assoc :tag tag)]
     `(let [~tagged-sym ~form] ~tagged-sym)))
 
-(defmacro vectorz-coerce [x]
+(defmacro vectorz-coerce 
+  "Coerces the argument to a vectorz INDArray"
+  ([x]
   `(tag-symbol mikera.arrayz.INDArray
                (let [x# ~x]
-                 (if (instance? INDArray x#) x# (vectorz-coerce* x#)))))
+                 (if (instance? INDArray x#) x# (vectorz-coerce* x#))))))
 
 (defmacro avector-coerce 
-  "Coerces an argument x to an AVector instance, of same size as m"
+  "Coerces an argument x to an AVector instance, of the same size as m"
   ([m x]
     `(tag-symbol mikera.vectorz.AVector
                  (let [x# ~x] 
@@ -91,6 +93,9 @@
 	        (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
 	          (and (seq sv) (sv 0) (SliceArray/create sv)))))))
 
+(defmacro double-coerce [x]
+  `(double (mp/get-0d ~x)))
+
 
 (eval
   `(extend-protocol mp/PImplementation
@@ -113,10 +118,10 @@
                                     (instance? INDArray data)
                                       (.clone ^INDArray data)
                                     (mp/is-scalar? data) 
-                                      (double data)
+                                      (double-coerce data)
                                     (array? data) 
                                       (if (== 0 (mp/dimensionality data))
-                                        (double (mp/get-0d data))
+                                        (double-coerce data)
                                         (vectorz-coerce data))
                                     :default
                                       (let [vm (mp/construct-matrix [] data)] 
@@ -135,14 +140,14 @@
 (extend-protocol mp/PMatrixMutableScaling
   INDArray
     (scale! [m a]
-      (.scale m (double (mp/get-0d a))))
+      (.scale m (double-coerce a)))
     (pre-scale! [m a]
-      (.scale m (double (mp/get-0d a))))
+      (.scale m (double-coerce a)))
   AVector
     (scale! [m a]
-      (.scale m (double (mp/get-0d a))))
+      (.scale m (double-coerce a)))
     (pre-scale! [m a]
-      (.scale m (double (mp/get-0d a)))))
+      (.scale m (double-coerce a))))
 
 (extend-protocol mp/PDoubleArrayOutput
   INDArray
@@ -172,7 +177,6 @@
     (to-vector [m]
       (.clone m)))
 
-; TODO: wait for next core.matrix after 0.8.0
 (extend-protocol mp/PMutableFill
   INDArray
   (fill!
@@ -273,12 +277,12 @@
     (get-0d [m]
       (.get m))
     (set-0d! [m value]
-      (.set m (double value)))
+      (.set m (double-coerce value)))
   AScalar
     (get-0d [m]
       (.get m))
     (set-0d! [m value]
-      (.set m (double value))))
+      (.set m (double-coerce value))))
 
 (extend-protocol mp/PSpecialisedConstructors
   INDArray
@@ -370,11 +374,11 @@
     (get-row [m i]
       (if (== 2 (mp/dimensionality m))
         (.slice m (int i))
-        (error "Can't get row of array with dimensionslty: " (mp/dimensionality m))))
+        (error "Can't get row of array with dimensionality: " (mp/dimensionality m))))
     (get-column [m i]
       (if (== 2 (mp/dimensionality m))
         (.slice m (int 1) (int i))
-        (error "Can't get column of array with dimensionslty: " (mp/dimensionality m))))
+        (error "Can't get column of array with dimensionality: " (mp/dimensionality m))))
     (get-major-slice [m i]
       (.slice m (int i)))
     (get-slice [m dimension i]
@@ -525,9 +529,9 @@
       (.sub m (vectorz-coerce a)))
   AScalar
     (matrix-add! [m a]
-      (.add m (double (mp/get-0d a))))
+      (.add m (double-coerce a)))
     (matrix-sub! [m a]
-      (.sub m (double (mp/get-0d a))))
+      (.sub m (double-coerce a)))
   AVector
     (matrix-add! [m a]
       (.add m (avector-coerce m a)))
@@ -548,9 +552,7 @@
     (length-squared [a]
       (.magnitudeSquared a))
     (normalise [a]
-      (let [a (.clone a)] 
-        (.normalise a)
-        a)))
+      (with-clone [a] (.normalise a))))
 
 (extend-protocol mp/PMatrixOps
   AMatrix
