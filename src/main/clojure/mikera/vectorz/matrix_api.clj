@@ -579,13 +579,20 @@
   AMatrix (transpose [m] (.getTranspose m))) 
 
 (extend-protocol mp/PVectorCross
+  INDArray
+    (cross-product [a b]
+      (let [v (Vector3. (avector-coerce a))]
+        (.crossProduct v (avector-coerce a b))
+        v))
+    (cross-product! [a b]
+      (assign! a (mp/cross-product a b)))
   AVector
     (cross-product [a b]
       (let [v (Vector3. a)]
-        (.crossProduct v ^AVector (mp/coerce-param a b))
+        (.crossProduct v (avector-coerce a b))
         v))
     (cross-product! [a b]
-      (.crossProduct a ^AVector (mp/coerce-param a b)))) 
+      (.crossProduct a (avector-coerce a b)))) 
 
 (extend-protocol mp/PMatrixCloning
   INDArray (clone [m] (.clone m))
