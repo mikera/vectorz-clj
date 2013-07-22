@@ -932,6 +932,12 @@
        (fn [[fname op]] 
          `(~fname [~'m]
                   (with-clone [~'m] (.applyTo ~op ~'m)))) 
+       math-op-mapping)
+   AScalar
+    ~@(map 
+       (fn [[fname op]] 
+         `(~fname [~'m]
+                  (.apply ~op (.get ~'m)))) 
        math-op-mapping)))
 
 (eval
