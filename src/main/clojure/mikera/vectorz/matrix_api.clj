@@ -814,6 +814,7 @@
 (extend-protocol mp/PSliceJoin
   INDArray
     (join [m a]
+      ;; TODO: wait for better join implementation in Vectorz for INDArray
       (SliceArray/create ^List (vec (concat (slices m) (slices (vectorz-coerce a))))))
   AVector
     (join [m a] 

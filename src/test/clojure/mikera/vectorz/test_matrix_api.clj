@@ -178,6 +178,9 @@
     ;; (is (= [[8.0]] (* [[2 2]] (m/matrix [[2] [2]]))))
     ))
 
+(deftest test-join
+  (is (= (array [[[1]] [[2]]]) (join (array [[[1]]]) (array [[[2]]])))))
+
 (deftest test-matrix-transform
   (testing "vector multiple"
     (is (= (v/of 2 4) (* (m/matrix [[2 0] [0 2]]) (v/of 1 2))))
