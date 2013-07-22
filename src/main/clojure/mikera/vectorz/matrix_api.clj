@@ -9,7 +9,7 @@
   (:import [mikera.matrixx.impl DiagonalMatrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
   (:import [mikera.vectorz Scalar])
-  (:import [mikera.arrayz Arrayz SliceArray INDArray])
+  (:import [mikera.arrayz Arrayz SliceArray INDArray Array])
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
   (:refer-clojure :exclude [vector?]))
@@ -153,6 +153,9 @@
   INDArray
     (to-double-array [m] (.toDoubleArray m))
     (as-double-array [m] nil)
+  Array
+    (to-double-array [m] (.toDoubleArray m))
+    (as-double-array [m] (.getArray m))
   AScalar
     (to-double-array [m] (let [arr (double-array 1)] (aset arr (int 0) (.get m)) arr))
     (as-double-array [m] nil)
