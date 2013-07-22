@@ -486,12 +486,19 @@
       (.subVector m (int start) (int length)))) 
 
 (extend-protocol mp/PSubMatrix
+  AMatrix
+    (submatrix [m index-ranges]
+      (let [[[s1 l1] [s2 l2]] index-ranges]
+        (.subMatrix m (int s1) (int l1) (int s2) (int l2))))
   AVector
     (submatrix [m index-ranges]
       (let [[[start length]] index-ranges]
         (.subVector m (int start) (int length))))) 
 
 (extend-protocol mp/PSummable
+  INDArray 
+    (element-sum [m]
+      (.elementSum m))
   AVector
     (element-sum [m]
       (.elementSum m))
@@ -500,10 +507,7 @@
       (.elementSum m))
   AScalar
     (element-sum [m]
-      (.get m))
-  INDArray 
-    (element-sum [m]
-      (.elementSum m)))
+      (.get m)))
 
 (extend-protocol mp/PMatrixAdd
   mikera.vectorz.AScalar
@@ -554,6 +558,16 @@
       (.sub m ^AMatrix (coerce m a))))
 
 (extend-protocol mp/PVectorOps
+  INDArray
+    (vector-dot [a b]
+      (.dotProduct (avector-coerce a) (avector-coerce a b)))
+    (length [a]
+      (.magnitude (avector-coerce a)))
+    (length-squared [a]
+      (.magnitudeSquared (avector-coerce a)))
+    (normalise [a]
+      (with-clone [a] (.normalise (avector-coerce a))))
+  
   AVector
     (vector-dot [a b]
       (.dotProduct a (avector-coerce a b)))
