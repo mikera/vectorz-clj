@@ -41,6 +41,13 @@
                  (let [x# ~x] 
                    (if (instance? AVector x#) x# (avector-coerce* x#))))))
 
+(defmacro amatrix-coerce
+  "Coerces an argument x to an AMatrix instance"
+  ([x]
+    `(tag-symbol mikera.matrixx.AMatrix
+                 (let [x# ~x] 
+                   (if (instance? AMatrix x#) x# (Matrix/create x#)))))) 
+
 (defmacro with-clone [[sym exp] & body]
   (let []
     (when-not (symbol? sym) (error "Symbol required for with-clone binding"))
@@ -748,6 +755,13 @@
       (.normalise a)))
 
 (extend-protocol mp/PMatrixOps
+  INDArray
+    (trace [m]
+      (.trace (amatrix-coerce m)))
+    (determinant [m]
+      (.determinant (amatrix-coerce m)))
+    (inverse [m]
+      (.inverse (amatrix-coerce m)))
   AMatrix
     (trace [m]
       (.trace m))
