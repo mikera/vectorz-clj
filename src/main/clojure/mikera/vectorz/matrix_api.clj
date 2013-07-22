@@ -764,6 +764,11 @@
         (assign! v (transform m v)))))
 
 (extend-protocol mp/PMutableVectorOps
+  INDArray
+    (normalise! [a]
+      (if (== 1 (.dimensionality a))
+        (.normalise (.asVector a))
+        (error "Can't normalise something that isn't a 1D vector!")))
   AVector
     (normalise! [a]
       (.normalise a)))
