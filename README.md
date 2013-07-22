@@ -67,3 +67,5 @@ You can then use `Vectorz` as a standard `core.matrix` implementation. Example:
     (* M v)
     => #<Vector2 [5.0,11.0]>
 ```
+
+For more examples see [Wiki Examples](https://github.com/mikera/vectorz-clj/wiki/Examples)
