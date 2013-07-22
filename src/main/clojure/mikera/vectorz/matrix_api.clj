@@ -683,6 +683,9 @@
         (.addMultiple m (avector-coerce m a) (double factor))))) 
 
 (extend-protocol mp/PAddScaledMutable
+  AMatrix
+    (add-scaled! [m a factor]
+      (.addMultiple m (vectorz-coerce a) (double factor)))
   AVector
     (add-scaled! [m a factor]
       (.addMultiple m (avector-coerce m a) (double factor)))) 
@@ -713,11 +716,17 @@
     (pre-scale [m a] (vectorz-scale m (double a))))
 
 (extend-protocol mp/PMatrixAdd
+  INDArray
+    (matrix-add [m a] (with-clone [m] (.add m (vectorz-coerce a))))
+    (matrix-sub [m a] (with-clone [m] (.sub m (vectorz-coerce a))))
   AVector
     (matrix-add [m a] (with-clone [m] (.add m (vectorz-coerce a))))
     (matrix-sub [m a] (with-clone [m] (.sub m (vectorz-coerce a)))))
 
 (extend-protocol mp/PMatrixAddMutable
+  INDArray
+    (matrix-add! [m a] (.add m (vectorz-coerce a)) m)
+    (matrix-sub! [m a] (.sub m (vectorz-coerce a)) m)
   AVector
     (matrix-add! [m a] (.add m (vectorz-coerce a)) m)
     (matrix-sub! [m a] (.sub m (vectorz-coerce a)) m))
