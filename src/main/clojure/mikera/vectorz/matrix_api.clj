@@ -812,6 +812,9 @@
       1))
 
 (extend-protocol mp/PSliceJoin
+  INDArray
+    (join [m a]
+      (SliceArray/create ^List (vec (concat (slices m) (slices (vectorz-coerce a))))))
   AVector
     (join [m a] 
           (.join m (avector-coerce a))))
