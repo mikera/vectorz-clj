@@ -11,9 +11,9 @@
   (:require clojure.core.matrix.impl.persistent-vector)
   (:require [clojure.core.matrix.impl.wrappers :as wrap])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
-  (:import [mikera.vectorz.impl DoubleScalar])
+  (:import [mikera.vectorz Scalar])
   (:import [mikera.vectorz AVector Vectorz Vector])
-  (:import [mikera.arrayz INDArray]))
+  (:import [mikera.arrayz INDArray Array NDArray SliceArray]))
 
 ;; note - all the operators are core.matrix operators
 
@@ -51,7 +51,7 @@
   (is (equals [2 3 4] (add (array :vectorz [1 2 3]) 1 0)))) 
 
 (deftest test-ecount
-  (is (== 1 (ecount (DoubleScalar. 10))))
+  (is (== 1 (ecount (Scalar. 10))))
   (is (== 2 (ecount (v/of 1 2))))
   (is (== 0 (ecount (Vector/of (double-array 0)))))
   (is (== 0 (count (eseq (Vector/of (double-array 0))))))
@@ -178,6 +178,9 @@
     ;; (is (= [[8.0]] (* [[2 2]] (m/matrix [[2] [2]]))))
     ))
 
+(deftest test-join
+  (is (= (array [[[1]] [[2]]]) (join (array [[[1]]]) (array [[[2]]])))))
+
 (deftest test-matrix-transform
   (testing "vector multiple"
     (is (= (v/of 2 4) (* (m/matrix [[2 0] [0 2]]) (v/of 1 2))))
@@ -273,20 +276,24 @@
   (is (v/vectorz? (* (identity-matrix 3) [1 2 3])))
   (is (v/vectorz? (inner-product (v/of 1 2) [1 2])))
   (is (v/vectorz? (outer-product (v/of 1 2) [1 2])))
-  (is (v/vectorz? (add! (DoubleScalar. 1.0) 10)))) 
+  (is (v/vectorz? (add! (Scalar. 1.0) 10)))) 
 
 ;; run compliance tests
 
 (deftest instance-tests
+  (clojure.core.matrix.compliance-tester/instance-test (Scalar. 2.0))
   (clojure.core.matrix.compliance-tester/instance-test (v/of 1 2))
   (clojure.core.matrix.compliance-tester/instance-test (v/of 1 2 3))
   (clojure.core.matrix.compliance-tester/instance-test (v/of 1 2 3 4 5 6 7))
+  (clojure.core.matrix.compliance-tester/instance-test (subvector (v/of 1 2 3 4 5 6 7) 2 3))
   (clojure.core.matrix.compliance-tester/instance-test (matrix :vectorz [[[1 2] [3 4]] [[5 6] [7 8]]]))
   (clojure.core.matrix.compliance-tester/instance-test (clone (first (slices (v/of 1 2 3)))))
   (clojure.core.matrix.compliance-tester/instance-test (first (slices (v/of 1 2 3))))
-;;   (clojure.core.matrix.compliance-tester/instance-test (Vector/of (double-array 0))) TODO: fix after core.matrix 0.8.0
+;;  (clojure.core.matrix.compliance-tester/instance-test (Vector/of (double-array 0))) ;; TODO: needs fixed compliance tests
   (clojure.core.matrix.compliance-tester/instance-test (first (slices (v/of 1 2 3 4 5 6))))
-  (clojure.core.matrix.compliance-tester/instance-test (array :vectorz [[1 2] [3 4]]))) 
+  (clojure.core.matrix.compliance-tester/instance-test (array :vectorz [[1 2] [3 4]]))
+  (clojure.core.matrix.compliance-tester/instance-test (array :vectorz [[[[4]]]]))
+  (clojure.core.matrix.compliance-tester/instance-test (Array/create (array :vectorz [[[[4 3]]]])))) 
 
 (deftest compliance-test
   (clojure.core.matrix.compliance-tester/compliance-test (v/of 1 2))) 
