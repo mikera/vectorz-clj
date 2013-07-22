@@ -322,7 +322,7 @@
     (is-mutable? [m] (.isFullyMutable m)) 
   
   AScalar
-    (set-1d [m row v] (error "Can't do 2-dimensional set on a 0-d array!"))
+    (set-1d [m row v] (error "Can't do 1-dimensional set on a 0-d array!"))
     (set-2d [m row column v] (error "Can't do 2-dimensional set on a 0-d array!"))
     (set-nd [m indexes v]
       (if (== 0 (count indexes))
@@ -481,6 +481,13 @@
 	              (mp/assign-array! s arr (+ start (* skip i)) skip))))))))
 
 (extend-protocol mp/PSubVector
+  INDArray
+    (subvector [m start length]
+      (let [dims (.dimensionality m)]
+        (if (== 1 dims)
+          (.subVector (.asVector m) (int start) (int length))
+          (error "Can't take subvector of " dims "-D array"))))
+  
   AVector
     (subvector [m start length]
       (.subVector m (int start) (int length)))) 
