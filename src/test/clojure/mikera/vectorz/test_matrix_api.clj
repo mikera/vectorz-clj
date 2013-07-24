@@ -44,7 +44,16 @@
     (is (equals [2 4 6] (add v v))))
   (let [v (Vector/of (double-array 0))]
     (is (== 10 (reduce (fn [acc _] (inc acc)) 10 (eseq v))))
-    (is (== 10 (ereduce (fn [acc _] (inc acc)) 10 v)))))
+    (is (== 10 (ereduce (fn [acc _] (inc acc)) 10 v))))
+  (let [m (reshape (array :vectorz  (double-array (range 9))) [3 3])]
+    (is (equals [[0 1 2]] (submatrix m 0 [0 1])))
+    (is (equals [[0 1 2]] (submatrix m [[0 1] nil])))
+    (is (equals [[0] [3] [6]] (submatrix m 1 [0 1]))))
+  (let [v (array :vectorz (range 9))]
+    (is (equals v (submatrix v [nil])))
+    (is (equals v (submatrix v [[0 9]])))
+    (is (equals [2 3 4] (submatrix v 0 [2 3])))
+    (is (equals [2 3 4] (submatrix v [[2 3]])))))
 
 (deftest test-scalar-add
   (is (equals [2 3 4] (add 1 (array :vectorz [1 2 3]))))
