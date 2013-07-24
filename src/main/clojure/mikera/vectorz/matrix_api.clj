@@ -495,12 +495,18 @@
 (extend-protocol mp/PSubMatrix
   AMatrix
     (submatrix [m index-ranges]
-      (let [[[s1 l1] [s2 l2]] index-ranges]
-        (.subMatrix m (int s1) (int l1) (int s2) (int l2))))
+      (let [[rr cr] index-ranges
+            s1 (int (if rr (first rr) 0))
+            s2 (int (if cr (first cr) 0))
+            l1 (int (if rr (second rr) (.rowCount m)))
+            l2 (int (if cr (second cr) (.columnCount m)))]
+        (.subMatrix m s1 l1 s2 l2)))
   AVector
     (submatrix [m index-ranges]
-      (let [[[start length]] index-ranges]
-        (.subVector m (int start) (int length))))) 
+      (let [[rr] index-ranges
+            s1 (int (if rr (first rr) 0))
+            l1 (int (if rr (second rr) (.length m)))]
+        (.subVector m s1 l1)))) 
 
 (extend-protocol mp/PSummable
   INDArray 
