@@ -191,7 +191,7 @@
   INDArray
   (fill!
     [m value]
-    (.fill m (double (mp/get-0d value)))))
+    (.fill m (double-coerce value))))
 
 (extend-protocol mp/PDimensionInfo
    INDArray
@@ -351,7 +351,7 @@
 (extend-protocol mp/PIndexedSettingMutable
   INDArray
     (set-1d! [m row v] 
-      (.set m (int row) (double v)))
+      (.set m (int row) (double v))) ;; double is OK: v should only be a java.lang.Number instance
     (set-2d! [m row column v] 
       (.set m (int row) (int column) (double v)))
     (set-nd! [m indexes v]
