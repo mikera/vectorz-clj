@@ -182,8 +182,8 @@
     (is (= (m/matrix [[2 2] [2 2]]) (scale (m/matrix [[1 1] [1 1]]) 2))))
   
   (testing "multiplication"
-    (is (= (m/matrix [[8]]) (* (m/matrix [[2 2]]) (m/matrix [[2] [2]]))))
-    (is (= (m/matrix [[8]]) (* (m/matrix [[2 2]]) [[2] [2]])))
+    (is (= (m/matrix [[8]]) (mmul (m/matrix [[2 2]]) (m/matrix [[2] [2]]))))
+    (is (= (m/matrix [[8]]) (mmul (m/matrix [[2 2]]) [[2] [2]])))
     ;; (is (= [[8.0]] (* [[2 2]] (m/matrix [[2] [2]]))))
     ))
 
@@ -192,9 +192,9 @@
 
 (deftest test-matrix-transform
   (testing "vector multiple"
-    (is (= (v/of 2 4) (* (m/matrix [[2 0] [0 2]]) (v/of 1 2))))
-    (is (= (v/of 2 4) (* (m/scalar-matrix 2 2.0) (v/of 1 2))))
-    (is (= (v/of 2 4) (* (m/scalar-matrix 2 2.0) [1 2]))))
+    (is (= (v/of 2 4) (mmul (m/matrix [[2 0] [0 2]]) (v/of 1 2))))
+    (is (= (v/of 2 4) (mmul (m/scalar-matrix 2 2.0) (v/of 1 2))))
+    (is (= (v/of 2 4) (mmul (m/scalar-matrix 2 2.0) [1 2]))))
   (testing "persistent vector transform"
     (is (= (v/of 1 2) (transform (m/identity-matrix 2) [1 2]))))
   (testing "transform in place"
