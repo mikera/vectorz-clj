@@ -284,8 +284,11 @@
 
 (extend-protocol mp/PZeroDimensionConstruction
   INDArray
-    (new-scalar-array [m value]
-      (Scalar/create (double-coerce value))))
+    (new-scalar-array 
+      ([m]
+        (Scalar/create 0.0))
+      ([m value]
+        (Scalar/create (double-coerce value)))))
 
 (extend-protocol mp/PZeroDimensionAccess
   INDArray
