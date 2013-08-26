@@ -50,6 +50,10 @@
 
 (defmacro amatrix-coerce
   "Coerces an argument x to an AMatrix instance"
+  ([m x]
+    `(tag-symbol mikera.matrixx.AMatrix
+                 (let [x# ~x] 
+                   (if (instance? AMatrix x#) x# (amatrix-coerce* ~m x#)))))
   ([x]
     `(tag-symbol mikera.matrixx.AMatrix
                  (let [x# ~x] 
@@ -64,15 +68,10 @@
 
 (defn avector-coerce* 
   (^AVector [^AVector v m]
-	  (cond
+	  (cond 
       (number? m) 
         (let [r (Vectorz/newVector (.length v))] (.fill r (double m)) r)
-	    (instance? AVector m) m
-      (== (mp/dimensionality m) 1)
-        (let [len (.length v)
-              r (Vectorz/newVector len)]
-          (assign! r m) r)
-      :else (Vectorz/toVector m)))
+      :else (.broadcastLike ^INDArray (vectorz-coerce* m) v)))
   (^AVector [m]
     (cond
 	    (instance? AVector m) m
@@ -80,19 +79,18 @@
         (let [len (ecount m)
               r (Vectorz/newVector len)]
           (assign! r m) r)
-      :else (Vectorz/toVector m)))) 
+      :else (Vectorz/toVector ^INDArray (vectorz-coerce* m))))) 
 
 (defn amatrix-coerce* 
   (^AMatrix [^AMatrix v m]
 	  (cond
       (number? m) 
         (let [r (Matrix/create (.rowCount v) (.columnCount v))] (.fill r (double m)) r)
-	    (instance? AMatrix m) m
-      :else (Matrixx/toMatrix m)))
+      :else (.broadcastLike ^INDArray (vectorz-coerce* m) v)))
   (^AMatrix [m]
     (cond
 	    (instance? AMatrix m) m
-      :else (Matrixx/toMatrix m)))) 
+      :else (Matrixx/toMatrix ^INDArray (vectorz-coerce* m))))) 
 
     
 (defn vectorz-coerce* 
@@ -575,7 +573,7 @@
     (matrix-add [m a]
       (if (instance? AVector a)
         (with-clone [m] (.add m ^AVector a)))
-        (let [^INDArray a (if (instance? INDArray a) a (vectorz-coerce a))]
+        (let [^INDArray a (vectorz-coerce a)]
           (if (== 0 (.dimensionality a))
             (let [m (.clone m)] (.add m (.get a)) m)
             (let [a (.clone a)] (.add a m) a))))
@@ -617,9 +615,9 @@
       (.sub m (avector-coerce m a)))
   AMatrix
     (matrix-add! [m a]
-      (.add m (amatrix-coerce a)))
+      (.add m (amatrix-coerce m a)))
     (matrix-sub! [m a]
-      (.sub m (amatrix-coerce a))))
+      (.sub m (amatrix-coerce m a))))
 
 (extend-protocol mp/PVectorOps
   INDArray

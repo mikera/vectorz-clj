@@ -65,6 +65,9 @@
   (is (equals [[2 3] [4 5]] (add (array [[1 2] [3 4]]) (array [1 1]))))
   (is (equals [[2 3] [4 5]] (add (array [1 1]) (array [[1 2] [3 4]])))))
 
+(deftest test-broadcasts
+  (is (equals [[2 2] [2 2]] (broadcast 2 [2 2]))))
+
 (deftest test-scalar-add
   (is (equals [2 3 4] (add 1 (array :vectorz [1 2 3]))))
   (is (equals [2 3 4] (add (array :vectorz [1 2 3]) 1 0)))) 
@@ -117,6 +120,8 @@
 
 
 (deftest test-coerce
+  (is (equals (array [1 2]) (coerce :vectorz [1 2])))
+  (is (equals (array [[1 2] [3 4]]) (coerce :vectorz [[1 2] [3 4]])))
   (let [a (v/vec [1 2 3 0 0])
         b (v/vec [1 1 4 0 0])
         r (sub a b)]
