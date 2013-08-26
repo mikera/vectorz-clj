@@ -282,6 +282,11 @@
           (error "Can't get from AMatrix with more than 2 dimensions")
           (.get m (int x) (int y))))))
 
+(extend-protocol mp/PZeroDimensionConstruction
+  INDArray
+    (new-scalar-array [m value]
+      (Scalar/create (double-coerce value))))
+
 (extend-protocol mp/PZeroDimensionAccess
   INDArray
     (get-0d [m]
@@ -293,6 +298,16 @@
       (.get m))
     (set-0d! [m value]
       (.set m (double-coerce value))))
+
+(extend-protocol mp/PZeroDimensionSet
+  INDArray
+    (set-0d [m value] 
+      (if (== 0 (.dimensionality m))
+        (Scalar/create (double-coerce value))
+        (error "Can't do 0-d set on " (class m))))
+  AScalar
+    (set-0d [m value] 
+      (Scalar/create (double-coerce value))))
 
 (extend-protocol mp/PSpecialisedConstructors
   INDArray
