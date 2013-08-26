@@ -557,21 +557,24 @@
             (.add r (.get m))
             r))))
     (matrix-sub [m a]
-      (let [^INDArray a (vectorz-coerce a)]
-        (if (== 0 (.dimensionality a))
-          (- (.get m) (.get a))
-          (let [r (.clone a)]
-            (.sub r (.get m))
-            r))))
+      (let [^INDArray a (vectorz-clone a)]
+        (cond 
+          (== 0 (.dimensionality a)) (- (.get m) (.get a))
+          :else (let [] (.sub a (.get m)) (.negate a) a))))
   mikera.vectorz.AVector
     (matrix-add [m a]
-      (let [m (.clone m)
-            ^AVector a (vectorz-coerce a)] 
-        (.add m a) m))
+      (if (instance? AVector a)
+        (with-clone [m] (.add m ^AVector a)))
+        (let [^INDArray a (if (instance? INDArray a) a (vectorz-coerce a))]
+          (if (== 0 (.dimensionality a))
+            (let [m (.clone m)] (.add m (.get a)) m)
+            (let [a (.clone a)] (.add a m) a))))
     (matrix-sub [m a]
-      (let [m (.clone m)
-            ^AVector a (vectorz-coerce a)] 
-        (.sub m a) m))
+      (let [^INDArray a (vectorz-coerce a)]
+        (cond 
+          (== 0 (.dimensionality a)) (with-clone [m] (.sub m (.get a)))
+          (== 1 (.dimensionality a)) (with-clone [m] (.sub m a))
+          :else (let [m (.clone (.broadcastLike m a))] (.sub m a) m))))
   mikera.matrixx.AMatrix
     (matrix-add [m a]
       (let [^AMatrix m (.clone m)
@@ -581,7 +584,10 @@
     (matrix-sub [m a]
       (let [m (.clone m)] 
         (.sub m (vectorz-coerce a))
-        m)))
+        m))
+  INDArray
+    (matrix-add [m a] (with-clone [m] (.add m (vectorz-coerce a))))
+    (matrix-sub [m a] (with-clone [m] (.sub m (vectorz-coerce a)))))
 
 (extend-protocol mp/PMatrixAddMutable
   INDArray
@@ -601,9 +607,9 @@
       (.sub m (avector-coerce m a)))
   AMatrix
     (matrix-add! [m a]
-      (.add m ^AMatrix (coerce m a)))
+      (.add m (amatrix-coerce a)))
     (matrix-sub! [m a]
-      (.sub m ^AMatrix (coerce m a))))
+      (.sub m (amatrix-coerce a))))
 
 (extend-protocol mp/PVectorOps
   INDArray
@@ -783,22 +789,6 @@
   INDArray
     (scale [m a] (vectorz-scale m (double a)))
     (pre-scale [m a] (vectorz-scale m (double a))))
-
-(extend-protocol mp/PMatrixAdd
-  INDArray
-    (matrix-add [m a] (with-clone [m] (.add m (vectorz-coerce a))))
-    (matrix-sub [m a] (with-clone [m] (.sub m (vectorz-coerce a))))
-  AVector
-    (matrix-add [m a] (with-clone [m] (.add m (vectorz-coerce a))))
-    (matrix-sub [m a] (with-clone [m] (.sub m (vectorz-coerce a)))))
-
-(extend-protocol mp/PMatrixAddMutable
-  INDArray
-    (matrix-add! [m a] (.add m (vectorz-coerce a)) m)
-    (matrix-sub! [m a] (.sub m (vectorz-coerce a)) m)
-  AVector
-    (matrix-add! [m a] (.add m (vectorz-coerce a)) m)
-    (matrix-sub! [m a] (.sub m (vectorz-coerce a)) m))
 
 (extend-protocol mp/PVectorTransform
   ATransform

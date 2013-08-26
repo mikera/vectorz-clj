@@ -61,6 +61,10 @@
   (is (equals [2 3] (add 1 (array [1 2]))))
   (is (equals [2 3] (add (scalar-array 1) (array [1 2])))))
 
+(deftest test-broadcasting-cases
+  (is (equals [[2 3] [4 5]] (add (array [[1 2] [3 4]]) (array [1 1]))))
+  (is (equals [[2 3] [4 5]] (add (array [1 1]) (array [[1 2] [3 4]])))))
+
 (deftest test-scalar-add
   (is (equals [2 3 4] (add 1 (array :vectorz [1 2 3]))))
   (is (equals [2 3 4] (add (array :vectorz [1 2 3]) 1 0)))) 
