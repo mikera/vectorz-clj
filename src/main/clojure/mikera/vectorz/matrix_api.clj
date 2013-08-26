@@ -543,9 +543,19 @@
 (extend-protocol mp/PMatrixAdd
   mikera.vectorz.AScalar
     (matrix-add [m a]
-      (+ (.get m) (double-coerce a)))
+      (let [^INDArray a (vectorz-coerce a)]
+        (if (== 0 (.dimensionality a))
+          (+ (.get m) (.get a))
+          (let [r (.clone a)]
+            (.add r (.get m))
+            r))))
     (matrix-sub [m a]
-      (- (.get m) (double-coerce a)))
+      (let [^INDArray a (vectorz-coerce a)]
+        (if (== 0 (.dimensionality a))
+          (- (.get m) (.get a))
+          (let [r (.clone a)]
+            (.sub r (.get m))
+            r))))
   mikera.vectorz.AVector
     (matrix-add [m a]
       (let [m (.clone m)

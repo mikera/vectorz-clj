@@ -55,6 +55,12 @@
     (is (equals [2 3 4] (submatrix v 0 [2 3])))
     (is (equals [2 3 4] (submatrix v [[2 3]])))))
 
+(deftest test-scalar-arrays
+  (is (equals 3 (scalar-array 3)))
+  (is (equals 2 (add 1 (array 1))))
+  (is (equals [2 3] (add 1 (array [1 2]))))
+  (is (equals [2 3] (add (scalar-array 1) (array [1 2])))))
+
 (deftest test-scalar-add
   (is (equals [2 3 4] (add 1 (array :vectorz [1 2 3]))))
   (is (equals [2 3 4] (add (array :vectorz [1 2 3]) 1 0)))) 
