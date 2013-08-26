@@ -30,6 +30,13 @@
                (let [x# ~x]
                  (if (instance? INDArray x#) x# (vectorz-coerce* x#))))))
 
+(defmacro vectorz-clone 
+  "Coerces the argument to a new (cloned) vectorz INDArray"
+  ([x]
+  `(tag-symbol mikera.arrayz.INDArray
+               (let [x# ~x]
+                 (if (instance? INDArray x#) (.clone ^INDArray x#) (vectorz-coerce* x#))))))
+
 (defmacro avector-coerce 
   "Coerces an argument x to an AVector instance, of the same size as m"
   ([m x]
