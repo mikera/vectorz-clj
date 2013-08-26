@@ -53,7 +53,7 @@
   ([x]
     `(tag-symbol mikera.matrixx.AMatrix
                  (let [x# ~x] 
-                   (if (instance? AMatrix x#) x# (Matrix/create x#)))))) 
+                   (if (instance? AMatrix x#) x# (amatrix-coerce* x#)))))) 
 
 (defmacro with-clone [[sym exp] & body]
   (let []
@@ -73,16 +73,26 @@
               r (Vectorz/newVector len)]
           (assign! r m) r)
       :else (Vectorz/toVector m)))
-  ([m]
+  (^AVector [m]
     (cond
-      (number? m) 
-        (let [r (Vectorz/newVector 1)] (.fill r (double m)) r)
 	    (instance? AVector m) m
       (== (mp/dimensionality m) 1)
         (let [len (ecount m)
               r (Vectorz/newVector len)]
           (assign! r m) r)
       :else (Vectorz/toVector m)))) 
+
+(defn amatrix-coerce* 
+  (^AMatrix [^AMatrix v m]
+	  (cond
+      (number? m) 
+        (let [r (Matrix/create (.rowCount v) (.columnCount v))] (.fill r (double m)) r)
+	    (instance? AMatrix m) m
+      :else (Matrixx/toMatrix m)))
+  (^AMatrix [m]
+    (cond
+	    (instance? AMatrix m) m
+      :else (Matrixx/toMatrix m)))) 
 
     
 (defn vectorz-coerce* 
