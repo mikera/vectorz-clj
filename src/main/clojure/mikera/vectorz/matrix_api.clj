@@ -583,29 +583,21 @@
     (matrix-add [m a]
       (if (instance? AVector a)
         (with-clone [m] (.add m ^AVector a)))
-        (let [^INDArray a (vectorz-coerce a)]
-          (if (== 0 (.dimensionality a))
-            (let [m (.clone m)] (.add m (.get a)) m)
-            (let [a (.clone a)] (.add a m) a))))
+        (with-broadcast-clone [m a] (.add m a)))
     (matrix-sub [m a]
-      (let [^INDArray a (vectorz-coerce a)]
-        (cond 
-          (== 0 (.dimensionality a)) (with-clone [m] (.sub m (.get a)))
-          (== 1 (.dimensionality a)) (with-clone [m] (.sub m a))
-          :else (let [m (.clone (.broadcastLike m a))] (.sub m a) m))))
+      (if (instance? AVector a)
+        (with-clone [m] (.sub m ^AVector a)))
+        (with-broadcast-clone [m a] (.sub m a)))
   mikera.matrixx.AMatrix
     (matrix-add [m a]
-      (let [^AMatrix m (.clone m)
-            ^INDArray a (vectorz-coerce a)] 
-        (.add m a)
-        m))
+      (with-broadcast-clone [m a] (.add m a)))
     (matrix-sub [m a]
-      (let [m (.clone m)] 
-        (.sub m (vectorz-coerce a))
-        m))
+      (with-broadcast-clone [m a] (.sub m a)))
   INDArray
-    (matrix-add [m a] (with-clone [m] (.add m (vectorz-coerce a))))
-    (matrix-sub [m a] (with-clone [m] (.sub m (vectorz-coerce a)))))
+    (matrix-add [m a]
+      (with-broadcast-clone [m a] (.add m a)))
+    (matrix-sub [m a]
+      (with-broadcast-clone [m a] (.sub m a))))
 
 (extend-protocol mp/PMatrixAddMutable
   INDArray
@@ -719,7 +711,8 @@
 (extend-protocol mp/PMatrixDivide
   INDArray
   (element-divide 
-    ([m] (with-clone [m] (.reciprocal m)))
+    ([m] 
+      (with-clone [m] (.reciprocal m)))
     ([m a] 
       (with-broadcast-clone [m a] ()))))
 
