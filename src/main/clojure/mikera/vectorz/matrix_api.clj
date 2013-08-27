@@ -74,6 +74,15 @@
          ~@body
          ~sym))))
 
+(defmacro with-vectorz-clone 
+  "Executes the body with a cloned version of the specfied symbol/expression binding. Returns the cloned object."
+  ([[sym exp] & body]
+    (let []
+      (when-not (symbol? sym) (error "Symbol required for with-clone binding"))
+      `(let [~sym (vectorz-clone ~(if exp exp sym))]
+         ~@body
+         ~sym))))
+
 (defmacro with-broadcast-clone 
   "Executes body with a broadcasted clone of a and a broadcasted INDArray version of b. Returns broadcasted clone of a."
   ([[a b] & body]
@@ -719,9 +728,9 @@
 (extend-protocol mp/PMatrixMultiply
   AScalar
     (matrix-multiply [m a]
-      (mp/pre-scale a (.get m)))
+      (with-vectorz-clone [a] (.multiply a (.get m))))
     (element-multiply [m a]
-      (mp/pre-scale a (.get m)))
+      (with-vectorz-clone [a] (.multiply a (.get m))))
   AVector
     (matrix-multiply [m a]
       (.innerProduct m (vectorz-coerce a)))
