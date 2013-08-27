@@ -28,7 +28,9 @@
   ([x]
   `(tag-symbol mikera.arrayz.INDArray
                (let [x# ~x]
-                 (if (instance? INDArray x#) x# (vectorz-coerce* x#))))))
+                 (if (instance? INDArray x#) x# (vectorz-coerce* x#)))))
+  ([m x]
+    `(.broadcastLike (vectorz-coerce ~x) ~m)))
 
 (defmacro vectorz-clone 
   "Coerces the argument to a new (cloned) vectorz INDArray"
@@ -59,12 +61,24 @@
                  (let [x# ~x] 
                    (if (instance? AMatrix x#) x# (amatrix-coerce* x#)))))) 
 
-(defmacro with-clone [[sym exp] & body]
-  (let []
-    (when-not (symbol? sym) (error "Symbol required for with-clone binding"))
-    `(let [~sym (.clone ~(if exp exp sym))]
-       ~@body
-       ~sym)))
+(defmacro with-clone 
+  "Executes the body with a cloned version of the specfied symbol/expression binding. Returns the cloned object."
+  ([[sym exp] & body]
+    (let []
+      (when-not (symbol? sym) (error "Symbol required for with-clone binding"))
+      `(let [~sym (.clone ~(if exp exp sym))]
+         ~@body
+         ~sym))))
+
+(defmacro with-broadcast-clone 
+  "Executes body with a broadcasted clone of a and a broadcasted INDArray version of b. Returns broadcasted clone of a."
+  ([[a b] & body]
+     (when-not (and (symbol? a) (symbol? b)) (error "Symbols required for with-broadcast-clone binding"))
+     (let []
+      `(let [~b (vectorz-coerce ~a ~b)
+             ~a (.broadcastCloneLike ~a ~b)]
+         ~@body
+         ~a))))
 
 (defn avector-coerce* 
   (^AVector [^AVector v m]
@@ -705,6 +719,13 @@
       (if (== 0 (.dimensionality m))
         (mp/get-0d m)
         (mapv mp/convert-to-nested-vectors (.getSlices m)))))
+
+(extend-protocol mp/PMatrixDivide
+  INDArray
+  (element-divide 
+    ([m] (with-clone [m] (.reciprocal m)))
+    ([m a] 
+      (with-broadcast-clone [m a] ()))))
 
 (extend-protocol mp/PMatrixMultiply
   AScalar
