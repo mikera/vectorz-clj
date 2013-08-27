@@ -53,7 +53,8 @@
     (is (equals v (submatrix v [nil])))
     (is (equals v (submatrix v [[0 9]])))
     (is (equals [2 3 4] (submatrix v 0 [2 3])))
-    (is (equals [2 3 4] (submatrix v [[2 3]])))))
+    (is (equals [2 3 4] (submatrix v [[2 3]]))))
+  (is (instance? AVector (array [1 2]))))
 
 (deftest test-scalar-arrays
   (is (equals 3 (scalar-array 3)))
@@ -63,7 +64,9 @@
 
 (deftest test-broadcasting-cases
   (is (equals [[2 3] [4 5]] (add (array [[1 2] [3 4]]) (array [1 1]))))
-  (is (equals [[2 3] [4 5]] (add (array [1 1]) (array [[1 2] [3 4]])))))
+  (is (equals [[2 3] [4 5]] (add (array [1 1]) (array [[1 2] [3 4]]))))
+  (is (equals [[2 4] [6 8]] (mul (array :vectorz [[1 2] [3 4]]) (array :ndarray 2))))
+  (is (equals [[2 6] [6 12]] (mul (array :vectorz [[1 2] [3 4]]) (array :ndarray [2 3])))))
 
 (deftest test-broadcasts
   (is (equals [[2 2] [2 2]] (broadcast 2 [2 2]))))
