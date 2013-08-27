@@ -366,6 +366,13 @@
     (broadcast [m target-shape]
      (.broadcast m (int-array target-shape)))) 
 
+(extend-protocol mp/PBroadcastLike
+  INDArray 
+    (broadcast-like [m a]
+     (if (instance? INDArray a)
+       (.broadcastLike ^INDArray a m)
+       (vectorz-coerce m a)))) 
+
 (extend-protocol mp/PReshaping
   INDArray 
     (reshape [m target-shape]
