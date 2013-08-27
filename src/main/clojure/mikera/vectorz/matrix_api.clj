@@ -762,6 +762,13 @@
     (element-multiply [m a]
       (with-broadcast-clone [m a] (.multiply m a))))
 
+(extend-protocol mp/PMatrixMultiplyMutable
+  INDArray
+    (matrix-multiply! [m a]
+      (mp/assign! m (mp/inner-product m a)))
+    (element-multiply! [m a]
+      (.multiply m (vectorz-coerce a))))
+
 (extend-protocol mp/PMatrixProducts
   INDArray
     (inner-product [m a] (.innerProduct m (vectorz-coerce a)))
