@@ -30,7 +30,11 @@
                (let [x# ~x]
                  (if (instance? INDArray x#) x# (vectorz-coerce* x#)))))
   ([m x]
-    `(.broadcastLike (vectorz-coerce ~x) ~m)))
+    `(let [m# ~m
+           x# (vectorz-coerce ~x)]
+       (if (< (.dimensionality x#) (.dimensionality m#)) 
+         (.broadcastLike x# m#) 
+         x#))))
 
 (defmacro vectorz-clone 
   "Coerces the argument to a new (cloned) vectorz INDArray"
@@ -572,17 +576,9 @@
 (extend-protocol mp/PMatrixAdd
   mikera.vectorz.AScalar
     (matrix-add [m a]
-      (let [^INDArray a (vectorz-coerce a)]
-        (if (== 0 (.dimensionality a))
-          (+ (.get m) (.get a))
-          (let [r (.clone a)]
-            (.add r (.get m))
-            r))))
+      (with-broadcast-clone [m a] (.add m a)))
     (matrix-sub [m a]
-      (let [^INDArray a (vectorz-clone a)]
-        (cond 
-          (== 0 (.dimensionality a)) (- (.get m) (.get a))
-          :else (let [] (.sub a (.get m)) (.negate a) a))))
+      (with-broadcast-clone [m a] (.sub m a)))
   mikera.vectorz.AVector
     (matrix-add [m a]
       (if (instance? AVector a)
