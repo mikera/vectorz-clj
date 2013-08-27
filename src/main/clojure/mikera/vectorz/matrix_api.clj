@@ -778,15 +778,15 @@
   AVector
     (add-scaled [m a factor]
       (with-clone [m] 
-        (.addMultiple m (avector-coerce m a) (double factor))))) 
+        (.addMultiple m (avector-coerce m a) (double-coerce factor))))) 
 
 (extend-protocol mp/PAddScaledMutable
   AMatrix
     (add-scaled! [m a factor]
-      (.addMultiple m (vectorz-coerce a) (double factor)))
+      (.addMultiple m (vectorz-coerce a) (double-coerce factor)))
   AVector
     (add-scaled! [m a factor]
-      (.addMultiple m (avector-coerce m a) (double factor)))) 
+      (.addMultiple m (avector-coerce m a) (double-coerce factor)))) 
 
 (extend-protocol mp/PAddScaledProduct
   AVector
@@ -801,24 +801,24 @@
 
 (extend-protocol mp/PMatrixScaling
   AScalar 
-    (scale [m a] (vectorz-scale m (double a)))
-    (pre-scale [m a] (vectorz-scale m (double a)))
+    (scale [m a] (vectorz-scale m (double-coerce a)))
+    (pre-scale [m a] (vectorz-scale m (double-coerce a)))
   AVector
-    (scale [m a] (vectorz-scale m (double a)))
-    (pre-scale [m a] (vectorz-scale m (double a)))
+    (scale [m a] (vectorz-scale m (double-coerce a)))
+    (pre-scale [m a] (vectorz-scale m (double-coerce a)))
   AMatrix
-    (scale [m a] (vectorz-scale m (double a)))
-    (pre-scale [m a] (vectorz-scale m (double a)))
+    (scale [m a] (vectorz-scale m (double-coerce a)))
+    (pre-scale [m a] (vectorz-scale m (double-coerce a)))
   INDArray
-    (scale [m a] (vectorz-scale m (double a)))
-    (pre-scale [m a] (vectorz-scale m (double a))))
+    (scale [m a] (vectorz-scale m (double-coerce a)))
+    (pre-scale [m a] (vectorz-scale m (double-coerce a))))
 
 (extend-protocol mp/PVectorTransform
   ATransform
     (vector-transform [m v] 
       (if (instance? AVector v) 
         (.transform m ^AVector v)
-        (.transform m ^AVector (vectorz-coerce v))))
+        (.transform m ^AVector (avector-coerce v))))
     (vector-transform! [m v] 
       (if (instance? AVector v) 
         (.transformInPlace m ^AVector v)
