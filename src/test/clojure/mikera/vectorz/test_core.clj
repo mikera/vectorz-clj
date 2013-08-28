@@ -1,5 +1,6 @@
 (ns mikera.vectorz.test-core
   (:use clojure.test)
+  (:require mikera.vectorz.examples) 
   (:require [mikera.vectorz.core :as v])
   (:import [mikera.vectorz AVector Vectorz Vector]))
 

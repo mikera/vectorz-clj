@@ -58,7 +58,7 @@
 (defn zero?
   "Returns true if the matrix is a zero-filled matrix (i.e. maps every vector to zero)"
   ([^AMatrix m]
-    (.isZeroMatrix m)))
+    (.isZero m)))
 
 (defn square?
   "Returns true if the matrix is a square matrix"
