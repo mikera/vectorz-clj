@@ -874,6 +874,11 @@
     (square [m]
       (with-clone [m] (.square m))))
 
+(extend-protocol mp/PExponent
+  INDArray
+    (element-pow [m exponent]
+      (with-clone [m] (.pow m (double-coerce exponent)))))
+
 (extend-protocol mp/PElementCount
   INDArray
     (element-count [m]
