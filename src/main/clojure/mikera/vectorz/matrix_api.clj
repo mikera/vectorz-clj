@@ -93,6 +93,8 @@
          ~@body
          ~a))))
 
+(def ^Class INT-ARRAY-CLASS (Class/forName "[I"))
+
 (defmacro with-indexes 
   "Executes body after binding int indexes from the given indexing object"
   ([[syms ixs] & body]
@@ -100,12 +102,17 @@
 	        isym (gensym)]
 	    `(let [~isym ~ixs]
 	       (cond
+	         (instance? INT-ARRAY-CLASS ~isym)
+             (let [~isym ~(vary-meta isym assoc :tag "[I")
+	                 ~@(interleave 
+	                     syms 
+	                     (map (fn [i] `(int (aget ~isym ~i)) ) (range n)))] ~@body)
 	         (instance? clojure.lang.IPersistentVector ~isym)
 	           (let [~isym ~(vary-meta isym assoc :tag 'clojure.lang.IPersistentVector)
 	                 ~@(interleave 
 	                     syms 
 	                     (map (fn [i] `(int (.nth ~isym ~i)) ) (range n)))] ~@body)
-	         :else
+           :else
 	           (let [[~@syms] (seq ~isym)] ~@body))))))
 
 (defn avector-coerce* 
