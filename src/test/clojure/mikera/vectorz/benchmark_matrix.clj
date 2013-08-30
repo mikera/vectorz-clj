@@ -2,6 +2,7 @@
   (:use clojure.core.matrix)
   (:use clojure.core.matrix.stats)
   (:require [clojure.core.matrix.operators :refer [+ - *]])
+  (:require [clojure.core.matrix.protocols :as mp])
   (:refer-clojure :exclude [+ - * ])
   (:require [criterium.core :as c])
   (:require [mikera.vectorz.matrix-api])
@@ -55,5 +56,11 @@
         b (Vectorz/create [1 2 3 4 5 6 7 8 9 10])]
     (c/quick-bench (dotimes [i 1000] (.add a b))))
   ;; => Execution time mean per addition: 11 ns
+  
+  ;; Indexed lookup with Clojure vector
+  (let [a (Vectorz/create [1 2 3 4 5 6 7 8 9 10])]
+    (c/quick-bench (dotimes [i 1000] (mp/get-nd a [1]))))
+  ;; => Execution time mean per lookup: 14 ns
+
 
 ) 
