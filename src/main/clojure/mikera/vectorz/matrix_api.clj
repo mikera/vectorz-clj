@@ -93,6 +93,21 @@
          ~@body
          ~a))))
 
+(defmacro with-indexes 
+  "Executes body after binding int indexes from the given indexing object"
+  ([[syms ixs] & body]
+	  (let [n (count syms)
+	        isym (gensym)]
+	    `(let [~isym ~ixs]
+	       (cond
+	         (instance? clojure.lang.IPersistentVector ~isym)
+	           (let [~isym ~(vary-meta isym assoc :tag 'clojure.lang.IPersistentVector)
+	                 ~@(interleave 
+	                     syms 
+	                     (map (fn [i] `(int (.nth ~isym ~i)) ) (range n)))] ~@body)
+	         :else
+	           (let [[~@syms] (seq ~isym)] ~@body))))))
+
 (defn avector-coerce* 
   (^AVector [^AVector v m]
 	  (cond 
@@ -310,19 +325,16 @@
     (get-2d [m x y]
       (error "Can't access 2-dimensional index of a vector"))
     (get-nd [m indexes]
-      (if-let [ni (next indexes)]
-        (error "Can't access multi-dimensional index of a vector")
-        (.get m (int (first indexes)))))
+      (with-indexes [[x] indexes]
+        (.get m (int x))))
   AMatrix
     (get-1d [m x]
       (error "Can't access 1-dimensional index of a matrix"))
     (get-2d [m x y]
       (.get m (int x) (int y)))
     (get-nd [m indexes]
-      (let [[x y & more] indexes]
-        (if (seq more)
-          (error "Can't get from AMatrix with more than 2 dimensions")
-          (.get m (int x) (int y))))))
+      (with-indexes [[x y] indexes]
+        (.get m x y))))
 
 (extend-protocol mp/PZeroDimensionConstruction
   INDArray
@@ -1045,3 +1057,5 @@
 ;; registration
 
 (imp/register-implementation (Vector/of (double-array [0])))
+
+:OK
