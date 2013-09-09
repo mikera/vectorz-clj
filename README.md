@@ -5,8 +5,8 @@ Fast vector library for Clojure, building on the [Vectorz](https://github.com/mi
 
 `vectorz-clj` is designed so that you don't have to compromise, offering both:
 
- - An idiomatic high-level Clojure API.
- - High performance (about as fast as you can get on the JVM)
+ - An idiomatic high-level Clojure API using **core.matrix**
+ - High performance (about as fast as you can get on the JVM). vectorz-clj is currently the fastest pure-JVM vector/matrix library available for Clojure
 
 The library was originally designed for games, simulations and machine learning applications, 
 but should be applicable for any situations where you need numerical `double` arrays.
@@ -16,7 +16,7 @@ Important features:
  - **"Pure"** functions for an idiomatic functional programming style are provided. These return new vectors without mutating their arguments.
  - **Primitive-backed** special purpose vectors and matrices for performance, e.g. `Vector3` for fast 3D maths.
  - **Flexible DSL-style** functions for manipulating vectors and matrices, e.g. the ability to create a "view" into a subspace of a large vector.
- - **`core.matrix`** fully supported - see: https://github.com/mikera/matrix-api
+ - **core.matrix** fully supported - see: https://github.com/mikera/matrix-api. 
  - **Pure JVM code** - no native dependencies
  - **"Impure"** functions that mutate vectors are available for performance when you need it: i.e. you can use a nice functional style most of the time, but switch to mutation when you hit a bottleneck.
  
