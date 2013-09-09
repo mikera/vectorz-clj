@@ -17,11 +17,26 @@
   (let [^Vector3 a ( v/vec [1 2 3])
         ^Vector3 b ( v/vec [1 2 3])]
     (c/quick-bench (dotimes [i 1000] (.add a b))))
+  ;; => 1.5 ns per addition
+  
+   ;; core.matrix mutable add
+  (let [a (v/vec [1 2 3])
+        b (v/vec [1 2 3])]
+    (c/quick-bench (dotimes [i 1000] (add! a b))))  
+  ;; => 7.5 ns per addition
+   
+  ;; mikera.vectorz.core mutable add
+  (let [^Vector3 a (v/vec [1 2 3])
+        ^Vector3 b (v/vec [1 2 3])]
+    (c/quick-bench (dotimes [i 1000] (v/add! a b))))  
+  ;; => 3.9 ns per addition
+
   
    ;; core.matrix add
   (let [a (v/vec [1 2 3])
         b (v/vec [1 2 3])]
     (c/quick-bench (dotimes [i 1000] (add a b))))  
+  ;; => 15.8 ns per addition
     
   ;; direct persistent vector add
   (let [a [1 2 3]
