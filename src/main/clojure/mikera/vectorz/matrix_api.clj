@@ -700,15 +700,6 @@
     (normalise [a]
       (with-clone [a] (.normalise a))))
 
-(extend-protocol mp/PMatrixOps
-  AMatrix
-    (trace [m]
-      (.trace m))
-    (determinant [m]
-      (.determinant m))
-    (inverse [m]
-      (.inverse m)))
-
 (extend-protocol mp/PNegation
   AScalar (negate [m] (with-clone [m] (.negate m)))
   AVector (negate [m] (with-clone [m] (.negate m)))
