@@ -1,4 +1,4 @@
-(ns mikera.vectorz.blank
+(ns mikera.vectorz.implementation-check
   (:use clojure.core.matrix)
   (:require [clojure.core.matrix.utils :as utils]))
 
@@ -7,5 +7,4 @@
 (defn test []
 	(array [1])
 	
-	(def protos (utils/extract-protocols))
-)
+	(def protos (utils/extract-protocols)))
