@@ -220,6 +220,18 @@
     (pre-scale! [m a]
       (.scale m (double-coerce a))))
 
+(extend-protocol mp/PNumerical
+  INDArray
+    (numerical? [m]
+      true))
+
+(extend-protocol mp/PSameShape
+  INDArray 
+    (same-shape? [a b]
+      (if (instance? INDArray b)
+        (.isSameShape a ^INDArray b)
+        (clojure.core.matrix.utils/same-shape-object? (mp/get-shape a) (mp/get-shape b)))))
+
 (extend-protocol mp/PDoubleArrayOutput
   INDArray
     (to-double-array [m] (.toDoubleArray m))
