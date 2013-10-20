@@ -474,6 +474,20 @@
         (error "Can't do " (count indexes) "-dimensional set on a 2D matrix!"))))
 
 
+(extend-protocol mp/PMatrixEquality
+  INDArray
+    (matrix-equals [a b]
+      (if (instance? INDArray b)
+        (.equals a ^INDArray b)
+        (.equals a (vectorz-coerce b)))))
+
+(extend-protocol mp/PMatrixEqualityEpsilon
+  INDArray 
+    (matrix-equals-epsilon [a b eps]
+      (if (instance? INDArray b)
+        (.epsilonEquals a ^INDArray b (double eps))
+        (.epsilonEquals a (vectorz-coerce b) (double eps)))))
+
 (extend-protocol mp/PMatrixSlices
   INDArray
     (get-row [m i]
@@ -941,20 +955,22 @@
 (extend-protocol mp/PComputeMatrix
   INDArray
     (compute-matrix [m shape f]
-      (let [dims (count shape)]
+      (let [dims (long (count shape))]
         (cond 
-          (== 0 dims) (f)
+          (== 0 dims) (double (f))
           (== 1 dims) 
             (let [n (int (first shape))
                   v (Vector/createLength n)] 
-              (dotimes [i n] (.set v (int i) (double (f i)))))
+              (dotimes [i n] (.set v (int i) (double (f i))))
+              v)
           (== 2 dims)
             (let [n (int (first shape))
                   m (int (second shape))
                   v (Matrix/create n m)] 
               (dotimes [i n] 
                 (dotimes [j m]
-                  (.set v (int i) (int j) (double (f i j))))))
+                  (.set v (int i) (int j) (double (f i j)))))
+              v)
           :else 
             (Arrayz/create 
               (let [ns (next shape)]
