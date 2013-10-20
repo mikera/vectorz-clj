@@ -397,6 +397,15 @@
     (reshape [m target-shape]
       (.reshape m (int-array target-shape)))) 
 
+(extend-protocol mp/PZeroCount
+  INDArray
+    (zero-count [m] (- (.elementCount m) (.nonZeroCount m))))
+
+
+(extend-protocol mp/PArrayMetrics
+  INDArray
+    (nonzero-count [m] (.nonZeroCount m)))
+
 (extend-protocol mp/PIndexedSetting
   INDArray
     (set-1d [m row v] 

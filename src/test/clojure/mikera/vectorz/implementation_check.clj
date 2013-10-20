@@ -4,7 +4,7 @@
 
 (set-current-implementation :vectorz)
 
-(defn test []
+(defn test-impls []
 	(array [1])
 	
 	(def protos (utils/extract-protocols)))
