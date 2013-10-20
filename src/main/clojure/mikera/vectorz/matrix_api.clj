@@ -975,6 +975,12 @@
     (as-vector [m]
       m))
 
+(extend-protocol mp/PVectorDistance
+  AVector
+    (distance [a b]
+      (.distance a (avector-coerce b))))
+
+
 (extend-protocol mp/PComputeMatrix
   INDArray
     (compute-matrix [m shape f]
