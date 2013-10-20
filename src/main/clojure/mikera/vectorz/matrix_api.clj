@@ -899,6 +899,26 @@
     (inverse [m]
       (.inverse m)))
 
+(extend-protocol mp/PMatrixPredicates
+  INDArray
+    (identity-matrix?
+      [m]
+      (and 
+        (== 2 (.dimensionality m))
+        (identity-matrix? (Matrixx/toMatrix m)))) ;; TODO: make cheaper
+    (zero-matrix?
+      [m]
+      (.isZero m))
+  AMatrix
+    (identity-matrix?
+      [m]
+      (and
+        (.isSquare m)    ;; workaround for vectorz bug until 0.21.1
+        (.isIdentity m)))
+    (zero-matrix?
+      [m]
+      (.isZero m)))
+
 (extend-protocol mp/PSquare
   INDArray
     (square [m]
