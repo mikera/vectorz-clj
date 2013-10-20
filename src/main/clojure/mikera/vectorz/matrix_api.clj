@@ -24,13 +24,13 @@
     `(let [~tagged-sym ~form] ~tagged-sym)))
 
 (defmacro vectorz-coerce 
-  "Coerces the argument to a vectorz INDArray"
+  "Coerces the argument to a vectorz INDArray. Broadcasts to the shape of target if provided."
   ([x]
   `(tag-symbol mikera.arrayz.INDArray
                (let [x# ~x]
                  (if (instance? INDArray x#) x# (vectorz-coerce* x#)))))
-  ([m x]
-    `(let [m# ~m
+  ([target x]
+    `(let [m# ~target
            x# (vectorz-coerce ~x)]
        (if (< (.dimensionality x#) (.dimensionality m#)) 
          (.broadcastLike x# m#) 
@@ -92,6 +92,28 @@
              ~a (.broadcastCloneLike ~a ~b)]
          ~@body
          ~a))))
+
+(def ^Class INT-ARRAY-CLASS (Class/forName "[I"))
+
+(defmacro with-indexes 
+  "Executes body after binding int indexes from the given indexing object"
+  ([[syms ixs] & body]
+	  (let [n (count syms)
+	        isym (gensym)]
+	    `(let [~isym ~ixs]
+	       (cond
+	         (instance? INT-ARRAY-CLASS ~isym)
+             (let [~isym ~(vary-meta isym assoc :tag "[I")
+	                 ~@(interleave 
+	                     syms 
+	                     (map (fn [i] `(int (aget ~isym ~i)) ) (range n)))] ~@body)
+	         (instance? clojure.lang.IPersistentVector ~isym)
+	           (let [~isym ~(vary-meta isym assoc :tag 'clojure.lang.IPersistentVector)
+	                 ~@(interleave 
+	                     syms 
+	                     (map (fn [i] `(int (.nth ~isym ~i)) ) (range n)))] ~@body)
+           :else
+	           (let [[~@syms] (seq ~isym)] ~@body))))))
 
 (defn avector-coerce* 
   (^AVector [^AVector v m]
@@ -197,6 +219,18 @@
       (.scale m (double-coerce a)))
     (pre-scale! [m a]
       (.scale m (double-coerce a))))
+
+(extend-protocol mp/PNumerical
+  INDArray
+    (numerical? [m]
+      true))
+
+(extend-protocol mp/PSameShape
+  INDArray 
+    (same-shape? [a b]
+      (if (instance? INDArray b)
+        (.isSameShape a ^INDArray b)
+        (clojure.core.matrix.utils/same-shape-object? (mp/get-shape a) (mp/get-shape b)))))
 
 (extend-protocol mp/PDoubleArrayOutput
   INDArray
@@ -310,19 +344,16 @@
     (get-2d [m x y]
       (error "Can't access 2-dimensional index of a vector"))
     (get-nd [m indexes]
-      (if-let [ni (next indexes)]
-        (error "Can't access multi-dimensional index of a vector")
-        (.get m (int (first indexes)))))
+      (with-indexes [[x] indexes]
+        (.get m (int x))))
   AMatrix
     (get-1d [m x]
       (error "Can't access 1-dimensional index of a matrix"))
     (get-2d [m x y]
       (.get m (int x) (int y)))
     (get-nd [m indexes]
-      (let [[x y & more] indexes]
-        (if (seq more)
-          (error "Can't get from AMatrix with more than 2 dimensions")
-          (.get m (int x) (int y))))))
+      (with-indexes [[x y] indexes]
+        (.get m x y))))
 
 (extend-protocol mp/PZeroDimensionConstruction
   INDArray
@@ -377,6 +408,15 @@
   INDArray 
     (reshape [m target-shape]
       (.reshape m (int-array target-shape)))) 
+
+(extend-protocol mp/PZeroCount
+  INDArray
+    (zero-count [m] (- (.elementCount m) (.nonZeroCount m))))
+
+
+(extend-protocol mp/PArrayMetrics
+  INDArray
+    (nonzero-count [m] (.nonZeroCount m)))
 
 (extend-protocol mp/PIndexedSetting
   INDArray
@@ -445,6 +485,20 @@
         (.set m (int (first indexes)) (int (second indexes)) (double v))
         (error "Can't do " (count indexes) "-dimensional set on a 2D matrix!"))))
 
+
+(extend-protocol mp/PMatrixEquality
+  INDArray
+    (matrix-equals [a b]
+      (if (instance? INDArray b)
+        (.equals a ^INDArray b)
+        (.equals a (vectorz-coerce b)))))
+
+(extend-protocol mp/PMatrixEqualityEpsilon
+  INDArray 
+    (matrix-equals-epsilon [a b eps]
+      (if (instance? INDArray b)
+        (.epsilonEquals a ^INDArray b (double eps))
+        (.epsilonEquals a (vectorz-coerce b) (double eps)))))
 
 (extend-protocol mp/PMatrixSlices
   INDArray
@@ -658,15 +712,6 @@
     (normalise [a]
       (with-clone [a] (.normalise a))))
 
-(extend-protocol mp/PMatrixOps
-  AMatrix
-    (trace [m]
-      (.trace m))
-    (determinant [m]
-      (.determinant m))
-    (inverse [m]
-      (.inverse m)))
-
 (extend-protocol mp/PNegation
   AScalar (negate [m] (with-clone [m] (.negate m)))
   AVector (negate [m] (with-clone [m] (.negate m)))
@@ -834,7 +879,7 @@
     (vector-transform [m v] 
       (if (instance? AVector v) 
         (.transform m ^AVector v)
-        (.transform m ^AVector (avector-coerce v))))
+        (.transform m (avector-coerce v))))
     (vector-transform! [m v] 
       (if (instance? AVector v) 
         (.transformInPlace m ^AVector v)
@@ -865,6 +910,26 @@
       (.determinant m))
     (inverse [m]
       (.inverse m)))
+
+(extend-protocol mp/PMatrixPredicates
+  INDArray
+    (identity-matrix?
+      [m]
+      (and 
+        (== 2 (.dimensionality m))
+        (identity-matrix? (Matrixx/toMatrix m)))) ;; TODO: make cheaper
+    (zero-matrix?
+      [m]
+      (.isZero m))
+  AMatrix
+    (identity-matrix?
+      [m]
+      (and
+        (.isSquare m)    ;; workaround for vectorz bug until 0.21.1
+        (.isIdentity m)))
+    (zero-matrix?
+      [m]
+      (.isZero m)))
 
 (extend-protocol mp/PSquare
   INDArray
@@ -909,6 +974,36 @@
   AVector
     (as-vector [m]
       m))
+
+(extend-protocol mp/PVectorDistance
+  AVector
+    (distance [a b]
+      (.distance a (avector-coerce b))))
+
+
+(extend-protocol mp/PComputeMatrix
+  INDArray
+    (compute-matrix [m shape f]
+      (let [dims (long (count shape))]
+        (cond 
+          (== 0 dims) (double (f))
+          (== 1 dims) 
+            (let [n (int (first shape))
+                  v (Vector/createLength n)] 
+              (dotimes [i n] (.set v (int i) (double (f i))))
+              v)
+          (== 2 dims)
+            (let [n (int (first shape))
+                  m (int (second shape))
+                  v (Matrix/create n m)] 
+              (dotimes [i n] 
+                (dotimes [j m]
+                  (.set v (int i) (int j) (double (f i j)))))
+              v)
+          :else 
+            (Arrayz/create 
+              (let [ns (next shape)]
+                (mapv #(mp/compute-matrix m ns (fn [& ixs] (apply f % ixs))) (range (first shape)))))))))
 
 (extend-protocol mp/PFunctionalOperations
   INDArray
@@ -1045,3 +1140,5 @@
 ;; registration
 
 (imp/register-implementation (Vector/of (double-array [0])))
+
+:OK
