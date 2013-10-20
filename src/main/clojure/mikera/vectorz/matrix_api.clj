@@ -24,13 +24,13 @@
     `(let [~tagged-sym ~form] ~tagged-sym)))
 
 (defmacro vectorz-coerce 
-  "Coerces the argument to a vectorz INDArray"
+  "Coerces the argument to a vectorz INDArray. Broadcasts to the shape of target if provided."
   ([x]
   `(tag-symbol mikera.arrayz.INDArray
                (let [x# ~x]
                  (if (instance? INDArray x#) x# (vectorz-coerce* x#)))))
-  ([m x]
-    `(let [m# ~m
+  ([target x]
+    `(let [m# ~target
            x# (vectorz-coerce ~x)]
        (if (< (.dimensionality x#) (.dimensionality m#)) 
          (.broadcastLike x# m#) 
@@ -937,6 +937,28 @@
   AVector
     (as-vector [m]
       m))
+
+(extend-protocol mp/PComputeMatrix
+  INDArray
+    (compute-matrix [m shape f]
+      (let [dims (count shape)]
+        (cond 
+          (== 0 dims) (f)
+          (== 1 dims) 
+            (let [n (int (first shape))
+                  v (Vector/createLength n)] 
+              (dotimes [i n] (.set v (int i) (double (f i)))))
+          (== 2 dims)
+            (let [n (int (first shape))
+                  m (int (second shape))
+                  v (Matrix/create n m)] 
+              (dotimes [i n] 
+                (dotimes [j m]
+                  (.set v (int i) (int j) (double (f i j))))))
+          :else 
+            (Arrayz/create 
+              (let [ns (next shape)]
+                (mapv #(mp/compute-matrix m ns (fn [& ixs] (apply f % ixs))) (range (first shape)))))))))
 
 (extend-protocol mp/PFunctionalOperations
   INDArray

@@ -275,6 +275,10 @@
     ;; (is (equals [2 3] (emap + (v/of 0 1) 2))) shouldn't work - no broadcast support in emap?
     (is (equals [3 6] (emap + (v/of 0 1) [1 2] (v/of 2 3))))))
 
+(deftest test-compute-array
+  (is (equals [[0 1] [1 2]] (compute-matrix :vectorz [2 2] +)))
+  (is (equals [[[0 1] [1 2]][[1 2][2 3]]] (compute-matrix :vectorz [2 2 2] +))))
+
 (deftest test-maths-functions
   (testing "abs"
     (is (equals [1 2 3] (abs [-1 2 -3])))
