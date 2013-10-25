@@ -14,31 +14,26 @@
 (set-current-implementation :vectorz)
 
 ;; elementwise mutation of 10x10 matrix, followed by computation of the sum
-
+;; => about 3,000 ns
 (defn buildsum [n]
  (let [bv (zero-matrix n n)]
    (dotimes [i n]
      (dotimes [j n]
        (mset! bv i j (* i j))))
    (esum bv)))
-
 (c/quick-bench (buildsum 10))
 
 
-;; multiplication of two matrices
-
+;; multiplication of two 100x100 matrices
+;; => about 1.3 ms
 (defn multiply [n]
   (let [ma (zero-matrix n n)
         mb (zero-matrix n n)]
     (mmul ma mb)))
-
 (c/quick-bench (multiply 100))
 
-;; multiplication of two identity matrices
 
-(defn multiplyidentity [n]
-  (let [ma (Matrixx/createIdentityMatrix n) ;; (identity-matrix n) (Matrixx/createIdentityMaytix n)
-        mb (Matrixx/createIdentityMatrix n)]
-    (inner-product ma mb)))
+;; multiplication of two 10x10 matrices
+;; => about 1,800 ns
+(c/quick-bench (multiply 10))
 
-(c/quick-bench (multiplyidentity 100))
