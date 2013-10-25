@@ -795,7 +795,7 @@
           (let [^AVector r (Vectorz/newVector (.rowCount m))] 
             (.transform m ^AVector a r)
             r)
-        (instance? AMatrix a) (.compose m ^AMatrix a) 
+        (instance? AMatrix a) (.innerProduct m ^AMatrix a) 
         :else (.innerProduct m (vectorz-coerce a))))
     (element-multiply [m a]
       (with-broadcast-clone [m a] (.multiply m a)))
