@@ -16,7 +16,7 @@ Important features:
  - **"Pure"** functions for an idiomatic functional programming style are provided. These return new vectors without mutating their arguments.
  - **Primitive-backed** special purpose vectors and matrices for performance, e.g. `Vector3` for fast 3D maths.
  - **Flexible DSL-style** functions for manipulating vectors and matrices, e.g. the ability to create a "view" into a subspace of a large vector.
- - **core.matrix** fully supported - see: https://github.com/mikera/matrix-api. 
+ - **core.matrix** fully supported - see: https://github.com/mikera/core.matrix 
  - **Pure JVM code** - no native dependencies
  - **"Impure"** functions that mutate vectors are available for performance when you need it: i.e. you can use a nice functional style most of the time, but switch to mutation when you hit a bottleneck.
  
