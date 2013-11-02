@@ -1134,7 +1134,60 @@
           :else (loop [v init i 0]
                   (if (< i n)
                     (recur (f v (.unsafeGet m i)) (inc i))
-                    v)))))))
+                    v))))))
+  
+  AMatrix
+  (element-seq
+    [m]
+    (let [ec (.elementCount m)
+          ^doubles data (or (.asDoubleArray m)
+                          (let [arr (double-array ec)]
+                            (.getElements m arr (int 0))
+                            arr))]
+      (seq data)))
+  (element-map
+    ([m f]
+      (let [rc (.rowCount m)
+            cc (.columnCount m)
+            ec (* rc cc)
+            ^doubles data (double-array ec)]
+        (.getElements m data (int 0))
+        (dotimes [i ec] (aset data i (double (f (aget data i))))) 
+        (Matrix/wrap rc cc data)))
+    ([m f a]
+      (let [a (amatrix-coerce m a)
+            rc (.rowCount m)
+            cc (.columnCount m)
+            ec (* rc cc)
+            ^doubles data (double-array ec)
+            ^doubles data2 (double-array ec)]
+        (.getElements m data (int 0))
+        (.getElements a data2 (int 0))
+        (dotimes [i ec] (aset data i (double (f (aget data i) (aget data2 i))))) 
+        (Matrix/wrap rc cc data)))
+    ([m f a more]
+      (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
+  (element-map!
+    ([m f]
+      (let [rc (.rowCount m)
+            cc (.columnCount m)]
+        (dotimes [i rc] 
+          (dotimes [j cc] 
+            (.unsafeSet m i j (double (f (.unsafeGet m i j)))))) ))
+    ([m f a]
+      (let [a (amatrix-coerce m a)
+            rc (.rowCount m)
+            cc (.columnCount m)]
+        (dotimes [i rc] 
+          (dotimes [j cc] 
+            (.unsafeSet m i j (double (f (.unsafeGet m i j) (.unsafeGet a i j)))))) ))
+    ([m f a more]
+      (mp/assign! m (mp/element-map m f a more))))
+  (element-reduce
+    ([m f]
+      (mp/element-reduce (.asVector m) f))
+    ([m f init]
+      (mp/element-reduce (.asVector m) f init))))
 
 (def math-op-mapping
   '[(abs Ops/ABS)
