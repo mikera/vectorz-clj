@@ -1082,6 +1082,61 @@
     ([m f]
       (reduce f (mp/element-seq m)))
     ([m f init]
+      (reduce f init (mp/element-seq m))))
+  
+  AVector
+  (element-seq
+    [m]
+    (let [ec (.length m)
+          ^doubles data (or (.asDoubleArray m)
+                          (let [arr (double-array ec)]
+                            (.getElements m arr (int 0))
+                            arr))]
+      (seq data)))
+  (element-map
+    ([m f]
+      (let [ec (.elementCount m)
+            ^doubles data (double-array ec)]
+        (dotimes [i ec] (aset data i (double (f (.unsafeGet m i))))) 
+        (Vector/wrap data)))
+    ([m f a]
+      (let [ec (.elementCount m)
+            a (vectorz-coerce a) 
+            ^doubles data (double-array ec)
+            ^doubles data2 (double-array ec)
+            ^ints sh (.getShape m)]
+        (when-not (== ec (.elementCount a)) (error "Arrays do do have matching number of elements")) 
+        (.getElements m data (int 0))
+        (.getElements a data2 (int 0))
+        (dotimes [i ec] (aset data i (double (f (aget data i) (aget data2 i))))) 
+        (Arrayz/createFromVector (Vector/wrap data) sh)))
+    ([m f a more]
+      (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
+  (element-map!
+    ([m f]
+      (let [ec (.elementCount m)
+            ^doubles data (double-array ec)
+            ^ints sh (.getShape m)]
+        (.getElements m data (int 0))
+        (dotimes [i ec] (aset data i (double (f (aget data i))))) 
+        (.setElements m data)))
+    ([m f a]
+      (let [ec (.elementCount m)
+            a (vectorz-coerce a) 
+            ^doubles data (double-array ec)
+            ^doubles data2 (double-array ec)
+            ^ints sh (.getShape m)]
+        (when-not (== ec (.elementCount a)) (error "Arrays do do have matching number of elements")) 
+        (.getElements m data (int 0))
+        (.getElements a data2 (int 0))
+        (dotimes [i ec] (aset data i (double (f (aget data i) (aget data2 i))))) 
+        (.setElements m data)))
+    ([m f a more]
+      (mp/assign! m (mp/element-map m f a more))))
+  (element-reduce
+    ([m f]
+      (reduce f (mp/element-seq m)))
+    ([m f init]
       (reduce f init (mp/element-seq m)))))
 
 (def math-op-mapping
