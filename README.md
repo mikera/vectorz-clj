@@ -63,8 +63,12 @@ You can then use `Vectorz` as a standard `core.matrix` implementation. Example:
     v
     => #<Vector2 [1.0,2.0]>
     
-    ;; Matrix x Vector multiply
-    (* M v)
+    ;; Matrix x Vector elementwise multiply
+    (mul M v)
+    => #<Matrix22 [[1.0,4.0],[3.0,8.0]]>
+    
+    ;; Matrix x Vector matrix multiply (inner product)
+    (inner-product M v)
     => #<Vector2 [5.0,11.0]>
 ```
 
