@@ -274,7 +274,14 @@
     (is (equals [1 2] (emap inc (v/of 0 1))))
     (is (equals [1 3] (emap + (v/of 0 1) [1 2])))
     ;; (is (equals [2 3] (emap + (v/of 0 1) 2))) shouldn't work - no broadcast support in emap?
-    (is (equals [3 6] (emap + (v/of 0 1) [1 2] (v/of 2 3))))))
+    (is (equals [3 6] (emap + (v/of 0 1) [1 2] (v/of 2 3)))))
+  (testing "long args"
+    (is (equals [10] (emap + 
+                           (v/of 1) 
+                           [2] 
+                           (array :vectorz [3]) 
+                           (broadcast 4 [1]))))
+    (is (equals 10 (ereduce + (array :vectorz [[1 2] [3 4]]))))))
 
 (deftest test-compute-array
   (is (equals [[0 1] [1 2]] (compute-matrix :vectorz [2 2] +)))
