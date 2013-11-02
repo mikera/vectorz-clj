@@ -775,7 +775,7 @@
     ([m] 
       (with-clone [m] (.reciprocal m)))
     ([m a] 
-      (with-broadcast-clone [m a] ()))))
+      (with-broadcast-clone [m a] (.divide m a)))))
 
 (extend-protocol mp/PMatrixMultiply
   AScalar

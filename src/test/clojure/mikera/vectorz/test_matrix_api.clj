@@ -54,7 +54,8 @@
     (is (equals v (submatrix v [[0 9]])))
     (is (equals [2 3 4] (submatrix v 0 [2 3])))
     (is (equals [2 3 4] (submatrix v [[2 3]]))))
-  (is (instance? AVector (array [1 2]))))
+  (is (instance? AVector (array [1 2])))
+  (is (equals [1 1 1] (div (array [2 2 2]) 2))))
 
 (deftest test-scalar-arrays
   (is (equals 3 (scalar-array 3)))
