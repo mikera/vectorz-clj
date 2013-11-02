@@ -95,6 +95,16 @@
 
 (def ^Class INT-ARRAY-CLASS (Class/forName "[I"))
 
+(defmacro int-array-coerce
+  ([m]
+    `(tag-symbol ~'ints          
+       (let [m# ~m] 
+         (cond
+           (instance? INT-ARRAY-CLASS m#) m#
+           (sequential? m#) (int-array m#)
+           :else (int-array (mp/element-seq m#)))))))
+
+
 (defmacro with-indexes 
   "Executes body after binding int indexes from the given indexing object"
   ([[syms ixs] & body]
@@ -391,6 +401,12 @@
       (Matrixx/createIdentityMatrix (int dims)))
     (diagonal-matrix [m diagonal-values] 
       (DiagonalMatrix/create (Vectorz/toVector diagonal-values))))
+
+(extend-protocol mp/PPermutationMatrix
+  INDArray
+    (permutation-matrix [m permutation]
+      (let [v (int-array-coerce permutation)]
+        (mikera.matrixx.impl.PermutationMatrix/create v))))
 
 (extend-protocol mp/PBroadcast
   INDArray 
