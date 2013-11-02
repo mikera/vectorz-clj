@@ -416,9 +416,12 @@
 (extend-protocol mp/PBroadcastLike
   INDArray 
     (broadcast-like [m a]
-     (if (instance? INDArray a)
-       (.broadcastLike ^INDArray a m)
-       (vectorz-coerce m a)))) 
+      (vectorz-coerce m a))) 
+
+(extend-protocol mp/PBroadcastCoerce
+  INDArray
+    (broadcast-coerce [m a]
+      (vectorz-coerce m a)))
 
 (extend-protocol mp/PReshaping
   INDArray 
