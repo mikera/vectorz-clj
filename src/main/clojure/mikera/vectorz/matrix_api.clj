@@ -175,8 +175,8 @@
 	          (and (seq sv) (sv 0) (SliceArray/create sv)))))))
 
 (defmacro double-coerce [x]
-  `(double (mp/get-0d ~x)))
-
+  `(let [x# ~x]
+     (double (if (number? x#) x# (mp/get-0d x#)))))
 
 (eval
   `(extend-protocol mp/PImplementation
