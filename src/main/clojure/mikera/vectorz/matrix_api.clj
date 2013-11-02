@@ -95,6 +95,16 @@
 
 (def ^Class INT-ARRAY-CLASS (Class/forName "[I"))
 
+(defmacro int-array-coerce
+  ([m]
+    `(tag-symbol ~'ints          
+       (let [m# ~m] 
+         (cond
+           (instance? INT-ARRAY-CLASS m#) m#
+           (sequential? m#) (int-array m#)
+           :else (int-array (mp/element-seq m#)))))))
+
+
 (defmacro with-indexes 
   "Executes body after binding int indexes from the given indexing object"
   ([[syms ixs] & body]
@@ -165,8 +175,8 @@
 	          (and (seq sv) (sv 0) (SliceArray/create sv)))))))
 
 (defmacro double-coerce [x]
-  `(double (mp/get-0d ~x)))
-
+  `(let [x# ~x]
+     (double (if (number? x#) x# (mp/get-0d x#)))))
 
 (eval
   `(extend-protocol mp/PImplementation
@@ -392,6 +402,12 @@
     (diagonal-matrix [m diagonal-values] 
       (DiagonalMatrix/create (Vectorz/toVector diagonal-values))))
 
+(extend-protocol mp/PPermutationMatrix
+  INDArray
+    (permutation-matrix [m permutation]
+      (let [v (int-array-coerce permutation)]
+        (mikera.matrixx.impl.PermutationMatrix/create v))))
+
 (extend-protocol mp/PBroadcast
   INDArray 
     (broadcast [m target-shape]
@@ -400,9 +416,12 @@
 (extend-protocol mp/PBroadcastLike
   INDArray 
     (broadcast-like [m a]
-     (if (instance? INDArray a)
-       (.broadcastLike ^INDArray a m)
-       (vectorz-coerce m a)))) 
+      (vectorz-coerce m a))) 
+
+(extend-protocol mp/PBroadcastCoerce
+  INDArray
+    (broadcast-coerce [m a]
+      (vectorz-coerce m a)))
 
 (extend-protocol mp/PReshaping
   INDArray 
@@ -582,7 +601,7 @@
     
   INDArray
     (assign! [m source] 
-      (.set m (vectorz-coerce source)))
+      (.set m (vectorz-coerce m source)))
     (assign-array!
       ([m arr]
 	      (let [alen (long (count arr))]
@@ -724,6 +743,9 @@
   AVector (transpose [m] m)
   AMatrix (transpose [m] (.getTranspose m))) 
 
+(extend-protocol mp/PTransposeInPlace
+  AMatrix (transpose! [m] (.transposeInPlace m))) 
+
 (extend-protocol mp/PVectorCross
   INDArray
     (cross-product [a b]
@@ -775,7 +797,7 @@
     ([m] 
       (with-clone [m] (.reciprocal m)))
     ([m a] 
-      (with-broadcast-clone [m a] ()))))
+      (with-broadcast-clone [m a] (.divide m a)))))
 
 (extend-protocol mp/PMatrixMultiply
   AScalar
@@ -795,7 +817,8 @@
           (let [^AVector r (Vectorz/newVector (.rowCount m))] 
             (.transform m ^AVector a r)
             r)
-        (instance? AMatrix a) (.compose m ^AMatrix a) 
+        (instance? AMatrix a) (.innerProduct m ^AMatrix a) 
+        (number? a) (with-clone [m] (.multiply m (double a)))
         :else (.innerProduct m (vectorz-coerce a))))
     (element-multiply [m a]
       (with-broadcast-clone [m a] (.multiply m a)))
@@ -1059,7 +1082,112 @@
     ([m f]
       (reduce f (mp/element-seq m)))
     ([m f init]
-      (reduce f init (mp/element-seq m)))))
+      (reduce f init (mp/element-seq m))))
+  
+  AVector
+  (element-seq
+    [m]
+    (let [ec (.length m)
+          ^doubles data (or (.asDoubleArray m)
+                          (let [arr (double-array ec)]
+                            (.getElements m arr (int 0))
+                            arr))]
+      (seq data)))
+  (element-map
+    ([m f]
+      (let [ec (.elementCount m)
+            ^doubles data (double-array ec)]
+        (dotimes [i ec] (aset data i (double (f (.unsafeGet m i))))) 
+        (Vector/wrap data)))
+    ([m f a]
+      (let [ec (.elementCount m)
+            a (avector-coerce m a) 
+            ^doubles data (double-array ec)]
+        (dotimes [i ec] (aset data i (double (f (.unsafeGet m i) (.unsafeGet a i))))) 
+        (Vector/wrap data)))
+    ([m f a more]
+      (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
+  (element-map!
+    ([m f]
+      (let [ec (.elementCount m)]
+        (dotimes [i ec] (.unsafeSet m i (double (f (.unsafeGet m i))))) ))
+    ([m f a]
+      (let [ec (.elementCount m)
+            a (avector-coerce m a)]
+        (dotimes [i ec] (.unsafeSet m i (double (f (.unsafeGet m i) (.unsafeGet a i))))) ))
+    ([m f a more]
+      (mp/assign! m (mp/element-map m f a more))))
+  (element-reduce
+    ([m f]
+      (let [n (.length m)] 
+        (cond 
+          (== 0 n) (f) 
+          (== 1 n) (.unsafeGet m 0) 
+          :else (loop [v ^Object (.unsafeGet m 0) i 1]
+                  (if (< i n)
+                    (recur (f v (.unsafeGet m i)) (inc i))
+                    v)))))
+    ([m f init]
+      (let [n (.length m)] 
+        (cond 
+          (== 0 n) init 
+          :else (loop [v init i 0]
+                  (if (< i n)
+                    (recur (f v (.unsafeGet m i)) (inc i))
+                    v))))))
+  
+  AMatrix
+  (element-seq
+    [m]
+    (let [ec (.elementCount m)
+          ^doubles data (or (.asDoubleArray m)
+                          (let [arr (double-array ec)]
+                            (.getElements m arr (int 0))
+                            arr))]
+      (seq data)))
+  (element-map
+    ([m f]
+      (let [rc (.rowCount m)
+            cc (.columnCount m)
+            ec (* rc cc)
+            ^doubles data (double-array ec)]
+        (.getElements m data (int 0))
+        (dotimes [i ec] (aset data i (double (f (aget data i))))) 
+        (Matrix/wrap rc cc data)))
+    ([m f a]
+      (let [a (amatrix-coerce m a)
+            rc (.rowCount m)
+            cc (.columnCount m)
+            ec (* rc cc)
+            ^doubles data (double-array ec)
+            ^doubles data2 (double-array ec)]
+        (.getElements m data (int 0))
+        (.getElements a data2 (int 0))
+        (dotimes [i ec] (aset data i (double (f (aget data i) (aget data2 i))))) 
+        (Matrix/wrap rc cc data)))
+    ([m f a more]
+      (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
+  (element-map!
+    ([m f]
+      (let [rc (.rowCount m)
+            cc (.columnCount m)]
+        (dotimes [i rc] 
+          (dotimes [j cc] 
+            (.unsafeSet m i j (double (f (.unsafeGet m i j)))))) ))
+    ([m f a]
+      (let [a (amatrix-coerce m a)
+            rc (.rowCount m)
+            cc (.columnCount m)]
+        (dotimes [i rc] 
+          (dotimes [j cc] 
+            (.unsafeSet m i j (double (f (.unsafeGet m i j) (.unsafeGet a i j)))))) ))
+    ([m f a more]
+      (mp/assign! m (mp/element-map m f a more))))
+  (element-reduce
+    ([m f]
+      (mp/element-reduce (.asVector m) f))
+    ([m f init]
+      (mp/element-reduce (.asVector m) f init))))
 
 (def math-op-mapping
   '[(abs Ops/ABS)

@@ -45,16 +45,17 @@
   (let [v (Vector/of (double-array 0))]
     (is (== 10 (reduce (fn [acc _] (inc acc)) 10 (eseq v))))
     (is (== 10 (ereduce (fn [acc _] (inc acc)) 10 v))))
-  (let [m (reshape (array :vectorz  (double-array (range 9))) [3 3])]
+  (let [m (reshape (array (double-array (range 9))) [3 3])]
     (is (equals [[0 1 2]] (submatrix m 0 [0 1])))
     (is (equals [[0 1 2]] (submatrix m [[0 1] nil])))
     (is (equals [[0] [3] [6]] (submatrix m 1 [0 1]))))
-  (let [v (array :vectorz (range 9))]
+  (let [v (array (range 9))]
     (is (equals v (submatrix v [nil])))
     (is (equals v (submatrix v [[0 9]])))
     (is (equals [2 3 4] (submatrix v 0 [2 3])))
     (is (equals [2 3 4] (submatrix v [[2 3]]))))
-  (is (instance? AVector (array [1 2]))))
+  (is (instance? AVector (array [1 2])))
+  (is (equals [1 1 1] (div (array [2 2 2]) 2))))
 
 (deftest test-scalar-arrays
   (is (equals 3 (scalar-array 3)))
@@ -65,15 +66,15 @@
 (deftest test-broadcasting-cases
   (is (equals [[2 3] [4 5]] (add (array [[1 2] [3 4]]) (array [1 1]))))
   (is (equals [[2 3] [4 5]] (add (array [1 1]) (array [[1 2] [3 4]]))))
-  (is (equals [[2 4] [6 8]] (mul (array :vectorz [[1 2] [3 4]]) (scalar-array 2))))
-  (is (equals [[2 6] [6 12]] (mul (array :vectorz [[1 2] [3 4]]) [2 3]))))
+  (is (equals [[2 4] [6 8]] (mul (array [[1 2] [3 4]]) (scalar-array 2))))
+  (is (equals [[2 6] [6 12]] (mul (array [[1 2] [3 4]]) [2 3]))))
 
 (deftest test-broadcasts
   (is (equals [[2 2] [2 2]] (broadcast 2 [2 2]))))
 
 (deftest test-scalar-add
-  (is (equals [2 3 4] (add 1 (array :vectorz [1 2 3]))))
-  (is (equals [2 3 4] (add (array :vectorz [1 2 3]) 1 0)))) 
+  (is (equals [2 3 4] (add 1 (array [1 2 3]))))
+  (is (equals [2 3 4] (add (array [1 2 3]) 1 0)))) 
 
 (deftest test-ecount
   (is (== 1 (ecount (Scalar. 10))))
@@ -88,15 +89,15 @@
   (let [v (v/of 1 2)]
     (is (mutable? v))
     (is (mutable? (first (slices v)))))
-  (let [v (new-array :vectorz [3 4 5 6])]
+  (let [v (new-array [3 4 5 6])]
     (is (v/vectorz? v))
     (is (mutable? v))
     (is (mutable? (first (slices v))))))
 
 (deftest test-new-array
-  (is (instance? AVector (new-array :vectorz [10])))
-  (is (instance? AMatrix (new-array :vectorz [10 10])))
-  (is (instance? INDArray (new-array :vectorz [3 4 5 6])))) 
+  (is (instance? AVector (new-array [10])))
+  (is (instance? AMatrix (new-array [10 10])))
+  (is (instance? INDArray (new-array [3 4 5 6])))) 
 
 (deftest test-sub
   (let [a (v/vec [1 2 3 0 0])
@@ -273,11 +274,20 @@
     (is (equals [1 2] (emap inc (v/of 0 1))))
     (is (equals [1 3] (emap + (v/of 0 1) [1 2])))
     ;; (is (equals [2 3] (emap + (v/of 0 1) 2))) shouldn't work - no broadcast support in emap?
-    (is (equals [3 6] (emap + (v/of 0 1) [1 2] (v/of 2 3))))))
+    (is (equals [3 6] (emap + (v/of 0 1) [1 2] (v/of 2 3)))))
+  (testing "long args"
+;; TODO: fix in core.matrix 0.15.0
+;    (is (equals [10] (emap + 
+;                           (v/of 1) 
+;                           [2] 
+;                           (array :vectorz [3]) 
+;                           (broadcast 4 [1]))))
+    (is (equals [10] (emap + (array :vectorz [1]) [2] [3] [4])))
+    (is (equals 10 (ereduce + (array :vectorz [[1 2] [3 4]]))))))
 
 (deftest test-compute-array
   (is (equals [[0 1] [1 2]] (compute-matrix :vectorz [2 2] +)))
-  (is (equals [[[0 1] [1 2]][[1 2][2 3]]] (compute-matrix :vectorz [2 2 2] +))))
+  (is (equals [[[0 1] [1 2]][[1 2][2 3]]] (compute-matrix [2 2 2] +))))
 
 (deftest test-maths-functions
   (testing "abs"
@@ -290,7 +300,11 @@
     (is (e== [1 2 3] (subvector m 0 3)))
     (is (e== [4 5 6] (subvector m 3 3)))
     (assign! (subvector m 0 3) (subvector m 3 3))
-    (is (e== [4 5 6 4 5 6] m)))) 
+    (is (e== [4 5 6 4 5 6] m)))
+  (testing "mutable assign"
+    (let [a (array [[1 2] [3 4]])]
+      (assign! a [0 1])
+      (is (equals [[0 1] [0 1]] a))))) 
 
 ;; vectorz operations hould return a vectorz datatype
 (deftest test-vectorz-results
