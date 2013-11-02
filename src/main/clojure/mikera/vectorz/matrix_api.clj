@@ -1119,9 +1119,22 @@
       (mp/assign! m (mp/element-map m f a more))))
   (element-reduce
     ([m f]
-      (reduce f (mp/element-seq m)))
+      (let [n (.length m)] 
+        (cond 
+          (== 0 n) (f) 
+          (== 1 n) (.unsafeGet m 0) 
+          :else (loop [v ^Object (.unsafeGet m 0) i 1]
+                  (if (< i n)
+                    (recur (f v (.unsafeGet m i)) (inc i))
+                    v)))))
     ([m f init]
-      (reduce f init (mp/element-seq m)))))
+      (let [n (.length m)] 
+        (cond 
+          (== 0 n) init 
+          :else (loop [v init i 0]
+                  (if (< i n)
+                    (recur (f v (.unsafeGet m i)) (inc i))
+                    v)))))))
 
 (def math-op-mapping
   '[(abs Ops/ABS)
