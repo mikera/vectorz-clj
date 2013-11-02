@@ -740,6 +740,9 @@
   AVector (transpose [m] m)
   AMatrix (transpose [m] (.getTranspose m))) 
 
+(extend-protocol mp/PTransposeInPlace
+  AMatrix (transpose! [m] (.transposeInPlace m))) 
+
 (extend-protocol mp/PVectorCross
   INDArray
     (cross-product [a b]
@@ -812,6 +815,7 @@
             (.transform m ^AVector a r)
             r)
         (instance? AMatrix a) (.innerProduct m ^AMatrix a) 
+        (number? a) (with-clone [m] (.multiply m (double a)))
         :else (.innerProduct m (vectorz-coerce a))))
     (element-multiply [m a]
       (with-broadcast-clone [m a] (.multiply m a)))
