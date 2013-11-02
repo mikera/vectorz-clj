@@ -601,7 +601,7 @@
     
   INDArray
     (assign! [m source] 
-      (.set m (vectorz-coerce source)))
+      (.set m (vectorz-coerce m source)))
     (assign-array!
       ([m arr]
 	      (let [alen (long (count arr))]

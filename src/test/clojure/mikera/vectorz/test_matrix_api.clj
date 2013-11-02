@@ -300,7 +300,11 @@
     (is (e== [1 2 3] (subvector m 0 3)))
     (is (e== [4 5 6] (subvector m 3 3)))
     (assign! (subvector m 0 3) (subvector m 3 3))
-    (is (e== [4 5 6 4 5 6] m)))) 
+    (is (e== [4 5 6 4 5 6] m)))
+  (testing "mutable assign"
+    (let [a (array [[1 2] [3 4]])]
+      (assign! a [0 1])
+      (is (equals [[0 1] [0 1]] a))))) 
 
 ;; vectorz operations hould return a vectorz datatype
 (deftest test-vectorz-results
