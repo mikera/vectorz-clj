@@ -9,7 +9,7 @@
   (:import [mikera.matrixx.impl DiagonalMatrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
   (:import [mikera.vectorz Scalar])
-  (:import [mikera.arrayz Arrayz SliceArray INDArray Array])
+  (:import [mikera.arrayz Arrayz INDArray Array])
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
   (:refer-clojure :exclude [vector?]))
@@ -172,7 +172,7 @@
 		      (try (Matrixx/toMatrix (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
 		    :else 
 	        (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
-	          (and (seq sv) (sv 0) (SliceArray/create sv)))))))
+	          (and (seq sv) (sv 0) (Arrayz/create sv)))))))
 
 (defmacro double-coerce [x]
   `(let [x# ~x]
@@ -193,7 +193,7 @@
                                  0 0.0
                                  1 (Vectorz/newVector (int (first shape)))
                                  2 (Matrixx/newMatrix (int (first shape)) (int (second shape)))
-                                 (SliceArray/create ^List (mapv (fn [_] (mp/new-matrix-nd m (next shape))) (range (first shape))))))
+                                 (Arrayz/create ^List (mapv (fn [_] (mp/new-matrix-nd m (next shape))) (range (first shape))))))
                 (construct-matrix [m data]
                                   (cond 
                                     (instance? INDArray data)
@@ -985,7 +985,7 @@
   INDArray
     (join [m a]
       ;; TODO: wait for better join implementation in Vectorz for INDArray
-      (SliceArray/create ^List (vec (concat (slices m) (slices (vectorz-coerce a))))))
+      (Arrayz/create ^List (vec (concat (slices m) (slices (vectorz-coerce a))))))
   AVector
     (join [m a] 
           (.join m (avector-coerce a))))

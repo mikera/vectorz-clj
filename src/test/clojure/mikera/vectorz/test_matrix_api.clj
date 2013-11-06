@@ -13,7 +13,7 @@
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.vectorz Scalar])
   (:import [mikera.vectorz AVector Vectorz Vector])
-  (:import [mikera.arrayz INDArray Array NDArray SliceArray]))
+  (:import [mikera.arrayz INDArray Array NDArray]))
 
 ;; note - all the operators are core.matrix operators
 
