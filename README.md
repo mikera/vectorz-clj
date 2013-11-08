@@ -1,7 +1,7 @@
 vectorz-clj
 ===========
 
-Fast vector library for Clojure, building on the [Vectorz](https://github.com/mikera/vectorz) library.
+Fast vector library for Clojure, building on the [Vectorz](https://github.com/mikera/vectorz) library and designed to work with the [core.matrix](https://github.com/mikera/core.matrix) array programming API.
 
 `vectorz-clj` is designed so that you don't have to compromise, offering both:
 
