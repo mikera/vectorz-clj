@@ -13,7 +13,7 @@
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.vectorz Scalar])
   (:import [mikera.vectorz AVector Vectorz Vector])
-  (:import [mikera.arrayz INDArray Array NDArray SliceArray]))
+  (:import [mikera.arrayz INDArray Array NDArray]))
 
 ;; note - all the operators are core.matrix operators
 
@@ -55,7 +55,9 @@
     (is (equals [2 3 4] (submatrix v 0 [2 3])))
     (is (equals [2 3 4] (submatrix v [[2 3]]))))
   (is (instance? AVector (array [1 2])))
-  (is (equals [1 1 1] (div (array [2 2 2]) 2))))
+  (is (equals [1 1 1] (div (array [2 2 2]) 2)))
+  (is (equals [[1 2] [3 4] [5 6]] (join (array [[1 2] [3 4]]) (array [[5 6]]))))
+  (is (equals [[1 3] [2 4] [5 6]] (join (transpose (array [[1 2] [3 4]])) (array [[5 6]])))))
 
 (deftest test-scalar-arrays
   (is (equals 3 (scalar-array 3)))
