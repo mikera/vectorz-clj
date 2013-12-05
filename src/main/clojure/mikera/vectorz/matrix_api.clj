@@ -167,7 +167,7 @@
                    ;; (println (str "Coercing " p))
                    (Scalar. (double (mp/get-0d p)))))
 		    (== 1 dims)
-		      (try (Vectorz/toVector (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
+		      (try (Vectorz/toVector (mp/to-double-array p)) (catch Throwable e nil))
 		    (== 2 dims)
 		      (try (Matrixx/toMatrix (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
 		    :else 
