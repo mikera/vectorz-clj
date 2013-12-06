@@ -325,6 +325,12 @@
   (is (v/vectorz? (outer-product (v/of 1 2) [1 2])))
   (is (v/vectorz? (add! (Scalar. 1.0) 10)))) 
 
+(deftest test-defensive-copy-on-double-array 
+  (let [a (double-array [1 2 3 4 5])
+        v (array a)]
+    (aset-double a 4 9999)
+    (is (equals v [1 2 3 4 5]))))
+
 ;; run compliance tests
 
 (deftest instance-tests
