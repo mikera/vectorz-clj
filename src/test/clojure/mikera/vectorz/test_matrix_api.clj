@@ -59,6 +59,11 @@
   (is (equals [[1 2] [3 4] [5 6]] (join (array [[1 2] [3 4]]) (array [[5 6]]))))
   (is (equals [[1 3] [2 4] [5 6]] (join (transpose (array [[1 2] [3 4]])) (array [[5 6]])))))
 
+(deftest test-mget-regressions
+  (is (== 3 (mget (mset (zero-array [4 4]) 0 2 3) 0 2)))
+  (is (== 3 (mget (mset (zero-array [4]) 2 3) 2)))
+  (is (== 3 (mget (mset (zero-array []) 3)))))
+
 (deftest test-scalar-arrays
   (is (equals 3 (scalar-array 3)))
   (is (equals 2 (add 1 (array 1))))
@@ -324,6 +329,12 @@
   (is (v/vectorz? (inner-product (v/of 1 2) [1 2])))
   (is (v/vectorz? (outer-product (v/of 1 2) [1 2])))
   (is (v/vectorz? (add! (Scalar. 1.0) 10)))) 
+
+(deftest test-defensive-copy-on-double-array 
+  (let [a (double-array [1 2 3 4 5])
+        v (array a)]
+    (aset-double a 4 9999)
+    (is (equals v [1 2 3 4 5]))))
 
 ;; run compliance tests
 

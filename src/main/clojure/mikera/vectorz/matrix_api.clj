@@ -167,7 +167,7 @@
                    ;; (println (str "Coercing " p))
                    (Scalar. (double (mp/get-0d p)))))
 		    (== 1 dims)
-		      (try (Vectorz/toVector (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
+		      (try (Vector/wrap (mp/to-double-array p)) (catch Throwable e nil))
 		    (== 2 dims)
 		      (try (Matrixx/toMatrix (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
 		    :else 
@@ -467,7 +467,7 @@
   AMatrix
     (set-1d [m row v] (error "Can't do 1-dimensional set on a 2D matrix!"))
     (set-2d [m row column v] 
-      (let [m (.clone m)] (.set m (int row) (int column) (double v))) m)
+      (let [m (.clone m)] (.set m (int row) (int column) (double v)) m))
     (set-nd [m indexes v]
       (if (== 2 (count indexes))
         (let [m (.clone m)] (.set m (int (first indexes)) (int (second indexes)) (double v)))
