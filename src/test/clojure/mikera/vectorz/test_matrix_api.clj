@@ -12,6 +12,7 @@
   (:require [clojure.core.matrix.impl.wrappers :as wrap])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.vectorz Scalar])
+  (:import [mikera.indexz AIndex Index])
   (:import [mikera.vectorz AVector Vectorz Vector])
   (:import [mikera.arrayz INDArray Array NDArray]))
 
@@ -351,7 +352,8 @@
   (clojure.core.matrix.compliance-tester/instance-test (first (slices (v/of 1 2 3 4 5 6))))
   (clojure.core.matrix.compliance-tester/instance-test (array :vectorz [[1 2] [3 4]]))
   (clojure.core.matrix.compliance-tester/instance-test (array :vectorz [[[[4]]]]))
-  (clojure.core.matrix.compliance-tester/instance-test (Array/create (array :vectorz [[[[4 3]]]])))) 
+  (clojure.core.matrix.compliance-tester/instance-test (Array/create (array :vectorz [[[[4 3]]]])))
+  (clojure.core.matrix.compliance-tester/instance-test (Index/of (int-array [1 2 3])))) 
 
 (deftest compliance-test
   (clojure.core.matrix.compliance-tester/compliance-test (v/of 1 2))) 
