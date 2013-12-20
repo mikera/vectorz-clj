@@ -984,6 +984,21 @@
     (inverse [m]
       (.inverse m)))
 
+;; Helper function for symmetric? predicate in PMatrixPredicates.
+;; Note loop/recur instead of letfn/recur is 20-25% slower.
+;; TODO Move to vectorz?
+(defn- symmetric-matrix-entries?
+  [m]
+  (let [dim (first (mp/get-shape m))]
+    (letfn [(f [i j]
+              (cond 
+                (>= i dim) true                         ; all entries match: symmetric
+                (>= j dim) (recur (+ 1 i) (+ 2 i))      ; all j's OK: restart with new i
+                (= (mp/get-2d m i j) 
+                   (mp/get-2d m j i)) (recur i (inc j)) ; OK, so check next pair
+                :else false))]                          ; not same, not symmetric
+      (f 0 1))))
+
 (extend-protocol mp/PMatrixPredicates
   INDArray
     (identity-matrix?
@@ -994,6 +1009,12 @@
     (zero-matrix?
       [m]
       (.isZero m))
+    (symmetric?
+      [m]
+      (and
+        (== 2 (.dimensionality m))
+        (== (.getShape m 0) (.getShape m 1))
+        (symmetric-matrix-entries? m)))
   AMatrix
     (identity-matrix?
       [m]
@@ -1002,7 +1023,12 @@
         (.isIdentity m)))
     (zero-matrix?
       [m]
-      (.isZero m)))
+      (.isZero m))
+    (symmetric?
+      [m]
+      (and
+        (.isSquare m)
+        (symmetric-matrix-entries? m))))
 
 (extend-protocol mp/PSquare
   INDArray
