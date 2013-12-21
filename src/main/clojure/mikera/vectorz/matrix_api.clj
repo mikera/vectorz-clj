@@ -1010,10 +1010,11 @@
       (.isZero m))
     (symmetric?
       [m]
-      (and
-        (== 2 (.dimensionality m))
-        (== (.getShape m 0) (.getShape m 1))
-        (symmetric-matrix-entries? m)))
+      false)
+      ;(and
+      ;  (== 2 (.dimensionality m))
+      ;  (== (.getShape m 0) (.getShape m 1))
+      ;  (symmetric-matrix-entries? m)))
   AMatrix
     (identity-matrix?
       [m]
