@@ -615,7 +615,10 @@
       (seq (.getSliceViews m)))
   AVector  
     (get-major-slice-seq [m] 
-      (seq (or (.asDoubleArray m) (.toDoubleArray m)))))
+      (seq (or (.asDoubleArray m) (.toDoubleArray m))))
+  Index
+    (get-major-slice-seq [m] 
+      (seq (.getData m))))
 
 (extend-protocol mp/PSliceViewSeq
   INDArray
@@ -797,7 +800,9 @@
   AMatrix (transpose [m] (.getTranspose m))) 
 
 (extend-protocol mp/PTransposeInPlace
-  AMatrix (transpose! [m] (.transposeInPlace m))) 
+  AMatrix (transpose! [m] (.transposeInPlace m))
+  AVector (transpose! [m] m)
+  AScalar (transpose! [m] m)) 
 
 (extend-protocol mp/PVectorCross
   INDArray
@@ -819,7 +824,8 @@
   INDArray (clone [m] (.clone m))
   AScalar (clone [m] (.clone m))
   AVector (clone [m] (.clone m))
-  AMatrix	(clone [m] (.clone m)))
+  AMatrix	(clone [m] (.clone m))
+  AIndex	(clone [m] (.clone m)))
 
 (extend-protocol mp/PCoercion
   INDArray
@@ -847,7 +853,13 @@
     (convert-to-nested-vectors [m]
       (if (== 0 (.dimensionality m))
         (mp/get-0d m)
-        (mapv mp/convert-to-nested-vectors (.getSlices m)))))
+        (mapv mp/convert-to-nested-vectors (.getSlices m))))
+  AIndex
+    (convert-to-nested-vectors [m]
+      (vec m))
+  Index
+    (convert-to-nested-vectors [m]
+      (vec (.getData m))))
 
 (extend-protocol mp/PMatrixDivide
   INDArray
