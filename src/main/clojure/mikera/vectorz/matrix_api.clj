@@ -1049,7 +1049,10 @@
       (.elementCount m))
   AScalar 
     (element-count [m]
-      1))
+      1)
+  AIndex
+    (element-count [m]
+      (.length m)))
 
 (extend-protocol mp/PSliceJoin
   INDArray
