@@ -612,7 +612,10 @@
 (extend-protocol mp/PSliceSeq
   INDArray  
     (get-major-slice-seq [m] 
-      (seq (.getSliceViews m))))
+      (seq (.getSliceViews m)))
+  AVector  
+    (get-major-slice-seq [m] 
+      (seq (or (.asDoubleArray m) (.toDoubleArray m)))))
 
 (extend-protocol mp/PMatrixSubComponents
   AMatrix
