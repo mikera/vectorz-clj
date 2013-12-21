@@ -986,7 +986,6 @@
 
 ;; Helper function for symmetric? predicate in PMatrixPredicates.
 ;; Note loop/recur instead of letfn/recur is 20-25% slower.
-;; TODO Move to vectorz?
 (defn- symmetric-matrix-entries?
   [m]
   (let [dim (first (mp/get-shape m))]
@@ -1027,8 +1026,7 @@
     (symmetric?
       [m]
       (and
-        (.isSquare m)
-        (symmetric-matrix-entries? m))))
+        (.isSymmetric m))))
 
 (extend-protocol mp/PSquare
   INDArray
