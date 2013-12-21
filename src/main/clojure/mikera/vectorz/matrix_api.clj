@@ -95,7 +95,7 @@
          ~@body
          ~a))))
 
-(def ^Class INT-ARRAY-CLASS (Class/forName "[I"))
+(def ^{:tag Class :const true} INT-ARRAY-CLASS (Class/forName "[I"))
 
 (defmacro int-array-coerce
   ([m]
@@ -442,7 +442,7 @@
 (extend-protocol mp/PBroadcast
   INDArray 
     (broadcast [m target-shape]
-     (.broadcast m (int-array target-shape)))) 
+      (.broadcast m (int-array-coerce target-shape)))) 
 
 (extend-protocol mp/PBroadcastLike
   INDArray 
@@ -461,10 +461,10 @@
   Index 
     (reshape [m target-shape]
       (cond
-      (== 1 (count target-shape))
-        (Index/of (int-array (take (first target-shape) (seq m))))
-      :else 
-        (.reshape (IndexVector/of (.data m)) (int-array target-shape))))) 
+        (== 1 (count target-shape))
+          (Index/of (int-array (take (first target-shape) (seq m))))
+        :else 
+          (.reshape (IndexVector/of (.data m)) (int-array target-shape))))) 
 
 (extend-protocol mp/PZeroCount
   INDArray
