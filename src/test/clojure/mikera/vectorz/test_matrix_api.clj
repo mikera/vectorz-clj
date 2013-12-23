@@ -79,7 +79,8 @@
   (is (equals [[1 4] [3 16]] (pow (array [[1 2] [3 4]]) [1 2]))))
 
 (deftest test-broadcasts
-  (is (equals [[2 2] [2 2]] (broadcast 2 [2 2]))))
+  (is (equals [[2 2] [2 2]] (broadcast 2 [2 2])))
+  (is (not (equals [[2 2] [2 2]] (broadcast 2 [2])))))
 
 (deftest test-scalar-add
   (is (equals [2 3 4] (add 1 (array [1 2 3]))))
