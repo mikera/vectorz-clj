@@ -6,7 +6,8 @@ Fast vector library for Clojure, building on the [Vectorz](https://github.com/mi
 `vectorz-clj` is designed so that you don't have to compromise, offering both:
 
  - An idiomatic high-level Clojure API using **core.matrix**
- - High performance (about as fast as you can get on the JVM). vectorz-clj is currently the fastest pure-JVM vector/matrix library available for Clojure
+ - General purpose **multi-dimensional** arrays
+ - High **performance** (about as fast as you can get on the JVM). vectorz-clj is currently the fastest pure-JVM vector/matrix library available for Clojure
 
 The library was originally designed for games, simulations and machine learning applications, 
 but should be applicable for any situations where you need numerical `double` arrays.
