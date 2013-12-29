@@ -95,7 +95,7 @@
          ~@body
          ~a))))
 
-(def ^Class INT-ARRAY-CLASS (Class/forName "[I"))
+(def ^{:tag Class :const true} INT-ARRAY-CLASS (Class/forName "[I"))
 
 (defmacro int-array-coerce
   ([m]
@@ -442,7 +442,7 @@
 (extend-protocol mp/PBroadcast
   INDArray 
     (broadcast [m target-shape]
-     (.broadcast m (int-array target-shape)))) 
+      (.broadcast m (int-array-coerce target-shape)))) 
 
 (extend-protocol mp/PBroadcastLike
   INDArray 
@@ -461,10 +461,10 @@
   Index 
     (reshape [m target-shape]
       (cond
-      (== 1 (count target-shape))
-        (Index/of (int-array (take (first target-shape) (seq m))))
-      :else 
-        (.reshape (IndexVector/of (.data m)) (int-array target-shape))))) 
+        (== 1 (count target-shape))
+          (Index/of (int-array (take (first target-shape) (seq m))))
+        :else 
+          (.reshape (IndexVector/of (.data m)) (int-array target-shape))))) 
 
 (extend-protocol mp/PZeroCount
   INDArray
@@ -612,6 +612,17 @@
 (extend-protocol mp/PSliceSeq
   INDArray  
     (get-major-slice-seq [m] 
+      (seq (.getSliceViews m)))
+  AVector  
+    (get-major-slice-seq [m] 
+      (seq (or (.asDoubleArray m) (.toDoubleArray m))))
+  Index
+    (get-major-slice-seq [m] 
+      (seq (.getData m))))
+
+(extend-protocol mp/PSliceViewSeq
+  INDArray
+    (get-major-slice-view-seq [m] 
       (seq (.getSliceViews m))))
 
 (extend-protocol mp/PMatrixSubComponents
@@ -789,7 +800,9 @@
   AMatrix (transpose [m] (.getTranspose m))) 
 
 (extend-protocol mp/PTransposeInPlace
-  AMatrix (transpose! [m] (.transposeInPlace m))) 
+  AMatrix (transpose! [m] (.transposeInPlace m))
+  AVector (transpose! [m] m)
+  AScalar (transpose! [m] m)) 
 
 (extend-protocol mp/PVectorCross
   INDArray
@@ -811,7 +824,8 @@
   INDArray (clone [m] (.clone m))
   AScalar (clone [m] (.clone m))
   AVector (clone [m] (.clone m))
-  AMatrix	(clone [m] (.clone m)))
+  AMatrix	(clone [m] (.clone m))
+  AIndex	(clone [m] (.clone m)))
 
 (extend-protocol mp/PCoercion
   INDArray
@@ -839,7 +853,13 @@
     (convert-to-nested-vectors [m]
       (if (== 0 (.dimensionality m))
         (mp/get-0d m)
-        (mapv mp/convert-to-nested-vectors (.getSlices m)))))
+        (mapv mp/convert-to-nested-vectors (.getSlices m))))
+  AIndex
+    (convert-to-nested-vectors [m]
+      (vec m))
+  Index
+    (convert-to-nested-vectors [m]
+      (vec (.getData m))))
 
 (extend-protocol mp/PMatrixDivide
   INDArray
@@ -984,20 +1004,6 @@
     (inverse [m]
       (.inverse m)))
 
-;; Helper function for symmetric? predicate in PMatrixPredicates.
-;; Note loop/recur instead of letfn/recur is 20-25% slower.
-(defn- symmetric-matrix-entries?
-  [m]
-  (let [dim (first (mp/get-shape m))]
-    (letfn [(f [i j]
-              (cond 
-                (>= i dim) true                         ; all entries match: symmetric
-                (>= j dim) (recur (+ 1 i) (+ 2 i))      ; all j's OK: restart with new i
-                (= (mp/get-2d m i j) 
-                   (mp/get-2d m j i)) (recur i (inc j)) ; OK, so check next pair
-                :else false))]                          ; not same, not symmetric
-      (f 0 1))))
-
 (extend-protocol mp/PMatrixPredicates
   INDArray
     (identity-matrix?
@@ -1010,11 +1016,10 @@
       (.isZero m))
     (symmetric?
       [m]
-      false)
-      ;(and
-      ;  (== 2 (.dimensionality m))
-      ;  (== (.getShape m 0) (.getShape m 1))
-      ;  (symmetric-matrix-entries? m)))
+      (case (.dimensionality m) ; should be 1, 3, 4, ...; never 2
+        1 true
+        (throw 
+          (java.lang.UnsupportedOperationException. "Not yet implemented for arrays with more than 2 dimensions."))))
   AMatrix
     (identity-matrix?
       [m]
@@ -1026,8 +1031,7 @@
       (.isZero m))
     (symmetric?
       [m]
-      (and
-        (.isSymmetric m))))
+      (.isSymmetric m)))
 
 (extend-protocol mp/PSquare
   INDArray
@@ -1054,7 +1058,10 @@
       (.elementCount m))
   AScalar 
     (element-count [m]
-      1))
+      1)
+  AIndex
+    (element-count [m]
+      (.length m)))
 
 (extend-protocol mp/PSliceJoin
   INDArray

@@ -9,7 +9,7 @@
                  [net.mikera/cljunit "0.3.0"]
                  [net.mikera/clojure-utils "0.5.0"]
                  ;[net.mikera/core.matrix "0.15.0"]
-                 [mars0i/core.matrix "0.16.1-SNAPSHOT"]
+                 [mars0i/core.matrix "0.18.1-SNAPSHOT"]
                  ;[net.mikera/core.matrix.stats "0.3.0"] ; references earlier core.matrix
                  [net.mikera/vectorz "0.23.0"]]
   :repositories [["clojars.org" {:url "https://clojars.org/repo"

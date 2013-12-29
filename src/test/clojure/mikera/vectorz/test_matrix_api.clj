@@ -96,11 +96,11 @@
 (deftest test-mutability
   (let [v (v/of 1 2)]
     (is (mutable? v))
-    (is (mutable? (first (slices v)))))
+    (is (mutable? (first (slice-views v)))))
   (let [v (new-array [3 4 5 6])]
     (is (v/vectorz? v))
     (is (mutable? v))
-    (is (mutable? (first (slices v))))))
+    (is (mutable? (first (slice-views v))))))
 
 (deftest test-new-array
   (is (instance? AVector (new-array [10])))
@@ -216,6 +216,9 @@
 
 (deftest test-join
   (is (= (array [[[1]] [[2]]]) (join (array [[[1]]]) (array [[[2]]])))))
+
+(deftest test-pm
+  (is (string? (clojure.core.matrix.impl.pprint/pm (array :vectorz [1 2]))))) 
 
 (deftest test-matrix-transform
   (testing "vector multiple"
