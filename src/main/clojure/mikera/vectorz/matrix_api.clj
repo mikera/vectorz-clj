@@ -1044,7 +1044,9 @@
 (extend-protocol mp/PExponent
   INDArray
     (element-pow [m exponent]
-      (with-clone [m] (.pow m (double-coerce exponent)))))
+      (if (number? m)
+        (with-clone [m] (.pow m (double-coerce exponent)))
+        (mp/element-map m #(Math/pow %1 %2) (vectorz-coerce m exponent)))))
 
 (extend-protocol mp/PElementCount
   INDArray
