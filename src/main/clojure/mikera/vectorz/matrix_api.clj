@@ -1019,7 +1019,7 @@
       (case (.dimensionality m) ; should be 1, 3, 4, ...; never 2
         1 true
         (throw 
-          (java.lang.UnsupportedOperationException. "symmetric? is not yet implemented for arrays with more than 2 dimensions."))))
+          (java.lang.UnsupportedOperationException. "symmetric? is not yet implemented for vectorz arrays with more than 2 dimensions."))))
   AMatrix
     (identity-matrix?
       [m]
