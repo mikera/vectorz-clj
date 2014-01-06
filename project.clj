@@ -1,4 +1,4 @@
-(defproject net-mikera/vectorz-clj "0.17.0"
+(defproject net-mikera/vectorz-clj "0.18.1-SNAPSHOT"
   :description "Fast vector library for Clojure, building on VectorZ and using core.matrix"
   :url "https://github.com/mikera/vectorz-clj"
   :license {:name "GNU Lesser General Public License (LGPL)"
