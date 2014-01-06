@@ -8,8 +8,8 @@
                  [criterium/criterium "0.4.2"]
                  [net.mikera/cljunit "0.3.0"]
                  [net.mikera/clojure-utils "0.5.0"]
-                 [net.mikera/core.matrix "0.15.0"]
+                 [net.mikera/core.matrix "0.18.0"]
                  [net.mikera/core.matrix.stats "0.3.0"]
-                 [net.mikera/vectorz "0.23.0"]]
+                 [net.mikera/vectorz "0.26.0"]]
   :repositories [["clojars.org" {:url "https://clojars.org/repo"
                                  :name "Clojars repository"}]])
