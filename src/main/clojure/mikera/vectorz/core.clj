@@ -53,12 +53,21 @@
     (instance? INDArray a)))
 
 (defn get
+  "DEPRECATED: use mset! instead for consistency with core.matrix
+
+   Returns the component of a vector at a specific index position"
+  (^double [^INDArray v ^long index]
+    (.get v (int index))))
+
+(defn mget
   "Returns the component of a vector at a specific index position"
   (^double [^INDArray v ^long index]
     (.get v (int index))))
 
 (defn set
-  "Sets the component of a vector at position i (mutates in place)"
+  "DEPRECATED: use mset! instead for consistency with core.matrix
+
+   Sets the component of a vector at position i (mutates in place)"
   ([^AVector v ^long index ^double value]
     (.set v (int index) value)
     v))

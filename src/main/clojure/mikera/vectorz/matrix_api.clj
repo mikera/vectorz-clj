@@ -18,7 +18,6 @@
 
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* true)
-
 (declare vectorz-coerce* avector-coerce*)
 
 (defmacro tag-symbol [tag form]
