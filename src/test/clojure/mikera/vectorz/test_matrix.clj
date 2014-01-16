@@ -27,11 +27,6 @@
     (is (= (v/of 1 0 0 1) (m/as-vector (m/identity-matrix 2))))
     (is (= (v/of 1 0) (m/get-row (m/identity-matrix 2) 0)))))
 
-(deftest test-constant-transform
-  (testing "application"
-    (is (= (v/of 1 0) (m/* (m/constant-transform (v/of 1 0)) (v/of 3 4))))
-    (is (= (v/of 1 0) (m/* (m/constant-transform (v/of 1 0) :input-dimensions 3) (v/of 3 4 5))))))
-
 (deftest test-get-set
   (testing "setting"
     (let [m (m/clone (m/identity-matrix 2))]

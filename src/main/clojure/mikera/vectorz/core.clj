@@ -33,14 +33,14 @@
 ;; basic functions
 
 (defn clone
-  "Creates a (mutable) clone of a vector. May not be exactly the same class as the original vector."
-  (^AVector [^AVector v]
+  "Creates a (mutable) clone of a vectorz array. May not be exactly the same class as the original array."
+  (^INDArray [^INDArray v]
     (.clone v)))
 
 (defn ecount
-  "Returns the number of elements in a vector"
-  (^long [^AVector v]
-    (.length v)))
+  "Returns the number of elements in a vectorz array"
+  (^long [^INDArray v]
+    (.elementCount v)))
 
 (defn vec?
   "Returns true if v is a vector (i.e. an instance of mikera.vectorz.AVector)"
@@ -53,11 +53,26 @@
     (instance? INDArray a)))
 
 (defn get
+  "DEPRECATED: use mset! instead for consistency with core.matrix
+
+   Returns the component of a vector at a specific index position"
+  (^double [^INDArray v ^long index]
+    (.get v (int index))))
+
+(defn mget
   "Returns the component of a vector at a specific index position"
-  (^double [^AVector v ^long index]
+  (^double [^INDArray v ^long index]
     (.get v (int index))))
 
 (defn set
+  "DEPRECATED: use mset! instead for consistency with core.matrix
+
+   Sets the component of a vector at position i (mutates in place)"
+  ([^AVector v ^long index ^double value]
+    (.set v (int index) value)
+    v))
+
+(defn mset!
   "Sets the component of a vector at position i (mutates in place)"
   ([^AVector v ^long index ^double value]
     (.set v (int index) value)

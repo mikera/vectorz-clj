@@ -18,7 +18,6 @@
 
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* true)
-
 (declare vectorz-coerce* avector-coerce*)
 
 (defmacro tag-symbol [tag form]
@@ -1064,6 +1063,16 @@
   AIndex
     (element-count [m]
       (.length m)))
+
+(extend-protocol mp/PSparse
+  INDArray
+    (sparse-coerce [m data]
+      (if (== 0 (mp/dimensionality data))
+        (Scalar. (double-coerce data))
+        (let [ss (map (fn [s] (.sparse (vectorz-coerce s))) (mp/get-major-slice-seq data))]
+         (.sparse (Arrayz/create (object-array ss))))))
+    (sparse [m]
+      (.sparse m)))
 
 (extend-protocol mp/PSliceJoin
   INDArray
