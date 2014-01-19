@@ -12,8 +12,9 @@
   (:require [clojure.core.matrix.impl.wrappers :as wrap])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.vectorz Scalar])
+  (:import [mikera.indexz AIndex Index])
   (:import [mikera.vectorz AVector Vectorz Vector])
-  (:import [mikera.arrayz INDArray Array NDArray SliceArray]))
+  (:import [mikera.arrayz INDArray Array NDArray]))
 
 ;; note - all the operators are core.matrix operators
 
@@ -55,7 +56,14 @@
     (is (equals [2 3 4] (submatrix v 0 [2 3])))
     (is (equals [2 3 4] (submatrix v [[2 3]]))))
   (is (instance? AVector (array [1 2])))
-  (is (equals [1 1 1] (div (array [2 2 2]) 2))))
+  (is (equals [1 1 1] (div (array [2 2 2]) 2)))
+  (is (equals [[1 2] [3 4] [5 6]] (join (array [[1 2] [3 4]]) (array [[5 6]]))))
+  (is (equals [[1 3] [2 4] [5 6]] (join (transpose (array [[1 2] [3 4]])) (array [[5 6]])))))
+
+(deftest test-mget-regressions
+  (is (== 3 (mget (mset (zero-array [4 4]) 0 2 3) 0 2)))
+  (is (== 3 (mget (mset (zero-array [4]) 2 3) 2)))
+  (is (== 3 (mget (mset (zero-array []) 3)))))
 
 (deftest test-scalar-arrays
   (is (equals 3 (scalar-array 3)))
@@ -67,10 +75,12 @@
   (is (equals [[2 3] [4 5]] (add (array [[1 2] [3 4]]) (array [1 1]))))
   (is (equals [[2 3] [4 5]] (add (array [1 1]) (array [[1 2] [3 4]]))))
   (is (equals [[2 4] [6 8]] (mul (array [[1 2] [3 4]]) (scalar-array 2))))
-  (is (equals [[2 6] [6 12]] (mul (array [[1 2] [3 4]]) [2 3]))))
+  (is (equals [[2 6] [6 12]] (mul (array [[1 2] [3 4]]) [2 3])))
+  (is (equals [[1 4] [3 16]] (pow (array [[1 2] [3 4]]) [1 2]))))
 
 (deftest test-broadcasts
-  (is (equals [[2 2] [2 2]] (broadcast 2 [2 2]))))
+  (is (equals [[2 2] [2 2]] (broadcast 2 [2 2])))
+  (is (not (equals [[2 2] [2 2]] (broadcast 2 [2])))))
 
 (deftest test-scalar-add
   (is (equals [2 3 4] (add 1 (array [1 2 3]))))
@@ -88,11 +98,11 @@
 (deftest test-mutability
   (let [v (v/of 1 2)]
     (is (mutable? v))
-    (is (mutable? (first (slices v)))))
+    (is (mutable? (first (slice-views v)))))
   (let [v (new-array [3 4 5 6])]
     (is (v/vectorz? v))
     (is (mutable? v))
-    (is (mutable? (first (slices v))))))
+    (is (mutable? (first (slice-views v))))))
 
 (deftest test-new-array
   (is (instance? AVector (new-array [10])))
@@ -209,6 +219,9 @@
 (deftest test-join
   (is (= (array [[[1]] [[2]]]) (join (array [[[1]]]) (array [[[2]]])))))
 
+(deftest test-pm
+  (is (string? (clojure.core.matrix.impl.pprint/pm (array :vectorz [1 2]))))) 
+
 (deftest test-matrix-transform
   (testing "vector multiple"
     (is (= (v/of 2 4) (mmul (m/matrix [[2 0] [0 2]]) (v/of 1 2))))
@@ -323,6 +336,12 @@
   (is (v/vectorz? (outer-product (v/of 1 2) [1 2])))
   (is (v/vectorz? (add! (Scalar. 1.0) 10)))) 
 
+(deftest test-defensive-copy-on-double-array 
+  (let [a (double-array [1 2 3 4 5])
+        v (array a)]
+    (aset-double a 4 9999)
+    (is (equals v [1 2 3 4 5]))))
+
 ;; run compliance tests
 
 (deftest instance-tests
@@ -338,7 +357,8 @@
   (clojure.core.matrix.compliance-tester/instance-test (first (slices (v/of 1 2 3 4 5 6))))
   (clojure.core.matrix.compliance-tester/instance-test (array :vectorz [[1 2] [3 4]]))
   (clojure.core.matrix.compliance-tester/instance-test (array :vectorz [[[[4]]]]))
-  (clojure.core.matrix.compliance-tester/instance-test (Array/create (array :vectorz [[[[4 3]]]])))) 
+  (clojure.core.matrix.compliance-tester/instance-test (Array/create (array :vectorz [[[[4 3]]]])))
+  (clojure.core.matrix.compliance-tester/instance-test (Index/of (int-array [1 2 3])))) 
 
 (deftest compliance-test
   (clojure.core.matrix.compliance-tester/compliance-test (v/of 1 2))) 

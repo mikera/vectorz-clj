@@ -51,20 +51,26 @@
   ;; Adding two regular Clojure vectors with clojure.core/+
   (let [a [1 2 3 4 5 6 7 8 9 10]
         b [1 2 3 4 5 6 7 8 9 10]]
-    (c/quick-bench (dotimes [i 1000] (vec (map clojure.core/+ a b)))))  
-  ;; => Execution time mean per addition : 1308 ns
+    (c/quick-bench (dotimes [i 1000] (mapv clojure.core/+ a b))))  
+  ;; => Execution time mean per addition : 285 ns
+  
+  ;; Adding two regular Clojure vectors with +
+  (let [a [1 2 3 4 5 6 7 8 9 10]
+        b [1 2 3 4 5 6 7 8 9 10]]
+    (c/quick-bench (dotimes [i 1000] (+ a b))))  
+  ;; => Execution time mean per addition : 285 ns
   
   ;; Adding two core.matrix vectors (pure functions, i.e. creating a new vector)
   (let [a (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])
         b (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])]
-    (c/quick-bench (dotimes [i 1000] (+ a b))))
-  ;; => Execution time mean per addition: 68 ns
+    (c/quick-bench (dotimes [i 1000] (add a b))))
+  ;; => Execution time mean per addition: 120 ns
   
   ;; Adding two core.matrix vectors (mutable operation, i.e. adding to the first vector)
   (let [a (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])
         b (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])]
     (c/quick-bench (dotimes [i 1000] (add! a b))))
-  ;; => Execution time mean per addition: 36 ns
+  ;; => Execution time mean per addition: 28 ns
   
   ;; Adding two core.matrix vectors using low level Java interop
   (let [a (Vectorz/create [1 2 3 4 5 6 7 8 9 10])
