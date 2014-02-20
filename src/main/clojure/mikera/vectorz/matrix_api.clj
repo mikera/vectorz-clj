@@ -425,6 +425,11 @@
     (set-0d [m value] 
       (Scalar/create (double-coerce value))))
 
+(extend-protocol mp/PImmutableMatrixConstruction
+  INDArray
+    (immutable-matrix [m]
+      (.immutable m)))
+
 (extend-protocol mp/PSpecialisedConstructors
   INDArray
     (identity-matrix [m dims] 
