@@ -1022,8 +1022,7 @@
       [m]
       (case (.dimensionality m) ; should be 1, 3, 4, ...; never 2
         1 true
-        (throw 
-          (java.lang.UnsupportedOperationException. "symmetric? is not yet implemented for vectorz arrays with more than 2 dimensions."))))
+        (equals m (transpose m))))
   AMatrix
     (identity-matrix?
       [m]
