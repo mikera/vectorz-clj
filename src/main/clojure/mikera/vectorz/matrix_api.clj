@@ -6,7 +6,6 @@
   (:require [clojure.core.matrix.multimethods :as mm])
   (:require [clojure.core.matrix.protocols :as mp])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
-  (:import [mikera.matrixx.impl DiagonalMatrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
   (:import [mikera.vectorz Scalar])
   (:import [mikera.vectorz.impl IndexVector])
@@ -438,7 +437,7 @@
     (identity-matrix [m dims] 
       (Matrixx/createIdentityMatrix (int dims)))
     (diagonal-matrix [m diagonal-values] 
-      (DiagonalMatrix/create (Vectorz/toVector diagonal-values))))
+      (Matrixx/createDiagonalMatrix (Vectorz/toVector diagonal-values))))
 
 (extend-protocol mp/PPermutationMatrix
   INDArray
