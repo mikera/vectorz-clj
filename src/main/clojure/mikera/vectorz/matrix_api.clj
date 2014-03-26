@@ -97,6 +97,7 @@
 (def ^{:tag Class :const true} INT-ARRAY-CLASS (Class/forName "[I"))
 
 (defmacro int-array-coerce
+  "Coerces an arbitrary object to an int array"
   ([m]
     `(tag-symbol ~'ints          
        (let [m# ~m] 
@@ -127,6 +128,7 @@
 	           (let [[~@syms] (seq ~isym)] ~@body))))))
 
 (defn avector-coerce* 
+  "Coerces to an AVector instance, broadcasting if necessary" 
   (^AVector [^AVector v m]
 	  (cond 
       (number? m) 
@@ -142,6 +144,7 @@
       :else (Vectorz/toVector ^INDArray (vectorz-coerce* m))))) 
 
 (defn amatrix-coerce* 
+  "Coerces to an AMatrix instance, broadcasting if necessary" 
   (^AMatrix [^AMatrix v m]
 	  (cond
       (number? m) 
@@ -154,7 +157,7 @@
 
     
 (defn vectorz-coerce* 
-  "Function to attempt conversion to Vectorz objects. May return nil if conversion fails."
+  "Function to attempt conversion to a Vectorz INDArray object. May return nil if conversion fails."
   (^INDArray [p]
 	  (let [dims (dimensionality p)]
 	    (cond
