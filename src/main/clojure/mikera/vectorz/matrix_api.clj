@@ -2,7 +2,6 @@
   (:use clojure.core.matrix)
   (:use clojure.core.matrix.utils)
   (:require [clojure.core.matrix.implementations :as imp])
-  (:require [clojure.core.matrix.multimethods :as mm])
   (:require [clojure.core.matrix.protocols :as mp])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
