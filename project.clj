@@ -10,7 +10,7 @@
             :url "http://www.gnu.org/licenses/lgpl.html"}
   :source-paths ["src/main/clojure"]
   :test-paths ["src/test/clojure"]
-  :dependencies [[org.clojure/clojure "1.5.1"]
+  :dependencies [[org.clojure/clojure "1.6.0-RC4"]
                  [criterium/criterium "0.4.3"]
                  [net.mikera/cljunit "0.3.0"]
                  [net.mikera/clojure-utils "0.6.0"]
