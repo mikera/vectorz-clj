@@ -611,7 +611,7 @@
 (extend-protocol mp/PSliceSeq
   INDArray  
     (get-major-slice-seq [m] 
-      (seq (.getSliceViews m)))
+      (seq (.getSlices m)))
   AVector  
     (get-major-slice-seq [m] 
       (seq (or (.asDoubleArray m) (.toDoubleArray m))))
