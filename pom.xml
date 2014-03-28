@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>vectorz-clj</artifactId>
-	<version>0.19.1-SNAPSHOT</version>
+	<version>0.20.1-SNAPSHOT</version>
 
 	<licenses>
 		<license>
@@ -35,17 +35,17 @@
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>vectorz</artifactId>
-			<version>0.28.0</version>
+			<version>0.29.0</version>
 		</dependency>
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>core.matrix</artifactId>
-			<version>0.19.0</version>
+			<version>0.21.0</version>
 		</dependency>
 		<dependency>
 			<groupId>criterium</groupId>
 			<artifactId>criterium</artifactId>
-			<version>0.4.2</version>
+			<version>0.4.3</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -57,18 +57,18 @@
 		<dependency>
 			<groupId>org.clojure</groupId>
 			<artifactId>clojure</artifactId>
-			<version>1.5.1</version>
+			<version>1.6.0</version>
 		</dependency>
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>core.matrix.stats</artifactId>
-			<version>0.3.0</version>
+			<version>0.4.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>clojure-utils</artifactId>
-			<version>0.5.0</version>
+			<version>0.6.0</version>
 		</dependency>
 	</dependencies>
 

@@ -1,12 +1,9 @@
 (ns mikera.vectorz.matrix-api
   (:use clojure.core.matrix)
   (:use clojure.core.matrix.utils)
-  (:require clojure.core.matrix.impl.persistent-vector)
   (:require [clojure.core.matrix.implementations :as imp])
-  (:require [clojure.core.matrix.multimethods :as mm])
   (:require [clojure.core.matrix.protocols :as mp])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
-  (:import [mikera.matrixx.impl DiagonalMatrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
   (:import [mikera.vectorz Scalar])
   (:import [mikera.vectorz.impl IndexVector])
@@ -97,6 +94,7 @@
 (def ^{:tag Class :const true} INT-ARRAY-CLASS (Class/forName "[I"))
 
 (defmacro int-array-coerce
+  "Coerces an arbitrary object to an int array"
   ([m]
     `(tag-symbol ~'ints          
        (let [m# ~m] 
@@ -127,6 +125,7 @@
 	           (let [[~@syms] (seq ~isym)] ~@body))))))
 
 (defn avector-coerce* 
+  "Coerces to an AVector instance, broadcasting if necessary" 
   (^AVector [^AVector v m]
 	  (cond 
       (number? m) 
@@ -142,6 +141,7 @@
       :else (Vectorz/toVector ^INDArray (vectorz-coerce* m))))) 
 
 (defn amatrix-coerce* 
+  "Coerces to an AMatrix instance, broadcasting if necessary" 
   (^AMatrix [^AMatrix v m]
 	  (cond
       (number? m) 
@@ -154,7 +154,7 @@
 
     
 (defn vectorz-coerce* 
-  "Function to attempt conversion to Vectorz objects. May return nil if conversion fails."
+  "Function to attempt conversion to a Vectorz INDArray object. May return nil if conversion fails."
   (^INDArray [p]
 	  (let [dims (dimensionality p)]
 	    (cond
@@ -425,12 +425,17 @@
     (set-0d [m value] 
       (Scalar/create (double-coerce value))))
 
+(extend-protocol mp/PImmutableMatrixConstruction
+  INDArray
+    (immutable-matrix [m]
+      (.immutable m)))
+
 (extend-protocol mp/PSpecialisedConstructors
   INDArray
     (identity-matrix [m dims] 
       (Matrixx/createIdentityMatrix (int dims)))
     (diagonal-matrix [m diagonal-values] 
-      (DiagonalMatrix/create (Vectorz/toVector diagonal-values))))
+      (Matrixx/createDiagonalMatrix (Vectorz/toVector diagonal-values))))
 
 (extend-protocol mp/PPermutationMatrix
   INDArray
@@ -1017,8 +1022,7 @@
       [m]
       (case (.dimensionality m) ; should be 1, 3, 4, ...; never 2
         1 true
-        (throw 
-          (java.lang.UnsupportedOperationException. "symmetric? is not yet implemented for vectorz arrays with more than 2 dimensions."))))
+        (equals m (transpose m))))
   AMatrix
     (identity-matrix?
       [m]
