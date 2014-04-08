@@ -10,12 +10,12 @@
             :url "http://www.gnu.org/licenses/lgpl.html"}
   :source-paths ["src/main/clojure"]
   :test-paths ["src/test/clojure"]
-  :dependencies [[org.clojure/clojure "1.6.0-RC4"]
+  :dependencies [[org.clojure/clojure "1.6.0"]
                  [criterium/criterium "0.4.3"]
                  [net.mikera/cljunit "0.3.0"]
                  [net.mikera/clojure-utils "0.6.0"]
-                 [net.mikera/core.matrix "0.20.0"]
-                 [net.mikera/core.matrix.stats "0.3.0"]
+                 [net.mikera/core.matrix "0.22.0"]
+                 [net.mikera/core.matrix.stats "0.4.0"]
                  [net.mikera/vectorz "0.29.0"]]
   :repositories [["clojars.org" {:url "https://clojars.org/repo"
                                  :name "Clojars repository"}]])
