@@ -579,7 +579,7 @@
         (.slice m (int 1) (int i))
         (error "Can't get column of array with dimensionality: " (mp/dimensionality m))))
     (get-major-slice [m i]
-      (.slice m (int i)))
+      (.sliceValue m (int i)))
     (get-slice [m dimension i]
       (let [dimension (int dimension)]
         (.slice m dimension (int i))))
@@ -589,10 +589,10 @@
     (get-column [m i]
       (error "Can't access column of a 1D vector!"))
     (get-major-slice [m i]
-      (.slice m (int i)))
+      (.sliceValue m (int i)))
     (get-slice [m dimension i]
       (if (== 0 dimension)
-        (.slice m (int i))
+        (.sliceValue m (int i))
         (error "Can't get slice from vector with dimension: " dimension)))
   AMatrix
     (get-row [m i]
