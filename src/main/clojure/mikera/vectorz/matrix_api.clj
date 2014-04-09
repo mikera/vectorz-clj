@@ -562,6 +562,10 @@
         (.set m (int (first indexes)) (int (second indexes)) (double v))
         (error "Can't do " (count indexes) "-dimensional set on a 2D matrix!"))))
 
+(extend-protocol mp/PSparseArray
+  INDArray
+    (is-sparse? [m]
+      (.isSparse m)))
 
 (extend-protocol mp/PMatrixEquality
   INDArray
