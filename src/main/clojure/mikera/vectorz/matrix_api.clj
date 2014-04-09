@@ -621,6 +621,22 @@
           (== 1 dimension) (.getColumn m (int i))
           :else (error "Can't get slice from matrix with dimension: " dimension)))))
 
+(extend-protocol mp/PRowSetting
+  AMatrix
+    (set-row [m i row]
+      (with-clone [m]
+        (.setRow m (int i) (avector-coerce (.getRow m 0) row))))
+    (set-row! [m i row]
+      (.setRow m (int i) (avector-coerce (.getRow m 0) row))))
+
+(extend-protocol mp/PColumnSetting
+  AMatrix
+    (set-column [m i v]
+      (with-clone [m]
+        (.setColumn m (int i) (avector-coerce (.getColumn m 0) v))))
+    (set-column! [m i v]
+      (.setColumn m (int i) (avector-coerce (.getColumn m 0) v))))
+
 (extend-protocol mp/PSliceView
   INDArray
     (get-major-slice-view [m i] 
