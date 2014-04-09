@@ -58,7 +58,8 @@
   (is (instance? AVector (array [1 2])))
   (is (equals [1 1 1] (div (array [2 2 2]) 2)))
   (is (equals [[1 2] [3 4] [5 6]] (join (array [[1 2] [3 4]]) (array [[5 6]]))))
-  (is (equals [[1 3] [2 4] [5 6]] (join (transpose (array [[1 2] [3 4]])) (array [[5 6]])))))
+  (is (equals [[1 3] [2 4] [5 6]] (join (transpose (array [[1 2] [3 4]])) (array [[5 6]]))))
+  (is (= 1.0 (slice (array [0 1 2]) 1))))
 
 (deftest test-mget-regressions
   (is (== 3 (mget (mset (zero-array [4 4]) 0 2 3) 0 2)))
@@ -70,6 +71,14 @@
   (is (equals 2 (add 1 (array 1))))
   (is (equals [2 3] (add 1 (array [1 2]))))
   (is (equals [2 3] (add (scalar-array 1) (array [1 2])))))
+
+(deftest test-symmetric?
+  (is (symmetric? (array [[1 2] [2 3]])))
+  (is (not (symmetric? (array [[1 2] [3 4]]))))
+  (is (symmetric? (array [1 2 3])))
+  (is (symmetric? (array [[[1 2] [0 0]] [[2 0] [0 1]]])))
+  (is (symmetric? (array [[[1 2] [3 0]] [[2 0] [0 1]]])))
+  (is (not (symmetric? (array [[[1 2] [0 0]] [[3 0] [0 1]]]))))) 
 
 (deftest test-broadcasting-cases
   (is (equals [[2 3] [4 5]] (add (array [[1 2] [3 4]]) (array [1 1]))))

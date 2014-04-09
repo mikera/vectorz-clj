@@ -1,12 +1,9 @@
 (ns mikera.vectorz.matrix-api
   (:use clojure.core.matrix)
   (:use clojure.core.matrix.utils)
-  (:require clojure.core.matrix.impl.persistent-vector)
   (:require [clojure.core.matrix.implementations :as imp])
-  (:require [clojure.core.matrix.multimethods :as mm])
   (:require [clojure.core.matrix.protocols :as mp])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
-  (:import [mikera.matrixx.impl DiagonalMatrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
   (:import [mikera.vectorz Scalar])
   (:import [mikera.vectorz.impl IndexVector])
@@ -94,9 +91,19 @@
          ~@body
          ~a))))
 
+(defmacro with-broadcast-coerce 
+  "Executes body with a and a coerced INDArray version of b. Returns result of body."
+  ([[a b] & body]
+     (when-not (and (symbol? a) (symbol? b)) (error "Symbols required for with-broadcast-clone binding"))
+     (let []
+      `(let [~b (vectorz-coerce ~a ~b)
+             ~a (.broadcastLike ~a ~b)]
+         ~@body))))
+
 (def ^{:tag Class :const true} INT-ARRAY-CLASS (Class/forName "[I"))
 
 (defmacro int-array-coerce
+  "Coerces an arbitrary object to an int array"
   ([m]
     `(tag-symbol ~'ints          
        (let [m# ~m] 
@@ -127,6 +134,7 @@
 	           (let [[~@syms] (seq ~isym)] ~@body))))))
 
 (defn avector-coerce* 
+  "Coerces to an AVector instance, broadcasting if necessary" 
   (^AVector [^AVector v m]
 	  (cond 
       (number? m) 
@@ -142,6 +150,7 @@
       :else (Vectorz/toVector ^INDArray (vectorz-coerce* m))))) 
 
 (defn amatrix-coerce* 
+  "Coerces to an AMatrix instance, broadcasting if necessary" 
   (^AMatrix [^AMatrix v m]
 	  (cond
       (number? m) 
@@ -154,7 +163,7 @@
 
     
 (defn vectorz-coerce* 
-  "Function to attempt conversion to Vectorz objects. May return nil if conversion fails."
+  "Function to attempt conversion to a Vectorz INDArray object. May return nil if conversion fails."
   (^INDArray [p]
 	  (let [dims (dimensionality p)]
 	    (cond
@@ -435,7 +444,7 @@
     (identity-matrix [m dims] 
       (Matrixx/createIdentityMatrix (int dims)))
     (diagonal-matrix [m diagonal-values] 
-      (DiagonalMatrix/create (Vectorz/toVector diagonal-values))))
+      (Matrixx/createDiagonalMatrix (Vectorz/toVector diagonal-values))))
 
 (extend-protocol mp/PPermutationMatrix
   INDArray
@@ -553,6 +562,10 @@
         (.set m (int (first indexes)) (int (second indexes)) (double v))
         (error "Can't do " (count indexes) "-dimensional set on a 2D matrix!"))))
 
+(extend-protocol mp/PSparseArray
+  INDArray
+    (is-sparse? [m]
+      (.isSparse m)))
 
 (extend-protocol mp/PMatrixEquality
   INDArray
@@ -579,7 +592,7 @@
         (.slice m (int 1) (int i))
         (error "Can't get column of array with dimensionality: " (mp/dimensionality m))))
     (get-major-slice [m i]
-      (.slice m (int i)))
+      (.sliceValue m (int i)))
     (get-slice [m dimension i]
       (let [dimension (int dimension)]
         (.slice m dimension (int i))))
@@ -589,10 +602,10 @@
     (get-column [m i]
       (error "Can't access column of a 1D vector!"))
     (get-major-slice [m i]
-      (.slice m (int i)))
+      (.sliceValue m (int i)))
     (get-slice [m dimension i]
       (if (== 0 dimension)
-        (.slice m (int i))
+        (.sliceValue m (int i))
         (error "Can't get slice from vector with dimension: " dimension)))
   AMatrix
     (get-row [m i]
@@ -608,6 +621,22 @@
           (== 1 dimension) (.getColumn m (int i))
           :else (error "Can't get slice from matrix with dimension: " dimension)))))
 
+(extend-protocol mp/PRowSetting
+  AMatrix
+    (set-row [m i row]
+      (with-clone [m]
+        (.setRow m (int i) (avector-coerce (.getRow m 0) row))))
+    (set-row! [m i row]
+      (.setRow m (int i) (avector-coerce (.getRow m 0) row))))
+
+(extend-protocol mp/PColumnSetting
+  AMatrix
+    (set-column [m i v]
+      (with-clone [m]
+        (.setColumn m (int i) (avector-coerce (.getColumn m 0) v))))
+    (set-column! [m i v]
+      (.setColumn m (int i) (avector-coerce (.getColumn m 0) v))))
+
 (extend-protocol mp/PSliceView
   INDArray
     (get-major-slice-view [m i] 
@@ -616,7 +645,7 @@
 (extend-protocol mp/PSliceSeq
   INDArray  
     (get-major-slice-seq [m] 
-      (seq (.getSliceViews m)))
+      (seq (.getSlices m)))
   AVector  
     (get-major-slice-seq [m] 
       (seq (or (.asDoubleArray m) (.toDoubleArray m))))
@@ -730,13 +759,9 @@
       (with-broadcast-clone [m a] (.sub m a)))
   mikera.vectorz.AVector
     (matrix-add [m a]
-      (if (instance? AVector a)
-        (with-clone [m] (.add m ^AVector a)))
-        (with-broadcast-clone [m a] (.add m a)))
+      (with-broadcast-coerce [m a] (.addCopy m a)))
     (matrix-sub [m a]
-      (if (instance? AVector a)
-        (with-clone [m] (.sub m ^AVector a)))
-        (with-broadcast-clone [m a] (.sub m a)))
+      (with-broadcast-coerce [m a] (.subCopy m a)))
   mikera.matrixx.AMatrix
     (matrix-add [m a]
       (with-broadcast-clone [m a] (.add m a)))
@@ -1022,8 +1047,7 @@
       [m]
       (case (.dimensionality m) ; should be 1, 3, 4, ...; never 2
         1 true
-        (throw 
-          (java.lang.UnsupportedOperationException. "symmetric? is not yet implemented for vectorz arrays with more than 2 dimensions."))))
+        (equals m (transpose m))))
   AMatrix
     (identity-matrix?
       [m]
