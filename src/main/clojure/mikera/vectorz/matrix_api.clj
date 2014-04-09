@@ -91,6 +91,15 @@
          ~@body
          ~a))))
 
+(defmacro with-broadcast-coerce 
+  "Executes body with a and a coerced INDArray version of b. Returns result of body."
+  ([[a b] & body]
+     (when-not (and (symbol? a) (symbol? b)) (error "Symbols required for with-broadcast-clone binding"))
+     (let []
+      `(let [~b (vectorz-coerce ~a ~b)
+             ~a (.broadcastLike ~a ~b)]
+         ~@body))))
+
 (def ^{:tag Class :const true} INT-ARRAY-CLASS (Class/forName "[I"))
 
 (defmacro int-array-coerce
@@ -730,13 +739,9 @@
       (with-broadcast-clone [m a] (.sub m a)))
   mikera.vectorz.AVector
     (matrix-add [m a]
-      (if (instance? AVector a)
-        (with-clone [m] (.add m ^AVector a)))
-        (with-broadcast-clone [m a] (.add m a)))
+      (with-broadcast-coerce [m a] (.addCopy m a)))
     (matrix-sub [m a]
-      (if (instance? AVector a)
-        (with-clone [m] (.sub m ^AVector a)))
-        (with-broadcast-clone [m a] (.sub m a)))
+      (with-broadcast-coerce [m a] (.subCopy m a)))
   mikera.matrixx.AMatrix
     (matrix-add [m a]
       (with-broadcast-clone [m a] (.add m a)))
