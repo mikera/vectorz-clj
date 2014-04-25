@@ -21,18 +21,28 @@
   (let [tagged-sym (vary-meta (gensym "res") assoc :tag tag)]
     `(let [~tagged-sym ~form] ~tagged-sym)))
 
+(defn vectorz-type? [tag]
+  (let [^String stag (if (class? tag) (.getName ^Class tag) (str tag))]
+    (or (.startsWith stag "mikera.vectorz.")
+        (.startsWith stag "mikera.matrixx.")
+        (.startsWith stag "mikera.indexz.")
+        (.startsWith stag "mikera.arrayz."))))
+
 (defmacro vectorz-coerce 
   "Coerces the argument to a vectorz INDArray. Broadcasts to the shape of target if provided."
   ([x]
-  `(tag-symbol mikera.arrayz.INDArray
+    (if (and (symbol? x) (vectorz-type? (:tag (meta x))))
+      x ;; return tagged symbol unchanged
+      `(tag-symbol mikera.arrayz.INDArray
                (let [x# ~x]
-                 (if (instance? INDArray x#) x# (vectorz-coerce* x#)))))
+                 (if (instance? INDArray x#) x# (vectorz-coerce* x#))))))
   ([target x]
     `(let [m# ~target
            x# (vectorz-coerce ~x)]
-       (if (< (.dimensionality x#) (.dimensionality m#)) 
-         (.broadcastLike x# m#) 
-         x#))))
+       (tag-symbol mikera.arrayz.INDArray
+         (if (< (.dimensionality x#) (.dimensionality m#)) 
+           (.broadcastLike x# m#) 
+           x#)))))
 
 (defmacro vectorz-clone 
   "Coerces the argument to a new (cloned) vectorz INDArray"
@@ -82,7 +92,8 @@
          ~sym))))
 
 (defmacro with-broadcast-clone 
-  "Executes body with a broadcasted clone of a and a broadcasted INDArray version of b. Returns broadcasted clone of a."
+  "Executes body with a broadcasted clone of a and a broadcasted INDArray version of b. 
+   Returns the broadcasted clone of a."
   ([[a b] & body]
      (when-not (and (symbol? a) (symbol? b)) (error "Symbols required for with-broadcast-clone binding"))
      (let []
@@ -521,7 +532,7 @@
       (let [m (.clone m)] (.set m (int row) (int column) (double v)) m))
     (set-nd [m indexes v]
       (if (== 2 (count indexes))
-        (let [m (.clone m)] (.set m (int (first indexes)) (int (second indexes)) (double v)))
+        (with-clone [m] (.set m (int (first indexes)) (int (second indexes)) (double v)))
         (error "Can't do " (count indexes) "-dimensional set on a 2D matrix!")))
     (is-mutable? [m] (.isFullyMutable m)))
     
@@ -908,7 +919,7 @@
     (matrix-multiply [m a]
       (.innerProduct m (vectorz-coerce a)))
     (element-multiply [m a]
-      (with-broadcast-clone [m a] (.multiply m a)))
+      (with-broadcast-coerce [m a] (.multiplyCopy m a)))
   AMatrix
     (matrix-multiply [m a]
       (cond 
