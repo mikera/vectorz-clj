@@ -39,9 +39,10 @@
   ([target x]
     `(let [m# ~target
            x# (vectorz-coerce ~x)]
-       (if (< (.dimensionality x#) (.dimensionality m#)) 
-         (.broadcastLike x# m#) 
-         x#))))
+       (tag-symbol mikera.arrayz.INDArray
+         (if (< (.dimensionality x#) (.dimensionality m#)) 
+           (.broadcastLike x# m#) 
+           x#)))))
 
 (defmacro vectorz-clone 
   "Coerces the argument to a new (cloned) vectorz INDArray"
