@@ -531,7 +531,7 @@
       (let [m (.clone m)] (.set m (int row) (int column) (double v)) m))
     (set-nd [m indexes v]
       (if (== 2 (count indexes))
-        (let [m (.clone m)] (.set m (int (first indexes)) (int (second indexes)) (double v)))
+        (with-clone [m] (.set m (int (first indexes)) (int (second indexes)) (double v)))
         (error "Can't do " (count indexes) "-dimensional set on a 2D matrix!")))
     (is-mutable? [m] (.isFullyMutable m)))
     
