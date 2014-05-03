@@ -765,9 +765,9 @@
 (extend-protocol mp/PMatrixAdd
   mikera.vectorz.AScalar
     (matrix-add [m a]
-      (with-broadcast-clone [m a] (.add m a)))
+      (with-broadcast-coerce [m a] (.addCopy m a)))
     (matrix-sub [m a]
-      (with-broadcast-clone [m a] (.sub m a)))
+      (with-broadcast-coerce [m a] (.subCopy m a)))
   mikera.vectorz.AVector
     (matrix-add [m a]
       (with-broadcast-coerce [m a] (.addCopy m a)))
@@ -775,14 +775,14 @@
       (with-broadcast-coerce [m a] (.subCopy m a)))
   mikera.matrixx.AMatrix
     (matrix-add [m a]
-      (with-broadcast-clone [m a] (.add m a)))
+      (with-broadcast-coerce [m a] (.addCopy m a)))
     (matrix-sub [m a]
-      (with-broadcast-clone [m a] (.sub m a)))
+      (with-broadcast-coerce [m a] (.subCopy m a)))
   INDArray
     (matrix-add [m a]
-      (with-broadcast-clone [m a] (.add m a)))
+      (with-broadcast-coerce [m a] (.addCopy m a)))
     (matrix-sub [m a]
-      (with-broadcast-clone [m a] (.sub m a))))
+      (with-broadcast-coerce [m a] (.subCopy m a))))
 
 (extend-protocol mp/PMatrixAddMutable
   INDArray
