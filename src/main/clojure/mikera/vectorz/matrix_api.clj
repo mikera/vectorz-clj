@@ -1136,6 +1136,12 @@
     (distance [a b]
       (.distance a (avector-coerce b))))
 
+(extend-protocol mp/PElementMinMax
+  INDArray
+  (element-min [m]
+    (.elementMin m))
+  (element-max [m]
+    (.elementMax m)))
 
 (extend-protocol mp/PComputeMatrix
   INDArray
