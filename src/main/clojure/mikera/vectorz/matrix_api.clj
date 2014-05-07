@@ -748,6 +748,43 @@
             l1 (int (if rr (second rr) (.length m)))]
         (.subVector m s1 l1)))) 
 
+;; protocols for indexed access
+
+(extend-protocol mp/PSelect
+  AVector
+    (select [a args] 
+      (let [ixs (int-array-coerce (first args))]
+        (.select a ixs))))
+
+(extend-protocol mp/PSetSelection
+  AVector
+    (set-selection [a args values] 
+      (let [ixs (int-array-coerce (first args))
+            sv (.select a ixs)
+            vs (avector-coerce sv values)]
+        (.set sv vs))))
+
+(extend-protocol mp/PIndicesAccess
+  INDArray
+  (get-indices [a indices] 
+    (let [c (int (count indices))
+          r (Vectorz/newVector c)]
+      (doseq-indexed [ix indices i]
+        (.unsafeSet r (int i) (.get a (int-array-coerce ix))))
+      r)))
+
+(extend-protocol mp/PIndicesSetting
+  INDArray
+    (set-indices [a indices values] 
+      (mp/set-indices! (.clone a) indices values))
+    (set-indices! [a indices values] 
+      (let [c (int (count indices))
+            vs (avector-coerce values)]
+        (doseq-indexed [ix indices i]
+          (.set a (int-array-coerce ix) (.get vs (int i)))))))
+
+;; protocols for elementwise ops
+
 (extend-protocol mp/PSummable
   INDArray 
     (element-sum [m]
