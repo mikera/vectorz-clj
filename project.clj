@@ -14,8 +14,8 @@
                  [criterium/criterium "0.4.3"]
                  [net.mikera/cljunit "0.3.0"]
                  [net.mikera/clojure-utils "0.6.0"]
-                 [net.mikera/core.matrix "0.22.0"]
+                 [net.mikera/core.matrix "0.23.0"]
                  [net.mikera/core.matrix.stats "0.4.0"]
-                 [net.mikera/vectorz "0.31.0"]]
+                 [net.mikera/vectorz "0.32.0"]]
   :repositories [["clojars.org" {:url "https://clojars.org/repo"
                                  :name "Clojars repository"}]])
