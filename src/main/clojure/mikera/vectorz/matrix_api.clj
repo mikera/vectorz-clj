@@ -11,6 +11,7 @@
   (:import [mikera.indexz AIndex Index])
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
+  (:import [mikera.matrixx.decompose QR IQRResult])
   (:refer-clojure :exclude [vector?]))
 
 (set! *warn-on-reflection* true)
@@ -230,6 +231,14 @@
                                         ;; (println m vm (shape vm))
                                         (assign! (mp/new-matrix-nd m (shape vm)) vm)))))))
          ['mikera.vectorz.AVector 'mikera.matrixx.AMatrix 'mikera.vectorz.AScalar 'mikera.arrayz.INDArray 'mikera.indexz.AIndex]) ))
+
+(extend-protocol mp/PQRDecomposition
+  AMatrix
+    (qr [m options]
+      (let [result (mikera.matrixx.decompose.QR/decompose m)]
+        (select-keys 
+        {:Q (.getQ result) :R (.getR result)}
+          (:return options)))))
 
 (extend-protocol mp/PTypeInfo
   INDArray
