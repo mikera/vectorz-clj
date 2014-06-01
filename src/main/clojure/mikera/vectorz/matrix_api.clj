@@ -244,7 +244,7 @@
                     (== 0 (count ks)) {}
                     (== 2 (count ks)) {:Q (.getQ result) :R (.getR result)}
                     :else (cond
-                            (= :Q (ks 0)) {:Q (.getQ result)}
+                            (= :Q (first ks)) {:Q (.getQ result)}
                             :else         {:R (.getR result)})))))))
 
 (extend-protocol mp/PTypeInfo
