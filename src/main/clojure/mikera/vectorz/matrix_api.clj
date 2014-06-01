@@ -235,14 +235,14 @@
 (extend-protocol mp/PQRDecomposition
   AMatrix
     (qr [m options]
-      (let [result (mikera.matrixx.decompose.QR/decompose m)]
+      (let [result (QR/decompose m)]
         (cond
-          (or (nil? options) (nil? (options :keys)))   ;if options is nil, return all keys
+          (or (nil? options) (nil? (options :return)))   ;if options is nil, return all keys
             {:Q (.getQ result) :R (.getR result)}
           :else (let [ks (filter (fn [x] (or (= x :Q) (= x :R))) (distinct (options :return)))]   ;remove invalid and duplicate keys
                   (cond
-                    (== 0 (count ks)) {}
-                    (== 2 (count ks)) {:Q (.getQ result) :R (.getR result)}
+                    (= 0 (count ks)) {}
+                    (= 2 (count ks)) {:Q (.getQ result) :R (.getR result)}
                     :else (cond
                             (= :Q (first ks)) {:Q (.getQ result)}
                             :else         {:R (.getR result)})))))))
