@@ -237,7 +237,7 @@
     (qr [m options]
       (let [result (mikera.matrixx.decompose.QR/decompose m)]
         (cond
-          (nil? options)   ;if options is nil, return all keys
+          (or (nil? options) (nil? (options :keys)))   ;if options is nil, return all keys
             {:Q (.getQ result) :R (.getR result)}
           :else (let [ks (filter (fn [x] (or (= x :Q) (= x :R))) (distinct (options :return)))]   ;remove invalid and duplicate keys
                   (cond
