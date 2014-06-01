@@ -234,7 +234,7 @@
 
 (extend-protocol mp/PQRDecomposition
   AMatrix
-    (qr [^AMatrix m options]
+    (qr [m options]
       (let [result (mikera.matrixx.decompose.QR/decompose m)]
         (cond
           (nil? options)   ;if options is nil, return all keys
