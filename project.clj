@@ -3,7 +3,7 @@
 ;; The pom.xml is used for official builds, and should be considered the 
 ;; definitive source for build configuration.
 
-(defproject net.mikera/vectorz-clj "0.22.1-SNAPSHOT"
+(defproject net.mikera/vectorz-clj "0.23.1-SNAPSHOT"
   :description "Fast vector library for Clojure, building on VectorZ and using core.matrix"
   :url "https://github.com/mikera/vectorz-clj"
   :license {:name "GNU Lesser General Public License (LGPL)"
@@ -16,8 +16,8 @@
                  [org.clojure/test.check "0.5.7"]
                  [net.mikera/cljunit "0.3.0"]
                  [net.mikera/clojure-utils "0.6.0"]
-                 [net.mikera/core.matrix "0.23.0"]
+                 [net.mikera/core.matrix "0.24.0"]
                  [net.mikera/core.matrix.stats "0.4.0"]
-                 [net.mikera/vectorz "0.32.0"]]
+                 [net.mikera/vectorz "0.33.0"]]
   :repositories [["clojars.org" {:url "https://clojars.org/repo"
                                  :name "Clojars repository"}]])
