@@ -232,20 +232,23 @@
                                         (assign! (mp/new-matrix-nd m (shape vm)) vm)))))))
          ['mikera.vectorz.AVector 'mikera.matrixx.AMatrix 'mikera.vectorz.AScalar 'mikera.arrayz.INDArray 'mikera.indexz.AIndex]) ))
 
+(defmacro with-keys
+  [available required]
+  (let [result-sym (gensym)]
+    `(let
+       [~result-sym {}
+        ~@(mapcat (fn [[k v]] `(~result-sym (if (some #{~k} ~required) 
+                                              (assoc ~result-sym ~k ~v)
+                                              ~result-sym)))
+                  available)]
+       ~result-sym)))
+
 (extend-protocol mp/PQRDecomposition
   AMatrix
     (qr [m options]
-      (let [result (QR/decompose m)]
-        (cond
-          (or (nil? options) (nil? (options :return)))   ;if options is nil, return all keys
-            {:Q (.getQ result) :R (.getR result)}
-          :else (let [ks (filter (fn [x] (or (= x :Q) (= x :R))) (distinct (options :return)))]   ;remove invalid and duplicate keys
-                  (cond
-                    (= 0 (count ks)) {}
-                    (= 2 (count ks)) {:Q (.getQ result) :R (.getR result)}
-                    :else (cond
-                            (= :Q (first ks)) {:Q (.getQ result)}
-                            :else         {:R (.getR result)})))))))
+      (let
+        [result (QR/decompose m)]
+        (with-keys {:Q (.getQ result) :R (.getR result)} (:return options)))))
 
 (extend-protocol mp/PTypeInfo
   INDArray
