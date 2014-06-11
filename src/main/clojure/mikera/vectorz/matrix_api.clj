@@ -11,7 +11,7 @@
   (:import [mikera.indexz AIndex Index])
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
-  (:import [mikera.matrixx.decompose QR IQRResult])
+  (:import [mikera.matrixx.decompose QR IQRResult Cholesky ICholeskyResult ICholeskyLDUResult])
   (:refer-clojure :exclude [vector?]))
 
 (set! *warn-on-reflection* true)
@@ -235,13 +235,15 @@
 (defmacro with-keys
   [available required]
   (let [result-sym (gensym)]
-    `(let
-       [~result-sym {}
-        ~@(mapcat (fn [[k v]] `(~result-sym (if (some #{~k} ~required) 
-                                              (assoc ~result-sym ~k ~v)
-                                              ~result-sym)))
-                  available)]
-       ~result-sym)))
+           `(if ~required
+              (let
+                      [~result-sym {}
+                       ~@(mapcat (fn [[k v]] `(~result-sym (if (some #{~k} ~required) 
+                                                             (assoc ~result-sym ~k ~v)
+                                                             ~result-sym)))
+                                 available)]
+                      ~result-sym)
+              ~available)))
 
 (extend-protocol mp/PQRDecomposition
   AMatrix
@@ -249,6 +251,15 @@
       (let
         [result (QR/decompose m)]
         (with-keys {:Q (.getQ result) :R (.getR result)} (:return options)))))
+
+(extend-protocol mp/PCholeskyDecomposition
+  AMatrix
+  (cholesky [m options] 
+      (let
+        [result (Cholesky/decompose m)]
+        (if result
+          (with-keys {:L (.getL result) :L* (.getU result)} (:return options))
+          nil))))
 
 (extend-protocol mp/PTypeInfo
   INDArray
