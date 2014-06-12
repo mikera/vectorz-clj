@@ -360,7 +360,7 @@
     (scale! (clone a) factor)))
 
 (defn scale-add 
-  "Scales a fector by a scalar numerical factor and adds a second vector" 
+  "Scales a vector by a scalar numerical factor and adds a second vector" 
   ([^AVector a factor ^AVector b]
     (scale-add! (clone a) factor b)))
 

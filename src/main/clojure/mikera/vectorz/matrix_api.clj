@@ -1,12 +1,9 @@
 (ns mikera.vectorz.matrix-api
   (:use clojure.core.matrix)
   (:use clojure.core.matrix.utils)
-  (:require clojure.core.matrix.impl.persistent-vector)
   (:require [clojure.core.matrix.implementations :as imp])
-  (:require [clojure.core.matrix.multimethods :as mm])
   (:require [clojure.core.matrix.protocols :as mp])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
-  (:import [mikera.matrixx.impl DiagonalMatrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
   (:import [mikera.vectorz Scalar])
   (:import [mikera.vectorz.impl IndexVector])
@@ -14,6 +11,7 @@
   (:import [mikera.indexz AIndex Index])
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
+  (:import [mikera.matrixx.decompose QR IQRResult Cholesky ICholeskyResult ICholeskyLDUResult])
   (:refer-clojure :exclude [vector?]))
 
 (set! *warn-on-reflection* true)
@@ -24,18 +22,28 @@
   (let [tagged-sym (vary-meta (gensym "res") assoc :tag tag)]
     `(let [~tagged-sym ~form] ~tagged-sym)))
 
+(defn vectorz-type? [tag]
+  (let [^String stag (if (class? tag) (.getName ^Class tag) (str tag))]
+    (or (.startsWith stag "mikera.vectorz.")
+        (.startsWith stag "mikera.matrixx.")
+        (.startsWith stag "mikera.indexz.")
+        (.startsWith stag "mikera.arrayz."))))
+
 (defmacro vectorz-coerce 
   "Coerces the argument to a vectorz INDArray. Broadcasts to the shape of target if provided."
   ([x]
-  `(tag-symbol mikera.arrayz.INDArray
+    (if (and (symbol? x) (vectorz-type? (:tag (meta x))))
+      x ;; return tagged symbol unchanged
+      `(tag-symbol mikera.arrayz.INDArray
                (let [x# ~x]
-                 (if (instance? INDArray x#) x# (vectorz-coerce* x#)))))
+                 (if (instance? INDArray x#) x# (vectorz-coerce* x#))))))
   ([target x]
     `(let [m# ~target
            x# (vectorz-coerce ~x)]
-       (if (< (.dimensionality x#) (.dimensionality m#)) 
-         (.broadcastLike x# m#) 
-         x#))))
+       (tag-symbol mikera.arrayz.INDArray
+         (if (< (.dimensionality x#) (.dimensionality m#)) 
+           (.broadcastLike x# m#) 
+           x#)))))
 
 (defmacro vectorz-clone 
   "Coerces the argument to a new (cloned) vectorz INDArray"
@@ -85,7 +93,8 @@
          ~sym))))
 
 (defmacro with-broadcast-clone 
-  "Executes body with a broadcasted clone of a and a broadcasted INDArray version of b. Returns broadcasted clone of a."
+  "Executes body with a broadcasted clone of a and a broadcasted INDArray version of b. 
+   Returns the broadcasted clone of a."
   ([[a b] & body]
      (when-not (and (symbol? a) (symbol? b)) (error "Symbols required for with-broadcast-clone binding"))
      (let []
@@ -94,9 +103,19 @@
          ~@body
          ~a))))
 
+(defmacro with-broadcast-coerce 
+  "Executes body with a and a coerced INDArray version of b. Returns result of body."
+  ([[a b] & body]
+     (when-not (and (symbol? a) (symbol? b)) (error "Symbols required for with-broadcast-clone binding"))
+     (let []
+      `(let [~b (vectorz-coerce ~a ~b)
+             ~a (.broadcastLike ~a ~b)]
+         ~@body))))
+
 (def ^{:tag Class :const true} INT-ARRAY-CLASS (Class/forName "[I"))
 
 (defmacro int-array-coerce
+  "Coerces an arbitrary object to an int array"
   ([m]
     `(tag-symbol ~'ints          
        (let [m# ~m] 
@@ -127,6 +146,7 @@
 	           (let [[~@syms] (seq ~isym)] ~@body))))))
 
 (defn avector-coerce* 
+  "Coerces to an AVector instance, broadcasting if necessary" 
   (^AVector [^AVector v m]
 	  (cond 
       (number? m) 
@@ -142,6 +162,7 @@
       :else (Vectorz/toVector ^INDArray (vectorz-coerce* m))))) 
 
 (defn amatrix-coerce* 
+  "Coerces to an AMatrix instance, broadcasting if necessary" 
   (^AMatrix [^AMatrix v m]
 	  (cond
       (number? m) 
@@ -154,7 +175,7 @@
 
     
 (defn vectorz-coerce* 
-  "Function to attempt conversion to Vectorz objects. May return nil if conversion fails."
+  "Function to attempt conversion to a Vectorz INDArray object. May return nil if conversion fails."
   (^INDArray [p]
 	  (let [dims (dimensionality p)]
 	    (cond
@@ -210,6 +231,35 @@
                                         ;; (println m vm (shape vm))
                                         (assign! (mp/new-matrix-nd m (shape vm)) vm)))))))
          ['mikera.vectorz.AVector 'mikera.matrixx.AMatrix 'mikera.vectorz.AScalar 'mikera.arrayz.INDArray 'mikera.indexz.AIndex]) ))
+
+(defmacro with-keys
+  [available required]
+  (let [result-sym (gensym)]
+           `(if ~required
+              (let
+                      [~result-sym {}
+                       ~@(mapcat (fn [[k v]] `(~result-sym (if (some #{~k} ~required) 
+                                                             (assoc ~result-sym ~k ~v)
+                                                             ~result-sym)))
+                                 available)]
+                      ~result-sym)
+              ~available)))
+
+(extend-protocol mp/PQRDecomposition
+  AMatrix
+    (qr [m options]
+      (let
+        [result (QR/decompose m)]
+        (with-keys {:Q (.getQ result) :R (.getR result)} (:return options)))))
+
+(extend-protocol mp/PCholeskyDecomposition
+  AMatrix
+  (cholesky [m options] 
+      (let
+        [result (Cholesky/decompose m)]
+        (if result
+          (with-keys {:L (.getL result) :L* (.getU result)} (:return options))
+          nil))))
 
 (extend-protocol mp/PTypeInfo
   INDArray
@@ -435,7 +485,7 @@
     (identity-matrix [m dims] 
       (Matrixx/createIdentityMatrix (int dims)))
     (diagonal-matrix [m diagonal-values] 
-      (DiagonalMatrix/create (Vectorz/toVector diagonal-values))))
+      (Matrixx/createDiagonalMatrix (Vectorz/toVector diagonal-values))))
 
 (extend-protocol mp/PPermutationMatrix
   INDArray
@@ -512,7 +562,7 @@
       (let [m (.clone m)] (.set m (int row) (int column) (double v)) m))
     (set-nd [m indexes v]
       (if (== 2 (count indexes))
-        (let [m (.clone m)] (.set m (int (first indexes)) (int (second indexes)) (double v)))
+        (with-clone [m] (.set m (int (first indexes)) (int (second indexes)) (double v)))
         (error "Can't do " (count indexes) "-dimensional set on a 2D matrix!")))
     (is-mutable? [m] (.isFullyMutable m)))
     
@@ -553,6 +603,10 @@
         (.set m (int (first indexes)) (int (second indexes)) (double v))
         (error "Can't do " (count indexes) "-dimensional set on a 2D matrix!"))))
 
+(extend-protocol mp/PSparseArray
+  INDArray
+    (is-sparse? [m]
+      (.isSparse m)))
 
 (extend-protocol mp/PMatrixEquality
   INDArray
@@ -579,7 +633,7 @@
         (.slice m (int 1) (int i))
         (error "Can't get column of array with dimensionality: " (mp/dimensionality m))))
     (get-major-slice [m i]
-      (.slice m (int i)))
+      (.sliceValue m (int i)))
     (get-slice [m dimension i]
       (let [dimension (int dimension)]
         (.slice m dimension (int i))))
@@ -589,10 +643,10 @@
     (get-column [m i]
       (error "Can't access column of a 1D vector!"))
     (get-major-slice [m i]
-      (.slice m (int i)))
+      (.sliceValue m (int i)))
     (get-slice [m dimension i]
       (if (== 0 dimension)
-        (.slice m (int i))
+        (.sliceValue m (int i))
         (error "Can't get slice from vector with dimension: " dimension)))
   AMatrix
     (get-row [m i]
@@ -608,6 +662,22 @@
           (== 1 dimension) (.getColumn m (int i))
           :else (error "Can't get slice from matrix with dimension: " dimension)))))
 
+(extend-protocol mp/PRowSetting
+  AMatrix
+    (set-row [m i row]
+      (with-clone [m]
+        (.setRow m (int i) (avector-coerce (.getRow m 0) row))))
+    (set-row! [m i row]
+      (.setRow m (int i) (avector-coerce (.getRow m 0) row))))
+
+(extend-protocol mp/PColumnSetting
+  AMatrix
+    (set-column [m i v]
+      (with-clone [m]
+        (.setColumn m (int i) (avector-coerce (.getColumn m 0) v))))
+    (set-column! [m i v]
+      (.setColumn m (int i) (avector-coerce (.getColumn m 0) v))))
+
 (extend-protocol mp/PSliceView
   INDArray
     (get-major-slice-view [m i] 
@@ -616,7 +686,7 @@
 (extend-protocol mp/PSliceSeq
   INDArray  
     (get-major-slice-seq [m] 
-      (seq (.getSliceViews m)))
+      (seq (.getSlices m)))
   AVector  
     (get-major-slice-seq [m] 
       (seq (or (.asDoubleArray m) (.toDoubleArray m))))
@@ -708,6 +778,43 @@
             l1 (int (if rr (second rr) (.length m)))]
         (.subVector m s1 l1)))) 
 
+;; protocols for indexed access
+
+(extend-protocol mp/PSelect
+  AVector
+    (select [a args] 
+      (let [ixs (int-array-coerce (first args))]
+        (.select a ixs))))
+
+(extend-protocol mp/PSetSelection
+  AVector
+    (set-selection [a args values] 
+      (let [ixs (int-array-coerce (first args))
+            sv (.select a ixs)
+            vs (avector-coerce sv values)]
+        (.set sv vs))))
+
+(extend-protocol mp/PIndicesAccess
+  INDArray
+  (get-indices [a indices] 
+    (let [c (int (count indices))
+          r (Vectorz/newVector c)]
+      (doseq-indexed [ix indices i]
+        (.unsafeSet r (int i) (.get a (int-array-coerce ix))))
+      r)))
+
+(extend-protocol mp/PIndicesSetting
+  INDArray
+    (set-indices [a indices values] 
+      (mp/set-indices! (.clone a) indices values))
+    (set-indices! [a indices values] 
+      (let [c (int (count indices))
+            vs (avector-coerce values)]
+        (doseq-indexed [ix indices i]
+          (.set a (int-array-coerce ix) (.get vs (int i)))))))
+
+;; protocols for elementwise ops
+
 (extend-protocol mp/PSummable
   INDArray 
     (element-sum [m]
@@ -725,28 +832,24 @@
 (extend-protocol mp/PMatrixAdd
   mikera.vectorz.AScalar
     (matrix-add [m a]
-      (with-broadcast-clone [m a] (.add m a)))
+      (with-broadcast-coerce [m a] (.addCopy m a)))
     (matrix-sub [m a]
-      (with-broadcast-clone [m a] (.sub m a)))
+      (with-broadcast-coerce [m a] (.subCopy m a)))
   mikera.vectorz.AVector
     (matrix-add [m a]
-      (if (instance? AVector a)
-        (with-clone [m] (.add m ^AVector a)))
-        (with-broadcast-clone [m a] (.add m a)))
+      (with-broadcast-coerce [m a] (.addCopy m a)))
     (matrix-sub [m a]
-      (if (instance? AVector a)
-        (with-clone [m] (.sub m ^AVector a)))
-        (with-broadcast-clone [m a] (.sub m a)))
+      (with-broadcast-coerce [m a] (.subCopy m a)))
   mikera.matrixx.AMatrix
     (matrix-add [m a]
-      (with-broadcast-clone [m a] (.add m a)))
+      (with-broadcast-coerce [m a] (.addCopy m a)))
     (matrix-sub [m a]
-      (with-broadcast-clone [m a] (.sub m a)))
+      (with-broadcast-coerce [m a] (.subCopy m a)))
   INDArray
     (matrix-add [m a]
-      (with-broadcast-clone [m a] (.add m a)))
+      (with-broadcast-coerce [m a] (.addCopy m a)))
     (matrix-sub [m a]
-      (with-broadcast-clone [m a] (.sub m a))))
+      (with-broadcast-coerce [m a] (.subCopy m a))))
 
 (extend-protocol mp/PMatrixAddMutable
   INDArray
@@ -883,7 +986,7 @@
     (matrix-multiply [m a]
       (.innerProduct m (vectorz-coerce a)))
     (element-multiply [m a]
-      (with-broadcast-clone [m a] (.multiply m a)))
+      (with-broadcast-coerce [m a] (.multiplyCopy m a)))
   AMatrix
     (matrix-multiply [m a]
       (cond 
@@ -1100,6 +1203,12 @@
     (distance [a b]
       (.distance a (avector-coerce b))))
 
+(extend-protocol mp/PElementMinMax
+  INDArray
+  (element-min [m]
+    (.elementMin m))
+  (element-max [m]
+    (.elementMax m)))
 
 (extend-protocol mp/PComputeMatrix
   INDArray

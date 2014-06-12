@@ -58,7 +58,9 @@
   (is (instance? AVector (array [1 2])))
   (is (equals [1 1 1] (div (array [2 2 2]) 2)))
   (is (equals [[1 2] [3 4] [5 6]] (join (array [[1 2] [3 4]]) (array [[5 6]]))))
-  (is (equals [[1 3] [2 4] [5 6]] (join (transpose (array [[1 2] [3 4]])) (array [[5 6]])))))
+  (is (equals [[1 3] [2 4] [5 6]] (join (transpose (array [[1 2] [3 4]])) (array [[5 6]]))))
+  (is (= 1.0 (slice (array [0 1 2]) 1)))
+  (is (mp/set-nd (matrix :vectorz [[1 2][3 4]]) [0 1] 3)))
 
 (deftest test-mget-regressions
   (is (== 3 (mget (mset (zero-array [4 4]) 0 2 3) 0 2)))
