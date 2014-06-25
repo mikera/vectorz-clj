@@ -12,6 +12,7 @@
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
   (:import [mikera.matrixx.decompose QR IQRResult Cholesky ICholeskyResult ICholeskyLDUResult])
+  (:import [mikera.matrixx.decompose SVD ISVDResult LUP ILUPResult])
   (:refer-clojure :exclude [vector?]))
 
 (set! *warn-on-reflection* true)
@@ -252,6 +253,13 @@
         [result (QR/decompose m)]
         (with-keys {:Q (.getQ result) :R (.getR result)} (:return options)))))
 
+(extend-protocol mp/PLUDecomposition
+  AMatrix
+    (lu [m]
+      (let
+        [result (LUP/decompose m)]
+        {:L (.getL result) :U (.getU result) :P (.getP result)})))
+
 (extend-protocol mp/PCholeskyDecomposition
   AMatrix
   (cholesky [m options] 
@@ -259,6 +267,15 @@
         [result (Cholesky/decompose m)]
         (if result
           (with-keys {:L (.getL result) :L* (.getU result)} (:return options))
+          nil))))
+
+(extend-protocol mp/PSVDDecomposition
+  AMatrix
+  (svd [m options] 
+      (let
+        [result (SVD/decompose m)]
+        (if result
+          (with-keys {:U (.getU result) :S (.getS result) :V (.getV result)} (:return options))
           nil))))
 
 (extend-protocol mp/PTypeInfo
