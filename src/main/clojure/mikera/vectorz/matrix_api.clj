@@ -255,10 +255,10 @@
 
 (extend-protocol mp/PLUDecomposition
   AMatrix
-    (lu [m]
+    (lu [m options]
       (let
         [result (LUP/decompose m)]
-        {:L (.getL result) :U (.getU result) :P (.getP result)})))
+        (with-keys {:L (.getL result) :U (.getU result) :P (.getP result)} (:return options)))))
 
 (extend-protocol mp/PCholeskyDecomposition
   AMatrix
@@ -275,7 +275,7 @@
       (let
         [result (SVD/decompose m)]
         (if result
-          (with-keys {:U (.getU result) :S (.getS result) :V (.getV result)} (:return options))
+          (with-keys {:U (.getU result) :S (.getS result) :V* (.getTranspose (.getV result))} (:return options))
           nil))))
 
 (extend-protocol mp/PTypeInfo

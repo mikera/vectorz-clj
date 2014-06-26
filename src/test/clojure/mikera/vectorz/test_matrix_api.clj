@@ -352,6 +352,84 @@
     (aset-double a 4 9999)
     (is (equals v [1 2 3 4 5]))))
 
+(deftest test-QR-decomposition
+  (let [epsilon 0.00001]
+    (testing "test0"
+      (let [M (matrix [[1 2 3][4 5 6][7 8 9]])
+            {:keys [Q R]} (clojure.core.matrix.linear/qr M {:return [:Q]})]
+        (is (orthogonal? Q))
+        (is (and Q (not R)))))
+    (testing "test1"
+      (let [M (matrix [[1 2 3][4 5 6][7 8 9]])
+            {:keys [Q R]} (clojure.core.matrix.linear/qr M {:return [:Q :R]})]
+        (is (orthogonal? Q))
+        (is (upper-triangular? R))
+        (is (equals M (mmul Q R) epsilon))))
+    (testing "test2"
+      (let [M (matrix [[111 222 333][444 555 666][777 888 999]])
+            {:keys [Q R]} (clojure.core.matrix.linear/qr M nil)]
+        (is (orthogonal? Q))
+        (is (upper-triangular? R))
+        (is (equals M (mmul Q R) epsilon))))
+    (testing "test3"
+      (let [M (matrix [[-1 2 0][14 51 6.23][7.1242 -8.4 119]])
+            {:keys [Q R]} (clojure.core.matrix.linear/qr M)]
+        (is (orthogonal? Q))
+        (is (upper-triangular? R))
+        (is (equals M (mmul Q R) epsilon))))))
+
+(deftest test-LUP-decomposition
+  (let [epsilon 0.00001]
+    (testing "test0"
+      (let [M (matrix [[1 2 3][4 5 6][7 8 9]])
+            {:keys [L U P]} (clojure.core.matrix.linear/lu M {:return [:U]})]
+        (is (upper-triangular? U))
+        (is (and U (not L) (not P)))))
+    (testing "test1"
+      (let [M (matrix [[1 2 3][4 5 6][7 8 9]])
+            {:keys [L U P]} (clojure.core.matrix.linear/lu M {:return [:L :U :P]})
+            p (matrix [[0.0 1.0 0.0][0.0 0.0 1.0][1.0 0.0 0.0]])]
+        (is (lower-triangular? L))
+        (is (upper-triangular? U))
+        (is (equals P p epsilon))
+        (is (equals M (mmul P L U) epsilon))))
+    (testing "test2"
+      (let [M (matrix [[76 87 98][11 21 32][43 54 65]])
+            {:keys [L U P]} (clojure.core.matrix.linear/lu M)
+            p (matrix [[1.0 0.0 0.0][0.0 1.0 0.0][0.0 0.0 1.0]])]
+        (is (lower-triangular? L))
+        (is (upper-triangular? U))
+        (is (equals P p epsilon))
+        (is (equals M (mmul P L U) epsilon))))))
+
+(deftest test-SVD-decomposition
+  (let [epsilon 0.00001]
+    (testing "test0"
+      (let [M (matrix [[1 2 3][4 5 6][7 8 9]])
+            {:keys [U S V*]} (clojure.core.matrix.linear/svd M {:return [:S]})]
+        (is (and S (not U) (not V*)))))
+    (testing "test1"
+      (let [M (matrix [[1 2 3][4 5 6][7 8 9]])
+            {:keys [U S V*]} (clojure.core.matrix.linear/svd M {:return [:U :S :V*]})]
+        (is (orthogonal? U))
+        (is (orthogonal? V*))
+        (is (diagonal? S))
+        (is (equals M (mmul U S V*) epsilon))))
+    (testing "test2"
+      (let [M (matrix [[12 234 3.23][-2344 -235 61][-7 18.34 9]])
+            {:keys [U S V*]} (clojure.core.matrix.linear/svd M)]
+        (is (orthogonal? U))
+        (is (orthogonal? V*))
+        (is (diagonal? S))
+        (is (equals M (mmul U S V*) epsilon))))
+    (testing "test3"
+      (let [M (matrix [[76 87 98][11 21 32][43 54 65]])
+            {:keys [U S V*]} (clojure.core.matrix.linear/svd M nil)]
+        (is (orthogonal? U))
+        (is (orthogonal? V*))
+        (is (diagonal? S))
+        (is (equals M (mmul U S V*) epsilon))))))
+
 ;; run compliance tests
 
 (deftest instance-tests
