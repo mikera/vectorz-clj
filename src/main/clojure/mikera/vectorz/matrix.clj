@@ -105,7 +105,7 @@
           mat (new-matrix rc cc)]
       (dotimes [i rc]
         (let [^AVector v (vecs i)
-              ^AVector row (get-row mat i)]
+              ^AVector row (.getRowView mat i)]
           (.copyTo v row (int 0))))
       mat)))
 
