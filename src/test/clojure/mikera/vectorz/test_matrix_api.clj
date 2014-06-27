@@ -430,6 +430,29 @@
         (is (diagonal? S))
         (is (equals M (mmul U S V*) epsilon))))))
 
+(deftest test-Cholesky-decomposition
+  (let [epsilon 0.00001]
+    (testing "test0"
+      (let [M (matrix [[1 2 3][4 5 6][7 8 9]])
+            result (clojure.core.matrix.linear/cholesky M)]
+        (is (nil? result))))
+    (testing "test1"
+      (let [M (matrix [[4 12 -16][12 37 -43][-16 -43 98]])
+            {:keys [L L*]} (clojure.core.matrix.linear/cholesky M {:return [:L]})]
+        (is (lower-triangular? L))
+        (is (and L (not L*)))
+        (is (equals M (mmul L (transpose L)) epsilon))
+        (is (reduce (fn [a b] (and a (> b 0))) true (diagonal L)))))
+    (testing "test1"
+      (let [M (matrix [[2 -1 0][-1 2 -1][0 -1 2]])
+            {:keys [L L*]} (clojure.core.matrix.linear/cholesky M {:return [:L :L*]})]
+        (is (lower-triangular? L))
+        (is (upper-triangular? L*))
+        (is (equals L (transpose L*) epsilon))
+        (is (equals M (mmul L L*) epsilon))
+        (is (reduce (fn [a b] (and a (> b 0))) true (diagonal L)))
+        (is (reduce (fn [a b] (and a (> b 0))) true (diagonal L*)))))))
+
 ;; run compliance tests
 
 (deftest instance-tests
