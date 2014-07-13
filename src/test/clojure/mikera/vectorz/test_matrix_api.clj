@@ -378,6 +378,24 @@
         (is (upper-triangular? R))
         (is (equals M (mmul Q R) epsilon))))))
 
+; TODO: Uncomment when vectorz version 0.37.0 is released
+; (deftest test-QR-decomposition-rectangular
+;   (let [epsilon 0.00001]
+;     (testing "should decompose wide matrices"
+;       (let [M (matrix [[1 2 3 4 5][6 7 8 9 10][11 12 13 14 15]])
+;             {:keys [Q R]} (clojure.core.matrix.linear/qr M)]
+;         (is (= [3 3](shape Q)))
+;         (is (orthogonal? Q))
+;         (is (= [3 5](shape R)))
+;         (is (equals M (mmul Q R) epsilon))))
+;     (testing "should decompose tall matrices"
+;       (let [M (matrix [[1 2 3][4 5 6][7 8 9][10 11 12][13 14 15]])
+;             {:keys [Q R]} (clojure.core.matrix.linear/qr M)]
+;         (is (= [5 5](shape Q)))
+;         (is (orthogonal? Q))
+;         (is (= [5 3](shape R)))
+;         (is (equals M (mmul Q R) epsilon))))))
+
 (deftest test-LUP-decomposition
   (let [epsilon 0.00001]
     (testing "test0"
@@ -410,25 +428,25 @@
         (is (and S (not U) (not V*)))))
     (testing "test1"
       (let [M (matrix [[1 2 3][4 5 6][7 8 9]])
-            {:keys [U S V*]} (clojure.core.matrix.linear/svd M {:return [:U :S :V*]})]
+            {:keys [U S V*]} (clojure.core.matrix.linear/svd M {:return [:U :S :V*]})
+            S_matrix (diagonal-matrix :vectorz S)]
         (is (orthogonal? U))
         (is (orthogonal? V*))
-        (is (diagonal? S))
-        (is (equals M (mmul U S V*) epsilon))))
+        (is (equals M (mmul U S_matrix V*) epsilon))))
     (testing "test2"
       (let [M (matrix [[12 234 3.23][-2344 -235 61][-7 18.34 9]])
-            {:keys [U S V*]} (clojure.core.matrix.linear/svd M)]
+            {:keys [U S V*]} (clojure.core.matrix.linear/svd M)
+            S_matrix (diagonal-matrix :vectorz S)]
         (is (orthogonal? U))
         (is (orthogonal? V*))
-        (is (diagonal? S))
-        (is (equals M (mmul U S V*) epsilon))))
+        (is (equals M (mmul U S_matrix V*) epsilon))))
     (testing "test3"
       (let [M (matrix [[76 87 98][11 21 32][43 54 65]])
-            {:keys [U S V*]} (clojure.core.matrix.linear/svd M nil)]
+            {:keys [U S V*]} (clojure.core.matrix.linear/svd M nil)
+            S_matrix (diagonal-matrix :vectorz S)]
         (is (orthogonal? U))
         (is (orthogonal? V*))
-        (is (diagonal? S))
-        (is (equals M (mmul U S V*) epsilon))))))
+        (is (equals M (mmul U S_matrix V*) epsilon))))))
 
 (deftest test-Cholesky-decomposition
   (let [epsilon 0.00001]
