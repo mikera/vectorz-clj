@@ -275,7 +275,7 @@
       (let
         [result (SVD/decompose m)]
         (if result
-          (with-keys {:U (.getU result) :S (.getLeadingDiagonal (.getS result)) :V* (.getTranspose (.getV result))} (:return options))
+          (with-keys {:U (.getU result) :S (diagonal (.getS result)) :V* (.getTranspose (.getV result))} (:return options))
           nil))))
 
 (extend-protocol mp/PTypeInfo
