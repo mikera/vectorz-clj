@@ -472,6 +472,22 @@
         (is (reduce (fn [a b] (and a (> b 0))) true (diagonal L)))
         (is (reduce (fn [a b] (and a (> b 0))) true (diagonal L*)))))))
 
+(deftest test-norm
+  (let [M (matrix [[1 2 3][4 5 6][7 8 9]])]
+    (is (equals 45.0 (li/norm M 1) 1e-10))
+    (is (equals 16.88194301613 (li/norm M 2) 1e-10))
+    (is (equals 16.88194301613 (li/norm M) 1e-10))
+    (is (equals 16.88194301613 (li/norm M :frobenius) 1e-10))
+    (is (equals 12.65148997952 (li/norm M 3) 1e-10))))
+
+(deftest test-rank
+  (let [M1 (matrix [[1 2 3][4 5 6][7 8 9]])
+        M2 (identity-matrix 3)
+        M3 (matrix [[1 1 1][1 1 1][1 1 1]])]
+    (is (equals 2 (li/rank M1)))
+    (is (equals 3 (li/rank M2)))
+    (is (equals 1 (li/rank M3)))))
+
 ;; run compliance tests
 
 (deftest instance-tests
