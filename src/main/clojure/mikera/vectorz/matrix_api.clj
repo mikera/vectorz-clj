@@ -278,6 +278,15 @@
           (with-keys {:U (.getU result) :S (diagonal (.getS result)) :V* (.getTranspose (.getV result))} (:return options))
           nil))))
 
+(extend-protocol mp/PNorm
+  INDArray
+    (vector-norm [m p]
+      (if (number? p) 
+        (Math/pow (.elementAbsPowSum m p) (/ 1 p))
+        (Math/pow (.elementAbsPowSum m 2) (/ 1 2))))
+    (matrix-norm [m p]
+      (mp/vector-norm m p)))
+
 (extend-protocol mp/PTypeInfo
   INDArray
     (element-type [m] (Double/TYPE))
