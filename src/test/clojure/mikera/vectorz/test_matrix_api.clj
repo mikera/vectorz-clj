@@ -5,6 +5,7 @@
   (:require [clojure.core.matrix.operators :refer [+ - *]])
   (:require clojure.core.matrix.compliance-tester)
   (:require [clojure.core.matrix.protocols :as mp])
+  (:require [clojure.core.matrix.linear :as li])
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])
   (:require [mikera.vectorz.matrix-api])
@@ -356,24 +357,24 @@
   (let [epsilon 0.00001]
     (testing "test0"
       (let [M (matrix [[1 2 3][4 5 6][7 8 9]])
-            {:keys [Q R]} (clojure.core.matrix.linear/qr M {:return [:Q]})]
+            {:keys [Q R]} (li/qr M {:return [:Q]})]
         (is (orthogonal? Q))
         (is (and Q (not R)))))
     (testing "test1"
       (let [M (matrix [[1 2 3][4 5 6][7 8 9]])
-            {:keys [Q R]} (clojure.core.matrix.linear/qr M {:return [:Q :R]})]
+            {:keys [Q R]} (li/qr M {:return [:Q :R]})]
         (is (orthogonal? Q))
         (is (upper-triangular? R))
         (is (equals M (mmul Q R) epsilon))))
     (testing "test2"
       (let [M (matrix [[111 222 333][444 555 666][777 888 999]])
-            {:keys [Q R]} (clojure.core.matrix.linear/qr M nil)]
+            {:keys [Q R]} (li/qr M nil)]
         (is (orthogonal? Q))
         (is (upper-triangular? R))
         (is (equals M (mmul Q R) epsilon))))
     (testing "test3"
       (let [M (matrix [[-1 2 0][14 51 6.23][7.1242 -8.4 119]])
-            {:keys [Q R]} (clojure.core.matrix.linear/qr M)]
+            {:keys [Q R]} (li/qr M)]
         (is (orthogonal? Q))
         (is (upper-triangular? R))
         (is (equals M (mmul Q R) epsilon))))))
@@ -383,14 +384,14 @@
 ;   (let [epsilon 0.00001]
 ;     (testing "should decompose wide matrices"
 ;       (let [M (matrix [[1 2 3 4 5][6 7 8 9 10][11 12 13 14 15]])
-;             {:keys [Q R]} (clojure.core.matrix.linear/qr M)]
+;             {:keys [Q R]} (li/qr M)]
 ;         (is (= [3 3](shape Q)))
 ;         (is (orthogonal? Q))
 ;         (is (= [3 5](shape R)))
 ;         (is (equals M (mmul Q R) epsilon))))
 ;     (testing "should decompose tall matrices"
 ;       (let [M (matrix [[1 2 3][4 5 6][7 8 9][10 11 12][13 14 15]])
-;             {:keys [Q R]} (clojure.core.matrix.linear/qr M)]
+;             {:keys [Q R]} (li/qr M)]
 ;         (is (= [5 5](shape Q)))
 ;         (is (orthogonal? Q))
 ;         (is (= [5 3](shape R)))
@@ -400,12 +401,12 @@
   (let [epsilon 0.00001]
     (testing "test0"
       (let [M (matrix [[1 2 3][4 5 6][7 8 9]])
-            {:keys [L U P]} (clojure.core.matrix.linear/lu M {:return [:U]})]
+            {:keys [L U P]} (li/lu M {:return [:U]})]
         (is (upper-triangular? U))
         (is (and U (not L) (not P)))))
     (testing "test1"
       (let [M (matrix [[1 2 3][4 5 6][7 8 9]])
-            {:keys [L U P]} (clojure.core.matrix.linear/lu M {:return [:L :U :P]})
+            {:keys [L U P]} (li/lu M {:return [:L :U :P]})
             p (matrix [[0.0 1.0 0.0][0.0 0.0 1.0][1.0 0.0 0.0]])]
         (is (lower-triangular? L))
         (is (upper-triangular? U))
@@ -413,7 +414,7 @@
         (is (equals M (mmul P L U) epsilon))))
     (testing "test2"
       (let [M (matrix [[76 87 98][11 21 32][43 54 65]])
-            {:keys [L U P]} (clojure.core.matrix.linear/lu M)
+            {:keys [L U P]} (li/lu M)
             p (matrix [[1.0 0.0 0.0][0.0 1.0 0.0][0.0 0.0 1.0]])]
         (is (lower-triangular? L))
         (is (upper-triangular? U))
@@ -424,25 +425,25 @@
   (let [epsilon 0.00001]
     (testing "test0"
       (let [M (matrix [[1 2 3][4 5 6][7 8 9]])
-            {:keys [U S V*]} (clojure.core.matrix.linear/svd M {:return [:S]})]
+            {:keys [U S V*]} (li/svd M {:return [:S]})]
         (is (and S (not U) (not V*)))))
     (testing "test1"
       (let [M (matrix [[1 2 3][4 5 6][7 8 9]])
-            {:keys [U S V*]} (clojure.core.matrix.linear/svd M {:return [:U :S :V*]})
+            {:keys [U S V*]} (li/svd M {:return [:U :S :V*]})
             S_matrix (diagonal-matrix :vectorz S)]
         (is (orthogonal? U))
         (is (orthogonal? V*))
         (is (equals M (mmul U S_matrix V*) epsilon))))
     (testing "test2"
       (let [M (matrix [[12 234 3.23][-2344 -235 61][-7 18.34 9]])
-            {:keys [U S V*]} (clojure.core.matrix.linear/svd M)
+            {:keys [U S V*]} (li/svd M)
             S_matrix (diagonal-matrix :vectorz S)]
         (is (orthogonal? U))
         (is (orthogonal? V*))
         (is (equals M (mmul U S_matrix V*) epsilon))))
     (testing "test3"
       (let [M (matrix [[76 87 98][11 21 32][43 54 65]])
-            {:keys [U S V*]} (clojure.core.matrix.linear/svd M nil)
+            {:keys [U S V*]} (li/svd M nil)
             S_matrix (diagonal-matrix :vectorz S)]
         (is (orthogonal? U))
         (is (orthogonal? V*))
@@ -452,18 +453,18 @@
   (let [epsilon 0.00001]
     (testing "test0"
       (let [M (matrix [[1 2 3][4 5 6][7 8 9]])
-            result (clojure.core.matrix.linear/cholesky M)]
+            result (li/cholesky M)]
         (is (nil? result))))
     (testing "test1"
       (let [M (matrix [[4 12 -16][12 37 -43][-16 -43 98]])
-            {:keys [L L*]} (clojure.core.matrix.linear/cholesky M {:return [:L]})]
+            {:keys [L L*]} (li/cholesky M {:return [:L]})]
         (is (lower-triangular? L))
         (is (and L (not L*)))
         (is (equals M (mmul L (transpose L)) epsilon))
         (is (reduce (fn [a b] (and a (> b 0))) true (diagonal L)))))
     (testing "test1"
       (let [M (matrix [[2 -1 0][-1 2 -1][0 -1 2]])
-            {:keys [L L*]} (clojure.core.matrix.linear/cholesky M {:return [:L :L*]})]
+            {:keys [L L*]} (li/cholesky M {:return [:L :L*]})]
         (is (lower-triangular? L))
         (is (upper-triangular? L*))
         (is (equals L (transpose L*) epsilon))
