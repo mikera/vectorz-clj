@@ -379,23 +379,22 @@
         (is (upper-triangular? R))
         (is (equals M (mmul Q R) epsilon))))))
 
-; TODO: Uncomment when vectorz version 0.37.0 is released
-; (deftest test-QR-decomposition-rectangular
-;   (let [epsilon 0.00001]
-;     (testing "should decompose wide matrices"
-;       (let [M (matrix [[1 2 3 4 5][6 7 8 9 10][11 12 13 14 15]])
-;             {:keys [Q R]} (li/qr M)]
-;         (is (= [3 3](shape Q)))
-;         (is (orthogonal? Q))
-;         (is (= [3 5](shape R)))
-;         (is (equals M (mmul Q R) epsilon))))
-;     (testing "should decompose tall matrices"
-;       (let [M (matrix [[1 2 3][4 5 6][7 8 9][10 11 12][13 14 15]])
-;             {:keys [Q R]} (li/qr M)]
-;         (is (= [5 5](shape Q)))
-;         (is (orthogonal? Q))
-;         (is (= [5 3](shape R)))
-;         (is (equals M (mmul Q R) epsilon))))))
+ (deftest test-QR-decomposition-rectangular
+   (let [epsilon 0.00001]
+     (testing "should decompose wide matrices"
+       (let [M (matrix [[1 2 3 4 5][6 7 8 9 10][11 12 13 14 15]])
+             {:keys [Q R]} (li/qr M)]
+         (is (= [3 3](shape Q)))
+         (is (orthogonal? Q))
+         (is (= [3 5](shape R)))
+         (is (equals M (mmul Q R) epsilon))))
+     (testing "should decompose tall matrices"
+       (let [M (matrix [[1 2 3][4 5 6][7 8 9][10 11 12][13 14 15]])
+             {:keys [Q R]} (li/qr M)]
+         (is (= [5 5](shape Q)))
+         (is (orthogonal? Q))
+         (is (= [5 3](shape R)))
+         (is (equals M (mmul Q R) epsilon))))))
 
 (deftest test-LUP-decomposition
   (let [epsilon 0.00001]
@@ -479,7 +478,14 @@
     (is (equals 9 (li/norm M java.lang.Double/POSITIVE_INFINITY) 1e-10))
     (is (equals 16.88194301613 (li/norm M) 1e-10))
     (is (equals 16.88194301613 (li/norm M :frobenius) 1e-10))
-    (is (equals 12.65148997952 (li/norm M 3) 1e-10))))
+    (is (equals 12.65148997952 (li/norm M 3) 1e-10))
+    (let [V (.asVector M)]
+      (is (equals 45.0 (li/norm V 1) 1e-10))
+      (is (equals 16.88194301613 (li/norm V 2) 1e-10))
+      (is (equals 9 (li/norm V java.lang.Double/POSITIVE_INFINITY) 1e-10))
+      (is (equals 16.88194301613 (li/norm V) 1e-10))
+      (is (equals 0.941944314533 (li/norm V -3) 1e-10))
+      (is (equals 12.65148997952 (li/norm V 3) 1e-10)))))
 
 (deftest test-rank
   (let [M1 (matrix [[1 2 3][4 5 6][7 8 9]])
