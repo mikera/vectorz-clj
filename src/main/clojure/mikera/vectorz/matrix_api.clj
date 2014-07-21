@@ -281,9 +281,10 @@
 (extend-protocol mp/PNorm
   INDArray
     (vector-norm [m p]
-      (if (number? p) 
-        (Math/pow (.elementAbsPowSum m p) (/ 1 p))
-        (Math/pow (.elementAbsPowSum m 2) (/ 1 2))))
+      (cond 
+        (= java.lang.Double/POSITIVE_INFINITY p) (.elementMax m)
+        (number? p) (Math/pow (.elementAbsPowSum m p) (/ 1 p))
+        :else (Math/pow (.elementAbsPowSum m 2) (/ 1 2))))
     (matrix-norm [m p]
       (mp/vector-norm m p)))
 
