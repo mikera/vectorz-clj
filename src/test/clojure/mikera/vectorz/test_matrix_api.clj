@@ -477,7 +477,6 @@
     (is (equals 16.88194301613 (li/norm M 2) 1e-10))
     (is (equals 9 (li/norm M java.lang.Double/POSITIVE_INFINITY) 1e-10))
     (is (equals 16.88194301613 (li/norm M) 1e-10))
-    (is (equals 16.88194301613 (li/norm M :frobenius) 1e-10))
     (is (equals 12.65148997952 (li/norm M 3) 1e-10))
     (let [V (.asVector M)]
       (is (equals 45.0 (li/norm V 1) 1e-10))

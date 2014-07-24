@@ -280,13 +280,11 @@
 
 (extend-protocol mp/PNorm
   INDArray
-    (vector-norm [m p]
+    (norm [m p]
       (cond 
         (= java.lang.Double/POSITIVE_INFINITY p) (.elementMax m)
         (number? p) (Math/pow (.elementAbsPowSum m p) (/ 1 p))
-        :else (Math/pow (.elementAbsPowSum m 2) (/ 1 2))))
-    (matrix-norm [m p]
-      (mp/vector-norm m p)))
+        :else (error "p must be a number"))))
 
 (extend-protocol mp/PMatrixRank
   AMatrix
