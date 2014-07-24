@@ -293,7 +293,7 @@
     (rank [m]
       (let [{:keys [S]} (mp/svd m {:return [:S]})
             eps 1e-10]
-        (reduce (fn [n ^double x] (if (< (java.lang.Math/abs x) eps) n (inc n))) 0 S)))) 
+        (reduce (fn [n x] (if (< (java.lang.Math/abs (double x)) eps) n (inc n))) 0 S)))) 
 
 (extend-protocol mp/PTypeInfo
   INDArray
