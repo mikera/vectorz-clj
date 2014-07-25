@@ -250,7 +250,9 @@
   AMatrix
     (qr [m options]
       (let
-        [result (QR/decompose m)]
+        [result (cond 
+                  (:compact options) (QR/decompose m true)
+                  :else (QR/decompose m))]
         (with-keys {:Q (.getQ result) :R (.getR result)} (:return options)))))
 
 (extend-protocol mp/PLUDecomposition
