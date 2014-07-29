@@ -11,6 +11,8 @@
   (:import [mikera.indexz AIndex Index])
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
+  (:import [mikera.matrixx.decompose QR IQRResult Cholesky ICholeskyResult ICholeskyLDUResult])
+  (:import [mikera.matrixx.decompose SVD ISVDResult LUP ILUPResult])
   (:refer-clojure :exclude [vector?]))
 
 (set! *warn-on-reflection* true)
@@ -230,6 +232,68 @@
                                         ;; (println m vm (shape vm))
                                         (assign! (mp/new-matrix-nd m (shape vm)) vm)))))))
          ['mikera.vectorz.AVector 'mikera.matrixx.AMatrix 'mikera.vectorz.AScalar 'mikera.arrayz.INDArray 'mikera.indexz.AIndex]) ))
+
+(defmacro with-keys
+  [available required]
+  (let [result-sym (gensym)]
+           `(if ~required
+              (let
+                      [~result-sym {}
+                       ~@(mapcat (fn [[k v]] `(~result-sym (if (some #{~k} ~required) 
+                                                             (assoc ~result-sym ~k ~v)
+                                                             ~result-sym)))
+                                 available)]
+                      ~result-sym)
+              ~available)))
+
+(extend-protocol mp/PQRDecomposition
+  AMatrix
+    (qr [m options]
+      (let
+        [result (cond 
+                  (:compact options) (QR/decompose m true)
+                  :else (QR/decompose m))]
+        (with-keys {:Q (.getQ result) :R (.getR result)} (:return options)))))
+
+(extend-protocol mp/PLUDecomposition
+  AMatrix
+    (lu [m options]
+      (let
+        [result (LUP/decompose m)]
+        (with-keys {:L (.getL result) :U (.getU result) :P (.getP result)} (:return options)))))
+
+(extend-protocol mp/PCholeskyDecomposition
+  AMatrix
+  (cholesky [m options] 
+      (let
+        [result (Cholesky/decompose m)]
+        (if result
+          (with-keys {:L (.getL result) :L* (.getU result)} (:return options))
+          nil))))
+
+(extend-protocol mp/PSVDDecomposition
+  AMatrix
+  (svd [m options] 
+      (let
+        [result (SVD/decompose m)]
+        (if result
+          (with-keys {:U (.getU result) :S (diagonal (.getS result)) :V* (.getTranspose (.getV result))} (:return options))
+          nil))))
+
+(extend-protocol mp/PNorm
+  INDArray
+    (norm [m p]
+      (cond 
+        (= java.lang.Double/POSITIVE_INFINITY p) (.elementMax m)
+        (number? p) (Math/pow (.elementAbsPowSum m p) (/ 1 p))
+        :else (error "p must be a number"))))
+
+(extend-protocol mp/PMatrixRank
+  AMatrix
+    (rank [m]
+      (let [{:keys [S]} (mp/svd m {:return [:S]})
+            eps 1e-10]
+        (reduce (fn [n x] (if (< (java.lang.Math/abs (double x)) eps) n (inc n))) 0 S)))) 
 
 (extend-protocol mp/PTypeInfo
   INDArray
@@ -748,6 +812,43 @@
             l1 (int (if rr (second rr) (.length m)))]
         (.subVector m s1 l1)))) 
 
+;; protocols for indexed access
+
+(extend-protocol mp/PSelect
+  AVector
+    (select [a args] 
+      (let [ixs (int-array-coerce (first args))]
+        (.select a ixs))))
+
+(extend-protocol mp/PSetSelection
+  AVector
+    (set-selection [a args values] 
+      (let [ixs (int-array-coerce (first args))
+            sv (.select a ixs)
+            vs (avector-coerce sv values)]
+        (.set sv vs))))
+
+(extend-protocol mp/PIndicesAccess
+  INDArray
+  (get-indices [a indices] 
+    (let [c (int (count indices))
+          r (Vectorz/newVector c)]
+      (doseq-indexed [ix indices i]
+        (.unsafeSet r (int i) (.get a (int-array-coerce ix))))
+      r)))
+
+(extend-protocol mp/PIndicesSetting
+  INDArray
+    (set-indices [a indices values] 
+      (mp/set-indices! (.clone a) indices values))
+    (set-indices! [a indices values] 
+      (let [c (int (count indices))
+            vs (avector-coerce values)]
+        (doseq-indexed [ix indices i]
+          (.set a (int-array-coerce ix) (.get vs (int i)))))))
+
+;; protocols for elementwise ops
+
 (extend-protocol mp/PSummable
   INDArray 
     (element-sum [m]
@@ -765,9 +866,9 @@
 (extend-protocol mp/PMatrixAdd
   mikera.vectorz.AScalar
     (matrix-add [m a]
-      (with-broadcast-clone [m a] (.add m a)))
+      (with-broadcast-coerce [m a] (.addCopy m a)))
     (matrix-sub [m a]
-      (with-broadcast-clone [m a] (.sub m a)))
+      (with-broadcast-coerce [m a] (.subCopy m a)))
   mikera.vectorz.AVector
     (matrix-add [m a]
       (with-broadcast-coerce [m a] (.addCopy m a)))
@@ -775,14 +876,14 @@
       (with-broadcast-coerce [m a] (.subCopy m a)))
   mikera.matrixx.AMatrix
     (matrix-add [m a]
-      (with-broadcast-clone [m a] (.add m a)))
+      (with-broadcast-coerce [m a] (.addCopy m a)))
     (matrix-sub [m a]
-      (with-broadcast-clone [m a] (.sub m a)))
+      (with-broadcast-coerce [m a] (.subCopy m a)))
   INDArray
     (matrix-add [m a]
-      (with-broadcast-clone [m a] (.add m a)))
+      (with-broadcast-coerce [m a] (.addCopy m a)))
     (matrix-sub [m a]
-      (with-broadcast-clone [m a] (.sub m a))))
+      (with-broadcast-coerce [m a] (.subCopy m a))))
 
 (extend-protocol mp/PMatrixAddMutable
   INDArray
@@ -1136,6 +1237,12 @@
     (distance [a b]
       (.distance a (avector-coerce b))))
 
+(extend-protocol mp/PElementMinMax
+  INDArray
+  (element-min [m]
+    (.elementMin m))
+  (element-max [m]
+    (.elementMax m)))
 
 (extend-protocol mp/PComputeMatrix
   INDArray
