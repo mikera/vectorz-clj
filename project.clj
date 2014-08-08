@@ -16,8 +16,8 @@
                  [org.clojure/test.check "0.5.8"]
                  [net.mikera/cljunit "0.3.1"]
                  [net.mikera/clojure-utils "0.6.1"]
-                 [net.mikera/core.matrix "0.27.1"]
+                 [net.mikera/core.matrix "0.28.0"]
                  [net.mikera/core.matrix.stats "0.4.0"]
-                 [net.mikera/vectorz "0.38.0"]]
+                 [net.mikera/vectorz "0.39.0"]]
   :repositories [["clojars.org" {:url "https://clojars.org/repo"
                                  :name "Clojars repository"}]])
