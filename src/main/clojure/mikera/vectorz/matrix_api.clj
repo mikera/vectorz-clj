@@ -12,7 +12,7 @@
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
   (:import [mikera.matrixx.decompose QR IQRResult Cholesky ICholeskyResult ICholeskyLDUResult])
-  (:import [mikera.matrixx.decompose SVD ISVDResult LUP ILUPResult])
+  (:import [mikera.matrixx.decompose SVD ISVDResult LUP ILUPResult Eigen IEigenResult])
   (:import [mikera.matrixx.solve Linear])
   (:refer-clojure :exclude [vector?]))
 

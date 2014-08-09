@@ -170,3 +170,11 @@
     (is (equals 2 (rank M1)))
     (is (equals 3 (rank M2)))
     (is (equals 1 (rank M3)))))
+
+(deftest test-solve
+  (let [M1 (matrix [[1 -2 1][0 1 6][0 0 1]])
+        M2 (matrix [[1 2 3][4 5 6][7 8 9]])    ;Singular matrix
+        V1 (.asVector (matrix [[4 -1 2]]))
+        A1 (.asVector (matrix [[-24 -13 2]]))]
+    (is (equals A1 (solve M1 V1) 1e-8))
+    (is (nil? (solve M2 V1)))))
