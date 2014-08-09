@@ -12,6 +12,7 @@
     (is (equals [2 1] (:S result)))
     (is (every? orthogonal? ((juxt :V* :U) result)))))
 
+;; TODO: Reinstate once linear algebra implementation complete
 ;(deftest test-solve
 ;  (let [A [[1 2]
 ;           [2 1]]
