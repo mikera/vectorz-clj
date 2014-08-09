@@ -11,3 +11,10 @@
     (is (every? v/vectorz? (vals result)))
     (is (equals [2 1] (:S result)))
     (is (every? orthogonal? ((juxt :V* :U) result)))))
+
+;(deftest test-solve
+;  (let [A [[1 2]
+;           [2 1]]
+;        b [22
+;           26]]
+;    (is (equals [10 6] (solve A b)))))
