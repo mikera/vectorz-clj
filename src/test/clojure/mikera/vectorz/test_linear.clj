@@ -178,3 +178,9 @@
         A1 (.asVector (matrix [[-24 -13 2]]))]
     (is (equals A1 (solve M1 V1) 1e-8))
     (is (nil? (solve M2 V1)))))
+
+(deftest test-least-squares
+  (let [M1 (matrix [[1 2][3 4][5 6]])
+        V1 (.asVector (matrix [[1 2 3]]))
+        A1 (.asVector (matrix [[0 0.5]]))]
+    (is (equals A1 (least-squares M1 V1) 1e-8))))
