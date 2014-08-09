@@ -301,6 +301,11 @@
     (solve [a ^AVector b]
       (Linear/solve a b)))
 
+(extend-protocol mp/PLeastSquares
+  AMatrix
+    (least-squares [a ^AVector b]
+      (Linear/solveLeastSquares a b)))
+
 (extend-protocol mp/PTypeInfo
   INDArray
     (element-type [m] (Double/TYPE))
