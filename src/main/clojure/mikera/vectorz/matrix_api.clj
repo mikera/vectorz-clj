@@ -299,12 +299,12 @@
 (extend-protocol mp/PSolveLinear
   AMatrix
     (solve [a ^AVector b]
-      (Linear/solve a b)))
+      (Linear/solve a (avector-coerce b))))
 
 (extend-protocol mp/PLeastSquares
   AMatrix
     (least-squares [a ^AVector b]
-      (Linear/solveLeastSquares a b)))
+      (Linear/solveLeastSquares a (avector-coerce b))))
 
 (extend-protocol mp/PTypeInfo
   INDArray
