@@ -13,6 +13,7 @@
   (:import [mikera.transformz ATransform])
   (:import [mikera.matrixx.decompose QR IQRResult Cholesky ICholeskyResult ICholeskyLDUResult])
   (:import [mikera.matrixx.decompose SVD ISVDResult LUP ILUPResult])
+  (:import [mikera.matrixx.solve Linear])
   (:refer-clojure :exclude [vector?]))
 
 (set! *warn-on-reflection* true)
@@ -293,7 +294,12 @@
     (rank [m]
       (let [{:keys [S]} (mp/svd m {:return [:S]})
             eps 1e-10]
-        (reduce (fn [n x] (if (< (java.lang.Math/abs (double x)) eps) n (inc n))) 0 S)))) 
+        (reduce (fn [n x] (if (< (java.lang.Math/abs (double x)) eps) n (inc n))) 0 S))))
+
+(extend-protocol mp/PSolveLinear
+  AMatrix
+    (solve [a ^AVector b]
+      (Linear/solve a b)))
 
 (extend-protocol mp/PTypeInfo
   INDArray
