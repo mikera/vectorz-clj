@@ -4,7 +4,7 @@
 ;; definitive source for build configuration.
 
 (defproject net.mikera/vectorz-clj "0.24.1-SNAPSHOT"
-  :description "Fast vector library for Clojure, building on VectorZ and using core.matrix"
+  :description "Fast vector library for Clojure, building on Vectorz and using core.matrix"
   :url "https://github.com/mikera/vectorz-clj"
   :license {:name "GNU Lesser General Public License (LGPL)"
             :url "http://www.gnu.org/licenses/lgpl.html"}
@@ -16,8 +16,8 @@
                  [org.clojure/test.check "0.5.8"]
                  [net.mikera/cljunit "0.3.1"]
                  [net.mikera/clojure-utils "0.6.1"]
-                 [net.mikera/core.matrix "0.27.1"]
+                 [net.mikera/core.matrix "0.28.0"]
                  [net.mikera/core.matrix.stats "0.4.0"]
-                 [net.mikera/vectorz "0.38.0"]]
+                 [net.mikera/vectorz "0.39.0"]]
   :repositories [["clojars.org" {:url "https://clojars.org/repo"
                                  :name "Clojars repository"}]])
