@@ -170,3 +170,21 @@
     (is (equals 2 (rank M1)))
     (is (equals 3 (rank M2)))
     (is (equals 1 (rank M3)))))
+
+(deftest test-solve
+  (let [M1 (matrix [[1 -2 1][0 1 6][0 0 1]])
+        M2 (matrix [[1 2 3][4 5 6][7 8 9]])    ;Singular matrix
+        V1 (array [4 -1 2])
+        V2 (vec [4 -1 2])
+        A1 (array [-24 -13 2])]
+    (is (equals A1 (solve M1 V1) 1e-8))
+    (is (equals A1 (solve M1 V2) 1e-8))
+    (is (nil? (solve M2 V1)))))
+
+(deftest test-least-squares
+  (let [M1 (matrix [[1 2][3 4][5 6]])
+        V1 (array [1 2 3])
+        V2 (vec [1 2 3])
+        A1 (array [0 0.5])]
+    (is (equals A1 (least-squares M1 V1) 1e-8))
+    (is (equals A1 (least-squares M1 V2) 1e-8))))
