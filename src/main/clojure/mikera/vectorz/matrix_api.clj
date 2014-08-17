@@ -11,6 +11,8 @@
   (:import [mikera.indexz AIndex Index])
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
+  (:import [mikera.matrixx.decompose QR IQRResult Cholesky ICholeskyResult ICholeskyLDUResult])
+  (:import [mikera.matrixx.decompose SVD ISVDResult LUP ILUPResult])
   (:refer-clojure :exclude [vector?]))
 
 (set! *warn-on-reflection* true)
@@ -230,6 +232,68 @@
                                         ;; (println m vm (shape vm))
                                         (assign! (mp/new-matrix-nd m (shape vm)) vm)))))))
          ['mikera.vectorz.AVector 'mikera.matrixx.AMatrix 'mikera.vectorz.AScalar 'mikera.arrayz.INDArray 'mikera.indexz.AIndex]) ))
+
+(defmacro with-keys
+  [available required]
+  (let [result-sym (gensym)]
+           `(if ~required
+              (let
+                      [~result-sym {}
+                       ~@(mapcat (fn [[k v]] `(~result-sym (if (some #{~k} ~required) 
+                                                             (assoc ~result-sym ~k ~v)
+                                                             ~result-sym)))
+                                 available)]
+                      ~result-sym)
+              ~available)))
+
+(extend-protocol mp/PQRDecomposition
+  AMatrix
+    (qr [m options]
+      (let
+        [result (cond 
+                  (:compact options) (QR/decompose m true)
+                  :else (QR/decompose m))]
+        (with-keys {:Q (.getQ result) :R (.getR result)} (:return options)))))
+
+(extend-protocol mp/PLUDecomposition
+  AMatrix
+    (lu [m options]
+      (let
+        [result (LUP/decompose m)]
+        (with-keys {:L (.getL result) :U (.getU result) :P (.getP result)} (:return options)))))
+
+(extend-protocol mp/PCholeskyDecomposition
+  AMatrix
+  (cholesky [m options] 
+      (let
+        [result (Cholesky/decompose m)]
+        (if result
+          (with-keys {:L (.getL result) :L* (.getU result)} (:return options))
+          nil))))
+
+(extend-protocol mp/PSVDDecomposition
+  AMatrix
+  (svd [m options] 
+      (let
+        [result (SVD/decompose m)]
+        (if result
+          (with-keys {:U (.getU result) :S (diagonal (.getS result)) :V* (.getTranspose (.getV result))} (:return options))
+          nil))))
+
+(extend-protocol mp/PNorm
+  INDArray
+    (norm [m p]
+      (cond 
+        (= java.lang.Double/POSITIVE_INFINITY p) (.elementMax m)
+        (number? p) (Math/pow (.elementAbsPowSum m p) (/ 1 p))
+        :else (error "p must be a number"))))
+
+(extend-protocol mp/PMatrixRank
+  AMatrix
+    (rank [m]
+      (let [{:keys [S]} (mp/svd m {:return [:S]})
+            eps 1e-10]
+        (reduce (fn [n x] (if (< (java.lang.Math/abs (double x)) eps) n (inc n))) 0 S)))) 
 
 (extend-protocol mp/PTypeInfo
   INDArray

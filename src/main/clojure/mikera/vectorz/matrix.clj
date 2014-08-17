@@ -105,7 +105,7 @@
           mat (new-matrix rc cc)]
       (dotimes [i rc]
         (let [^AVector v (vecs i)
-              ^AVector row (get-row mat i)]
+              ^AVector row (.getRowView mat i)]
           (.copyTo v row (int 0))))
       mat)))
 
@@ -222,10 +222,8 @@
   "Applies a matrix transform to a vector, returning a new vector"
   (^AVector [m ^AVector a]
     (if (instance? ATransform m)
-      (let [^ATransform m m
-            ^AVector result (v/create-length (.outputDimensions m))]
-        (.transform m a result)
-        result)
+      (let [^ATransform m m]
+        (.transform m a))
       (.innerProduct ^AMatrix m a))))
 
 (defn transform-normal 
@@ -236,6 +234,6 @@
 (defn *
   "Applies a matrix to a vector or matrix, returning a new vector or matrix. If applied to a vector, the vector is transformed. If applied to a matrix, the two matrices are composed"
   ([^AMatrix m a]
-    (if (instance? AVector a)
-      (.innerProduct m ^AVector a) 
-      (.innerProduct m ^INDArray a))))
+    (cond
+      (instance? AVector a) (.innerProduct m ^AVector a) 
+      :else (.innerProduct m ^INDArray a))))
