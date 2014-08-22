@@ -1491,6 +1491,9 @@
                     (recur (f v (.get m i)) (inc i))
                     v)))))))
 
+;; ==============================================================
+;; Generator for mathematical functions
+
 (def math-op-mapping
   '[(abs Ops/ABS)
 	  (acos Ops/ACOS)
