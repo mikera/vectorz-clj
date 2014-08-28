@@ -20,6 +20,11 @@
 (set! *unchecked-math* true)
 (declare vectorz-coerce* avector-coerce*)
 
+;; =======================================================================
+;; Macros and helper functions
+;;
+;; Intended to be internal to vectorz-clj implementation
+
 (defmacro tag-symbol [tag form]
   (let [tagged-sym (vary-meta (gensym "res") assoc :tag tag)]
     `(let [~tagged-sym ~form] ~tagged-sym)))
@@ -32,7 +37,7 @@
         (.startsWith stag "mikera.arrayz."))))
 
 (defmacro vectorz-coerce 
-  "Coerces the argument to a vectorz INDArray. Broadcasts to the shape of target if provided."
+  "Coerces the argument to a vectorz INDArray. Broadcasts to the shape of an optional target if provided."
   ([x]
     (if (and (symbol? x) (vectorz-type? (:tag (meta x))))
       x ;; return tagged symbol unchanged
@@ -1485,6 +1490,9 @@
                   (if (< i n)
                     (recur (f v (.get m i)) (inc i))
                     v)))))))
+
+;; ==============================================================
+;; Generator for mathematical functions
 
 (def math-op-mapping
   '[(abs Ops/ABS)
