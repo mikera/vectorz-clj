@@ -5,6 +5,7 @@
   (:require [clojure.core.matrix.operators :refer [+ - *]])
   (:require clojure.core.matrix.compliance-tester)
   (:require [clojure.core.matrix.protocols :as mp])
+  (:require [clojure.core.matrix.linear :as li])
   (:require [mikera.vectorz.core :as v])
   (:require [mikera.vectorz.matrix :as m])
   (:require [mikera.vectorz.matrix-api])
@@ -351,6 +352,7 @@
         v (array a)]
     (aset-double a 4 9999)
     (is (equals v [1 2 3 4 5]))))
+
 
 ;; run compliance tests
 

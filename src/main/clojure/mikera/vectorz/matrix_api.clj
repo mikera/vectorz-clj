@@ -12,11 +12,18 @@
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
   (:import [mikera.matrixx.decompose QR IQRResult Cholesky ICholeskyResult ICholeskyLDUResult])
+  (:import [mikera.matrixx.decompose SVD ISVDResult LUP ILUPResult Eigen IEigenResult])
+  (:import [mikera.matrixx.solve Linear])
   (:refer-clojure :exclude [vector?]))
 
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* true)
 (declare vectorz-coerce* avector-coerce*)
+
+;; =======================================================================
+;; Macros and helper functions
+;;
+;; Intended to be internal to vectorz-clj implementation
 
 (defmacro tag-symbol [tag form]
   (let [tagged-sym (vary-meta (gensym "res") assoc :tag tag)]
@@ -30,7 +37,7 @@
         (.startsWith stag "mikera.arrayz."))))
 
 (defmacro vectorz-coerce 
-  "Coerces the argument to a vectorz INDArray. Broadcasts to the shape of target if provided."
+  "Coerces the argument to a vectorz INDArray. Broadcasts to the shape of an optional target if provided."
   ([x]
     (if (and (symbol? x) (vectorz-type? (:tag (meta x))))
       x ;; return tagged symbol unchanged
@@ -249,8 +256,17 @@
   AMatrix
     (qr [m options]
       (let
-        [result (QR/decompose m)]
+        [result (cond 
+                  (:compact options) (QR/decompose m true)
+                  :else (QR/decompose m))]
         (with-keys {:Q (.getQ result) :R (.getR result)} (:return options)))))
+
+(extend-protocol mp/PLUDecomposition
+  AMatrix
+    (lu [m options]
+      (let
+        [result (LUP/decompose m)]
+        (with-keys {:L (.getL result) :U (.getU result) :P (.getP result)} (:return options)))))
 
 (extend-protocol mp/PCholeskyDecomposition
   AMatrix
@@ -260,6 +276,40 @@
         (if result
           (with-keys {:L (.getL result) :L* (.getU result)} (:return options))
           nil))))
+
+(extend-protocol mp/PSVDDecomposition
+  AMatrix
+  (svd [m options] 
+      (let
+        [result (SVD/decompose m)]
+        (if result
+          (with-keys {:U (.getU result) :S (diagonal (.getS result)) :V* (.getTranspose (.getV result))} (:return options))
+          nil))))
+
+(extend-protocol mp/PNorm
+  INDArray
+    (norm [m p]
+      (cond 
+        (= java.lang.Double/POSITIVE_INFINITY p) (.elementMax m)
+        (number? p) (Math/pow (.elementAbsPowSum m p) (/ 1 p))
+        :else (error "p must be a number"))))
+
+(extend-protocol mp/PMatrixRank
+  AMatrix
+    (rank [m]
+      (let [{:keys [S]} (mp/svd m {:return [:S]})
+            eps 1e-10]
+        (reduce (fn [n x] (if (< (java.lang.Math/abs (double x)) eps) n (inc n))) 0 S))))
+
+(extend-protocol mp/PSolveLinear
+  AMatrix
+    (solve [a b]
+      (Linear/solve a (avector-coerce b))))
+
+(extend-protocol mp/PLeastSquares
+  AMatrix
+    (least-squares [a b]
+      (Linear/solveLeastSquares a (avector-coerce b))))
 
 (extend-protocol mp/PTypeInfo
   INDArray
@@ -1440,6 +1490,9 @@
                   (if (< i n)
                     (recur (f v (.get m i)) (inc i))
                     v)))))))
+
+;; ==============================================================
+;; Generator for mathematical functions
 
 (def math-op-mapping
   '[(abs Ops/ABS)
