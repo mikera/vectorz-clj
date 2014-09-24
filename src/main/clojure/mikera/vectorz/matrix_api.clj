@@ -36,6 +36,11 @@
         (.startsWith stag "mikera.indexz.")
         (.startsWith stag "mikera.arrayz."))))
 
+(defmacro vectorz?
+  "Returns true if v is a vectorz class (i.e. an instance of mikera.arrayz.INDArray)"
+  ([a]
+    `(instance? INDArray ~a)))
+
 (defmacro vectorz-coerce 
   "Coerces the argument to a vectorz INDArray. Broadcasts to the shape of an optional target if provided."
   ([x]
@@ -1224,10 +1229,11 @@
 (extend-protocol mp/PSparse
   INDArray
     (sparse-coerce [m data]
-      (if (== 0 (mp/dimensionality data))
-        (Scalar. (double-coerce data))
-        (let [ss (map (fn [s] (.sparse (vectorz-coerce s))) (mp/get-major-slice-seq data))]
-         (.sparse (Arrayz/create (object-array ss))))))
+      (cond 
+        (== 0 (mp/dimensionality data)) (Scalar. (double-coerce data))
+        (vectorz? data) (.sparse ^INDArray data)
+        :else (let [ss (map (fn [s] (.sparse (vectorz-coerce s))) (mp/get-major-slice-seq data))]
+               (.sparse (Arrayz/create (object-array ss))))))
     (sparse [m]
       (.sparse m)))
 
