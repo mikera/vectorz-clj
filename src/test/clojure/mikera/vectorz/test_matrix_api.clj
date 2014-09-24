@@ -17,6 +17,9 @@
   (:import [mikera.vectorz AVector Vectorz Vector])
   (:import [mikera.arrayz INDArray Array NDArray]))
 
+(set! *warn-on-reflection* true)
+(set! *unchecked-math* true)
+
 ;; note - all the operators are core.matrix operators
 
 (set-current-implementation :vectorz)
@@ -179,7 +182,7 @@
   (is (== -1.0 (det (matrix :vectorz [[0 1] [1 0]])))))
 
 (defn test-round-trip [m]
-  (is (equals m (read-string (.toString m))))
+  (is (equals m (read-string (str m))))
   ;; TODO edn round-tripping?
   )
 
