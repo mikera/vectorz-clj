@@ -6,7 +6,7 @@
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
   (:import [mikera.vectorz Scalar])
-  (:import [mikera.vectorz.impl IndexVector])
+  (:import [mikera.vectorz.impl IndexVector ASparseIndexedVector SparseHashedVector])
   (:import [mikera.arrayz Arrayz INDArray Array])
   (:import [mikera.indexz AIndex Index])
   (:import [java.util List])
@@ -862,6 +862,25 @@
             vs (avector-coerce values)]
         (doseq-indexed [ix indices i]
           (.set a (int-array-coerce ix) (.get vs (int i)))))))
+
+(extend-protocol mp/PNonZeroIndices
+  AVector
+  (non-zero-indices 
+    [m]
+    (.nonZeroIndices m))
+  ASparseIndexedVector
+  (non-zero-indices
+    [m]
+    (.nonZeroIndices m))
+  SparseHashedVector
+  (non-zero-indices
+    [m]
+    (.nonZeroIndices m))
+  AMatrix
+  (non-zero-indices 
+    [m]
+    (vec (for [i (range (mp/dimension-count m 0))]
+           (mp/non-zero-indices (mp/get-major-slice m i))))))
 
 ;; protocols for elementwise ops
 
