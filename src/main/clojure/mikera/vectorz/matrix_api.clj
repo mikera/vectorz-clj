@@ -1069,6 +1069,12 @@
     (element-multiply! [m a]
       (.multiply m (vectorz-coerce a))))
 
+(extend-protocol mp/PMatrixDivideMutable
+  INDArray
+    (element-divide!
+      ([m] (.reciprocal m))
+      ([m a] (.divide m (vectorz-coerce a)))))
+
 (extend-protocol mp/PMatrixProducts
   INDArray
     (inner-product [m a] (.innerProduct m (vectorz-coerce a)))

@@ -29,3 +29,9 @@
         sm (sparse (matrix :vectorz pm))]
     (is (equals [0] (first (non-zero-indices sm))))
     (is (equals [1] (second (non-zero-indices sm))))))
+
+(deftest test-ops
+  (let [pm [[2 0] [0 1]]
+        sm (sparse (matrix :vectorz pm))]
+    (is (equals [[4 0] [ 0 2]] (div! sm 0.5)))
+    (is (equals pm (mul! sm 0.5)))))
