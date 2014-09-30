@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>vectorz</artifactId>
-			<version>0.40.1-SNAPSHOT</version>
+			<version>0.41.0</version>
 		</dependency>
 		<dependency>
 			<groupId>net.mikera</groupId>
