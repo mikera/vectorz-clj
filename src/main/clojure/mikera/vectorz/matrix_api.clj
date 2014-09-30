@@ -1092,6 +1092,9 @@
         (.addProduct m (avector-coerce m a) (avector-coerce m b))))) 
 
 (extend-protocol mp/PAddProductMutable
+  INDArray
+    (add-product! [m a b]
+      (.add m (vectorz-coerce (mp/element-multiply a b))))
   AVector
     (add-product! [m a b]
       (.addProduct m (avector-coerce m a) (avector-coerce m b)))) 
