@@ -23,3 +23,9 @@
     (is (== 30 (esum sm)))
     (assign! sm 2)
     (is (== 8 (esum sm)))))
+
+(deftest test-non-zero-indices
+  (let [pm [[2 0] [0 1]]
+        sm (sparse (matrix :vectorz pm))]
+    (is (equals [0] (first (non-zero-indices sm))))
+    (is (equals [1] (second (non-zero-indices sm))))))
