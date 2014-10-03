@@ -36,6 +36,11 @@
         (.startsWith stag "mikera.indexz.")
         (.startsWith stag "mikera.arrayz."))))
 
+(defmacro vectorz?
+  "Returns true if v is a vectorz class (i.e. an instance of mikera.arrayz.INDArray)"
+  ([a]
+    `(instance? INDArray ~a)))
+
 (defmacro vectorz-coerce 
   "Coerces the argument to a vectorz INDArray. Broadcasts to the shape of an optional target if provided."
   ([x]
@@ -1064,6 +1069,12 @@
     (element-multiply! [m a]
       (.multiply m (vectorz-coerce a))))
 
+(extend-protocol mp/PMatrixDivideMutable
+  INDArray
+    (element-divide!
+      ([m] (.reciprocal m))
+      ([m a] (.divide m (vectorz-coerce a)))))
+
 (extend-protocol mp/PMatrixProducts
   INDArray
     (inner-product [m a] (.innerProduct m (vectorz-coerce a)))
@@ -1081,6 +1092,9 @@
         (.addProduct m (avector-coerce m a) (avector-coerce m b))))) 
 
 (extend-protocol mp/PAddProductMutable
+  INDArray
+    (add-product! [m a b]
+      (.add m (vectorz-coerce (mp/element-multiply a b))))
   AVector
     (add-product! [m a b]
       (.addProduct m (avector-coerce m a) (avector-coerce m b)))) 
@@ -1224,10 +1238,11 @@
 (extend-protocol mp/PSparse
   INDArray
     (sparse-coerce [m data]
-      (if (== 0 (mp/dimensionality data))
-        (Scalar. (double-coerce data))
-        (let [ss (map (fn [s] (.sparse (vectorz-coerce s))) (mp/get-major-slice-seq data))]
-         (.sparse (Arrayz/create (object-array ss))))))
+      (cond 
+        (== 0 (mp/dimensionality data)) (Scalar. (double-coerce data))
+        (vectorz? data) (.sparse ^INDArray data)
+        :else (let [ss (map (fn [s] (.sparse (vectorz-coerce s))) (mp/get-major-slice-seq data))]
+               (.sparse (Arrayz/create (object-array ss))))))
     (sparse [m]
       (.sparse m)))
 
