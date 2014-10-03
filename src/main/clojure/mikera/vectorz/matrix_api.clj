@@ -12,12 +12,18 @@
   (:import [java.util List])
   (:import [mikera.transformz ATransform])
   (:import [mikera.matrixx.decompose QR IQRResult Cholesky ICholeskyResult ICholeskyLDUResult])
-  (:import [mikera.matrixx.decompose SVD ISVDResult LUP ILUPResult])
+  (:import [mikera.matrixx.decompose SVD ISVDResult LUP ILUPResult Eigen IEigenResult])
+  (:import [mikera.matrixx.solve Linear])
   (:refer-clojure :exclude [vector?]))
 
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* true)
 (declare vectorz-coerce* avector-coerce*)
+
+;; =======================================================================
+;; Macros and helper functions
+;;
+;; Intended to be internal to vectorz-clj implementation
 
 (defmacro tag-symbol [tag form]
   (let [tagged-sym (vary-meta (gensym "res") assoc :tag tag)]
@@ -30,8 +36,13 @@
         (.startsWith stag "mikera.indexz.")
         (.startsWith stag "mikera.arrayz."))))
 
+(defmacro vectorz?
+  "Returns true if v is a vectorz class (i.e. an instance of mikera.arrayz.INDArray)"
+  ([a]
+    `(instance? INDArray ~a)))
+
 (defmacro vectorz-coerce 
-  "Coerces the argument to a vectorz INDArray. Broadcasts to the shape of target if provided."
+  "Coerces the argument to a vectorz INDArray. Broadcasts to the shape of an optional target if provided."
   ([x]
     (if (and (symbol? x) (vectorz-type? (:tag (meta x))))
       x ;; return tagged symbol unchanged
@@ -293,7 +304,17 @@
     (rank [m]
       (let [{:keys [S]} (mp/svd m {:return [:S]})
             eps 1e-10]
-        (reduce (fn [n x] (if (< (java.lang.Math/abs (double x)) eps) n (inc n))) 0 S)))) 
+        (reduce (fn [n x] (if (< (java.lang.Math/abs (double x)) eps) n (inc n))) 0 S))))
+
+(extend-protocol mp/PSolveLinear
+  AMatrix
+    (solve [a b]
+      (Linear/solve a (avector-coerce b))))
+
+(extend-protocol mp/PLeastSquares
+  AMatrix
+    (least-squares [a b]
+      (Linear/solveLeastSquares a (avector-coerce b))))
 
 (extend-protocol mp/PTypeInfo
   INDArray
@@ -1048,6 +1069,12 @@
     (element-multiply! [m a]
       (.multiply m (vectorz-coerce a))))
 
+(extend-protocol mp/PMatrixDivideMutable
+  INDArray
+    (element-divide!
+      ([m] (.reciprocal m))
+      ([m a] (.divide m (vectorz-coerce a)))))
+
 (extend-protocol mp/PMatrixProducts
   INDArray
     (inner-product [m a] (.innerProduct m (vectorz-coerce a)))
@@ -1065,6 +1092,9 @@
         (.addProduct m (avector-coerce m a) (avector-coerce m b))))) 
 
 (extend-protocol mp/PAddProductMutable
+  INDArray
+    (add-product! [m a b]
+      (.add m (vectorz-coerce (mp/element-multiply a b))))
   AVector
     (add-product! [m a b]
       (.addProduct m (avector-coerce m a) (avector-coerce m b)))) 
@@ -1208,10 +1238,11 @@
 (extend-protocol mp/PSparse
   INDArray
     (sparse-coerce [m data]
-      (if (== 0 (mp/dimensionality data))
-        (Scalar. (double-coerce data))
-        (let [ss (map (fn [s] (.sparse (vectorz-coerce s))) (mp/get-major-slice-seq data))]
-         (.sparse (Arrayz/create (object-array ss))))))
+      (cond 
+        (== 0 (mp/dimensionality data)) (Scalar. (double-coerce data))
+        (vectorz? data) (.sparse ^INDArray data)
+        :else (let [ss (map (fn [s] (.sparse (vectorz-coerce s))) (mp/get-major-slice-seq data))]
+               (.sparse (Arrayz/create (object-array ss))))))
     (sparse [m]
       (.sparse m)))
 
@@ -1474,6 +1505,9 @@
                   (if (< i n)
                     (recur (f v (.get m i)) (inc i))
                     v)))))))
+
+;; ==============================================================
+;; Generator for mathematical functions
 
 (def math-op-mapping
   '[(abs Ops/ABS)
