@@ -776,8 +776,7 @@
         (== 0 (mp/dimensionality source))
            (.fill m (double-coerce source))
         :else 
-           (dotimes [i (.length m)]
-             (.set m i (double (mp/get-1d source i))))))
+           (.set m (vectorz-coerce source))))
     (assign-array! 
       ([m arr] (dotimes [i (count arr)] (.set m (int i) (double (nth arr i)))))
       ([m arr start length] 
