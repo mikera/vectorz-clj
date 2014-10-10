@@ -72,6 +72,7 @@
   (is (== 3 (mget (mset (zero-array []) 3)))))
 
 (deftest test-scalar-arrays
+  (is (equals 0 (new-scalar-array :vectorz)))
   (is (equals 3 (scalar-array 3)))
   (is (equals 2 (add 1 (array 1))))
   (is (equals [2 3] (add 1 (array [1 2]))))
