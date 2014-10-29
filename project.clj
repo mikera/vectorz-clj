@@ -12,12 +12,15 @@
   :test-paths ["src/test/clojure"]
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [criterium/criterium "0.4.3"]
-                 [org.clojure/tools.analyzer "0.5.1"]
+                 [org.clojure/tools.analyzer "0.6.0"]
                  [org.clojure/test.check "0.5.9"]
                  [net.mikera/cljunit "0.3.1"]
                  [net.mikera/clojure-utils "0.6.1"]
-                 [net.mikera/core.matrix "0.29.1"]
+                 [net.mikera/core.matrix "0.30.2"]
                  [net.mikera/core.matrix.stats "0.4.0"]
-                 [net.mikera/vectorz "0.40.0"]]
+                 [net.mikera/vectorz "0.41.0"]]
+  
+  :profiles {:dev {:java-source-paths ["src/test/java"]}}
+  
   :repositories [["clojars.org" {:url "https://clojars.org/repo"
                                  :name "Clojars repository"}]])
