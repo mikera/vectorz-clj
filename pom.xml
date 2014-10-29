@@ -36,12 +36,12 @@
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>vectorz</artifactId>
-			<version>0.41.0</version>
+			<version>0.41.2</version>
 		</dependency>
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>core.matrix</artifactId>
-			<version>0.30.2</version>
+			<version>0.31.0</version>
 		</dependency>
 		<dependency>
 			<groupId>criterium</groupId>

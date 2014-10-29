@@ -185,7 +185,6 @@
 	    (instance? AMatrix m) m
       :else (Matrixx/toMatrix ^INDArray (vectorz-coerce* m))))) 
 
-    
 (defn vectorz-coerce* 
   "Function to attempt conversion to a Vectorz INDArray object. May return nil if conversion fails."
   (^INDArray [p]
@@ -203,7 +202,13 @@
 		    (== 1 dims)
 		      (try (Vector/wrap (mp/to-double-array p)) (catch Throwable e nil))
 		    (== 2 dims)
-		      (try (Matrixx/toMatrix (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
+		      (let [rows (int (mp/dimension-count p 0))
+                cols (int (mp/dimension-count p 1))]
+            (try 
+              (if (< (* rows cols) 10000) ;; dense default for small matrices
+                (Matrix/wrap rows cols (mp/to-double-array p)) 
+                (Matrixx/create ^java.util.List (mapv vectorz-coerce* (slices p)))) 
+              (catch Throwable e nil)))
 		    :else 
 	        (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
 	          (and (seq sv) (sv 0) (Arrayz/create sv)))))))
@@ -1248,11 +1253,15 @@
 (extend-protocol mp/PSliceJoin
   INDArray
     (join [m a]
-      ;; TODO: wait for better join implementation in Vectorz for INDArray
-      (Arrayz/create ^List (vec (concat (slices m) (slices (vectorz-coerce a))))))
+      (.join m (vectorz-coerce a) (int 0)))
   AVector
     (join [m a] 
-          (.join m (avector-coerce a))))
+      (.join m (avector-coerce a))))
+
+(extend-protocol mp/PSliceJoinAlong
+  INDArray
+    (join-along [m a dim]
+      (.join m (vectorz-coerce a) (int dim))))
 
 (extend-protocol mp/PVectorView
   INDArray
