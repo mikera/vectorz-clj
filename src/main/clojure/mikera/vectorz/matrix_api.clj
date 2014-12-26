@@ -1005,6 +1005,13 @@
         (Index/of (int-array (mp/element-seq param))) 
         (error "Cannot coerce to Index with shape: " (vec (mp/get-shape param))))))
 
+(extend-protocol mp/PRowColMatrix
+  INDArray 
+    (column-matrix [m data]
+      (mikera.matrixx.impl.ColumnMatrix. (avector-coerce data)))
+    (row-matrix [m data]
+      (mikera.matrixx.impl.RowMatrix. (avector-coerce data))))
+
 (extend-protocol mp/PConversion
   AScalar
     (convert-to-nested-vectors [m]

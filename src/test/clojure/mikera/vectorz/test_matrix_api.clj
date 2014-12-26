@@ -66,6 +66,13 @@
   (is (= 1.0 (slice (array [0 1 2]) 1)))
   (is (mp/set-nd (matrix :vectorz [[1 2][3 4]]) [0 1] 3)))
 
+(deftest test-row-column-matrix
+  (let [m (matrix :vectorz [1 2 3])
+        rm (row-matrix m)
+        cm (column-matrix m)]
+    (is (equals rm (transpose cm)))
+    (is (equals rm [[1 2 3]]))))
+
 (deftest test-mget-regressions
   (is (== 3 (mget (mset (zero-array [4 4]) 0 2 3) 0 2)))
   (is (== 3 (mget (mset (zero-array [4]) 2 3) 2)))
