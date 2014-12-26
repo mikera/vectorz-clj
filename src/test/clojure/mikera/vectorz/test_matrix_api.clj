@@ -70,6 +70,7 @@
   (let [m (matrix :vectorz [1 2 3])
         rm (row-matrix m)
         cm (column-matrix m)]
+    (is (not (equals rm cm)))
     (is (equals rm (transpose cm)))
     (is (equals rm [[1 2 3]]))))
 
