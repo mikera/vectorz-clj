@@ -740,6 +740,11 @@
           (== 1 dimension) (.getColumn m (int i))
           :else (error "Can't get slice from matrix with dimension: " dimension)))))
 
+(extend-protocol mp/PRotate
+  INDArray
+  (rotate [m dim places]
+    (.rotateView m (int dim) (int places)))) 
+
 (extend-protocol mp/PMatrixRows
   AMatrix
     (get-rows [m]
