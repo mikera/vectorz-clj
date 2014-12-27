@@ -722,6 +722,16 @@
           (== 1 dimension) (.getColumn m (int i))
           :else (error "Can't get slice from matrix with dimension: " dimension)))))
 
+(extend-protocol mp/PMatrixRows
+  AMatrix
+    (get-rows [m]
+      (.getSlices m 0)))
+
+(extend-protocol mp/PMatrixColumns
+  AMatrix
+    (get-columns [m]
+      (.getSlices m 1)))
+
 (extend-protocol mp/PRowSetting
   AMatrix
     (set-row [m i row]
