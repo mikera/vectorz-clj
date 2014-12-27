@@ -1075,6 +1075,14 @@
     ([m a] 
       (with-broadcast-clone [m a] (.divide m a)))))
 
+(extend-protocol mp/PMatrixDivideMutable
+  INDArray
+  (element-divide!
+    ([m] 
+      (.reciprocal m))
+    ([m a]
+      (.divide m (vectorz-coerce a)))))
+
 (extend-protocol mp/PMatrixMultiply
   AScalar
     (matrix-multiply [m a]
