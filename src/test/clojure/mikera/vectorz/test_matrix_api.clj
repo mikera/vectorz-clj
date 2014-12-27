@@ -155,7 +155,6 @@
     (add-scaled-product! b [0 1] [3 4] 2)
     (is (equals [1 11] b)))) 
 
-
 (deftest test-coerce
   (is (equals (array [1 2]) (coerce :vectorz [1 2])))
   (is (equals (array [[1 2] [3 4]]) (coerce :vectorz [[1 2] [3 4]])))

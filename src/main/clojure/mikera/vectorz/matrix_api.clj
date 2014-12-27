@@ -1012,6 +1012,11 @@
     (row-matrix [m data]
       (mikera.matrixx.impl.RowMatrix. (avector-coerce data))))
 
+(extend-protocol mp/PValidateShape
+  INDArray
+    (validate-shape [m]
+      (.validate m))) 
+
 (extend-protocol mp/PConversion
   AScalar
     (convert-to-nested-vectors [m]
