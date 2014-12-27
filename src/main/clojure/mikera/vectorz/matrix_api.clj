@@ -694,6 +694,11 @@
     (is-sparse? [m]
       (.isSparse m)))
 
+(extend-protocol mp/PNewSparseArray
+  INDArray
+  (new-sparse-array [m shape]
+    (Arrayz/createSparseArray (int-array-coerce shape))))
+
 (extend-protocol mp/PMatrixEquality
   INDArray
     (matrix-equals [a b]
