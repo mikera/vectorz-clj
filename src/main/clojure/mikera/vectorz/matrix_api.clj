@@ -1659,6 +1659,6 @@
 
 ;; registration
 
-(imp/register-implementation (Vector/of (double-array [0])))
+(imp/register-implementation (vectorz-coerce [[1 2] [3 4]]))
 
 :OK
