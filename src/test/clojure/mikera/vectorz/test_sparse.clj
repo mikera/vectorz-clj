@@ -14,10 +14,16 @@
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* true)
 
+(deftest test-new-sparse-array
+  (let [s [1000 1000]
+        a (new-sparse-array :vectorz s)]
+    (is (instance? INDArray a))
+    (is (= s (shape a)))))
+
 (deftest test-sparse-assign
   (let [pm [[6 7] [8 9]]
         sm (sparse :vectorz (matrix :vectorz [[1 2] [3 4]]))]
-    (is (instance? mikera.arrayz.INDArray sm))
+    (is (instance? INDArray sm))
     (is (sparse? sm))
     (assign! sm pm)
     (is (== 30 (esum sm)))
@@ -27,7 +33,7 @@
 (deftest test-sparse-assign-double
   (let [pm [[6 7] [8 9]]
         sm (sparse :vectorz pm)]
-    (is (instance? mikera.arrayz.INDArray sm))
+    (is (instance? INDArray sm))
     (is (sparse? sm))
     (assign! sm 1)
     (is (== 4 (esum sm)))))
