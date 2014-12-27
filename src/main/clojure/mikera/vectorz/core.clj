@@ -78,11 +78,6 @@
     (.set v (int index) value)
     v))
 
-(defn update
-  "Returns a new vector with the component at position i updated"
-  ([^AVector v ^long index ^double value]
-    (mikera.vectorz.core/set (clone v) index value)))
-
 ;; =====================================================
 ;; vector predicates
 

@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>vectorz-clj</artifactId>
 	<groupId>net.mikera</groupId>
-	<version>0.26.2</version>
+	<version>0.27.0</version>
 
 	<licenses>
 		<license>
@@ -23,7 +23,7 @@
 		<connection>scm:git:git@github.com:mikera/${project.artifactId}.git</connection>
 		<url>scm:git:git@github.com:mikera/${project.artifactId}.git</url>
 		<developerConnection>scm:git:git@github.com:mikera/${project.artifactId}.git</developerConnection>
-		<tag>vectorz-clj-0.26.2</tag>
+		<tag>vectorz-clj-0.27.0</tag>
 	</scm>
 
 	<parent>
@@ -36,12 +36,12 @@
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>vectorz</artifactId>
-			<version>0.41.2</version>
+			<version>0.43.0</version>
 		</dependency>
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>core.matrix</artifactId>
-			<version>0.31.1</version>
+			<version>0.32.1</version>
 		</dependency>
 		<dependency>
 			<groupId>criterium</groupId>
@@ -58,18 +58,18 @@
 		<dependency>
 			<groupId>org.clojure</groupId>
 			<artifactId>clojure</artifactId>
-			<version>1.6.0</version>
+			<version>1.7.0-alpha4</version>
 		</dependency>
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>core.matrix.stats</artifactId>
-			<version>0.4.1</version>
+			<version>0.5.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.clojure</groupId>
 			<artifactId>tools.analyzer</artifactId>
-			<version>0.6.2</version>
+			<version>0.6.4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -80,7 +80,7 @@
 		<dependency>
 			<groupId>org.clojure</groupId>
 			<artifactId>test.check</artifactId>
-			<version>0.5.9</version>
+			<version>0.6.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
