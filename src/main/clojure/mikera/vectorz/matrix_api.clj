@@ -743,7 +743,18 @@
 (extend-protocol mp/PRotate
   INDArray
   (rotate [m dim places]
-    (.rotateView m (int dim) (int places)))) 
+    (let [dim (int dim)]
+      (if (<= 0 dim (dec (.dimensionality m)))
+        (.rotateView m dim (int places))
+        m)))) 
+
+(extend-protocol mp/POrder
+  INDArray
+  (order
+    ([m indices]
+      (.reorder m (int-array-coerce indices)))
+    ([m dimension indices]
+      (.reorder m (int dimension) (int-array-coerce indices)))))
 
 (extend-protocol mp/PMatrixRows
   AMatrix
