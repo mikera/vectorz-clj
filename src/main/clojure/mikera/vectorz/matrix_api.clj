@@ -383,6 +383,17 @@
     (to-double-array [m] (.toDoubleArray (.asVector m)))
     (as-double-array [m] (.data m))) 
 
+; TODO: reinstate with next Vectorz release
+;(defprotocol PObjectArrayOutput
+;  INDArray
+;  (to-object-array [m]
+;    (let [ec (.elementCount m)
+;          obs (object-array ec)]
+;      (.getElements obs m)
+;      obs))
+;  (as-object-array [m]
+;    nil))
+
 (extend-protocol mp/PVectorisable
   INDArray
     (to-vector [m]
