@@ -612,8 +612,8 @@
 	  (diagonal? [m] (.isDiagonal m))
 	  (upper-triangular? [m] (.isUpperTriangular m))
 	  (lower-triangular? [m] (.isLowerTriangular m))
-	  (positive-definite? [m] (mikera.matrixx.algo.Definite/isPositiveDefininite m))
-	  (positive-semidefinite? [m] (mikera.matrixx.algo.Definite/isPositiveSemiDefininite m))
+	  (positive-definite? [m] (mikera.matrixx.algo.Definite/isPositiveDefinite m))
+	  (positive-semidefinite? [m] (mikera.matrixx.algo.Definite/isPositiveSemiDefinite m))
 	  (orthogonal? [m eps] (.isOrthogonal m (double-coerce eps))))
 
 (extend-protocol mp/PIndexedSetting
