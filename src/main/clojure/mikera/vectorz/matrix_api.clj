@@ -540,6 +540,13 @@
     (immutable-matrix [m]
       (.immutable m)))
 
+;; TODO semantics are tricky re: cloning or not?
+;(extend-protocol mp/PImmutableAssignment
+;  INDArray
+;  (assign
+;    [m source]
+;    (broadcast-coerce m source)))
+
 (extend-protocol mp/PSpecialisedConstructors
   INDArray
     (identity-matrix [m dims] 
