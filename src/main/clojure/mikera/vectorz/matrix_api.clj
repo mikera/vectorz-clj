@@ -36,6 +36,11 @@
         (.startsWith stag "mikera.indexz.")
         (.startsWith stag "mikera.arrayz."))))
 
+(defmacro vectorz?
+  "Returns true if v is a vectorz class (i.e. an instance of mikera.arrayz.INDArray)"
+  ([a]
+    `(instance? INDArray ~a)))
+
 (defmacro vectorz-coerce 
   "Coerces the argument to a vectorz INDArray. Broadcasts to the shape of an optional target if provided."
   ([x]
@@ -180,7 +185,6 @@
 	    (instance? AMatrix m) m
       :else (Matrixx/toMatrix ^INDArray (vectorz-coerce* m))))) 
 
-    
 (defn vectorz-coerce* 
   "Function to attempt conversion to a Vectorz INDArray object. May return nil if conversion fails."
   (^INDArray [p]
@@ -198,7 +202,13 @@
 		    (== 1 dims)
 		      (try (Vector/wrap (mp/to-double-array p)) (catch Throwable e nil))
 		    (== 2 dims)
-		      (try (Matrixx/toMatrix (mp/convert-to-nested-vectors p)) (catch Throwable e nil))
+		      (let [rows (int (mp/dimension-count p 0))
+                cols (int (mp/dimension-count p 1))]
+            (try 
+              (if (< (* rows cols) 10000) ;; dense default for small matrices
+                (Matrix/wrap rows cols (mp/to-double-array p)) 
+                (Matrixx/create ^java.util.List (mapv vectorz-coerce* (slices p)))) 
+              (catch Throwable e nil)))
 		    :else 
 	        (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
 	          (and (seq sv) (sv 0) (Arrayz/create sv)))))))
@@ -373,6 +383,16 @@
     (to-double-array [m] (.toDoubleArray (.asVector m)))
     (as-double-array [m] (.data m))) 
 
+(extend-protocol mp/PObjectArrayOutput
+  INDArray
+	  (to-object-array [m]
+	    (let [ec (.elementCount m)
+	          ^objects obs (object-array ec)]
+	      (.getElements m obs (int 0))
+	      obs))
+	  (as-object-array [m]
+	    nil))
+
 (extend-protocol mp/PVectorisable
   INDArray
     (to-vector [m]
@@ -530,6 +550,13 @@
     (immutable-matrix [m]
       (.immutable m)))
 
+;; TODO semantics are tricky re: cloning or not?
+;(extend-protocol mp/PImmutableAssignment
+;  INDArray
+;  (assign
+;    [m source]
+;    (broadcast-coerce m source)))
+
 (extend-protocol mp/PSpecialisedConstructors
   INDArray
     (identity-matrix [m dims] 
@@ -578,6 +605,15 @@
 (extend-protocol mp/PArrayMetrics
   INDArray
     (nonzero-count [m] (.nonZeroCount m)))
+
+(extend-protocol mp/PMatrixTypes
+  AMatrix
+	  (diagonal? [m] (.isDiagonal m))
+	  (upper-triangular? [m] (.isUpperTriangular m))
+	  (lower-triangular? [m] (.isLowerTriangular m))
+	  (positive-definite? [m] (mikera.matrixx.algo.Definite/isPositiveDefinite m))
+	  (positive-semidefinite? [m] (mikera.matrixx.algo.Definite/isPositiveSemiDefinite m))
+	  (orthogonal? [m eps] (.isOrthogonal m (double-coerce eps))))
 
 (extend-protocol mp/PIndexedSetting
   INDArray
@@ -658,6 +694,11 @@
     (is-sparse? [m]
       (.isSparse m)))
 
+(extend-protocol mp/PNewSparseArray
+  INDArray
+  (new-sparse-array [m shape]
+    (Arrayz/createSparseArray (int-array-coerce shape))))
+
 (extend-protocol mp/PMatrixEquality
   INDArray
     (matrix-equals [a b]
@@ -711,6 +752,32 @@
           (== 0 dimension) (.getRow m (int i))
           (== 1 dimension) (.getColumn m (int i))
           :else (error "Can't get slice from matrix with dimension: " dimension)))))
+
+(extend-protocol mp/PRotate
+  INDArray
+  (rotate [m dim places]
+    (let [dim (int dim)]
+      (if (<= 0 dim (dec (.dimensionality m)))
+        (.rotateView m dim (int places))
+        m)))) 
+
+(extend-protocol mp/POrder
+  INDArray
+  (order
+    ([m indices]
+      (.reorder m (int-array-coerce indices)))
+    ([m dimension indices]
+      (.reorder m (int dimension) (int-array-coerce indices)))))
+
+(extend-protocol mp/PMatrixRows
+  AMatrix
+    (get-rows [m]
+      (.getSlices m 0)))
+
+(extend-protocol mp/PMatrixColumns
+  AMatrix
+    (get-columns [m]
+      (.getSlices m 1)))
 
 (extend-protocol mp/PRowSetting
   AMatrix
@@ -771,8 +838,7 @@
         (== 0 (mp/dimensionality source))
            (.fill m (double-coerce source))
         :else 
-           (dotimes [i (.length m)]
-             (.set m i (double (mp/get-1d source i))))))
+           (.set m (vectorz-coerce source))))
     (assign-array! 
       ([m arr] (dotimes [i (count arr)] (.set m (int i) (double (nth arr i)))))
       ([m arr start length] 
@@ -996,6 +1062,18 @@
         (Index/of (int-array (mp/element-seq param))) 
         (error "Cannot coerce to Index with shape: " (vec (mp/get-shape param))))))
 
+(extend-protocol mp/PRowColMatrix
+  INDArray 
+    (column-matrix [m data]
+      (mikera.matrixx.impl.ColumnMatrix. (avector-coerce data)))
+    (row-matrix [m data]
+      (mikera.matrixx.impl.RowMatrix. (avector-coerce data))))
+
+(extend-protocol mp/PValidateShape
+  INDArray
+    (validate-shape [m]
+      (.validate m))) 
+
 (extend-protocol mp/PConversion
   AScalar
     (convert-to-nested-vectors [m]
@@ -1025,6 +1103,14 @@
       (with-clone [m] (.reciprocal m)))
     ([m a] 
       (with-broadcast-clone [m a] (.divide m a)))))
+
+(extend-protocol mp/PMatrixDivideMutable
+  INDArray
+  (element-divide!
+    ([m] 
+      (.reciprocal m))
+    ([m a]
+      (.divide m (vectorz-coerce a)))))
 
 (extend-protocol mp/PMatrixMultiply
   AScalar
@@ -1064,6 +1150,12 @@
     (element-multiply! [m a]
       (.multiply m (vectorz-coerce a))))
 
+(extend-protocol mp/PMatrixDivideMutable
+  INDArray
+    (element-divide!
+      ([m] (.reciprocal m))
+      ([m a] (.divide m (vectorz-coerce a)))))
+
 (extend-protocol mp/PMatrixProducts
   INDArray
     (inner-product [m a] (.innerProduct m (vectorz-coerce a)))
@@ -1081,6 +1173,9 @@
         (.addProduct m (avector-coerce m a) (avector-coerce m b))))) 
 
 (extend-protocol mp/PAddProductMutable
+  INDArray
+    (add-product! [m a b]
+      (.add m (vectorz-coerce (mp/element-multiply a b))))
   AVector
     (add-product! [m a b]
       (.addProduct m (avector-coerce m a) (avector-coerce m b)))) 
@@ -1224,21 +1319,26 @@
 (extend-protocol mp/PSparse
   INDArray
     (sparse-coerce [m data]
-      (if (== 0 (mp/dimensionality data))
-        (Scalar. (double-coerce data))
-        (let [ss (map (fn [s] (.sparse (vectorz-coerce s))) (mp/get-major-slice-seq data))]
-         (.sparse (Arrayz/create (object-array ss))))))
+      (cond 
+        (== 0 (mp/dimensionality data)) (Scalar. (double-coerce data))
+        (vectorz? data) (.sparse ^INDArray data)
+        :else (let [ss (map (fn [s] (.sparse (vectorz-coerce s))) (mp/get-major-slice-seq data))]
+               (.sparse (Arrayz/create (object-array ss))))))
     (sparse [m]
       (.sparse m)))
 
 (extend-protocol mp/PSliceJoin
   INDArray
     (join [m a]
-      ;; TODO: wait for better join implementation in Vectorz for INDArray
-      (Arrayz/create ^List (vec (concat (slices m) (slices (vectorz-coerce a))))))
+      (.join m (vectorz-coerce a) (int 0)))
   AVector
     (join [m a] 
-          (.join m (avector-coerce a))))
+      (.join m (avector-coerce a))))
+
+(extend-protocol mp/PSliceJoinAlong
+  INDArray
+    (join-along [m a dim]
+      (.join m (vectorz-coerce a) (int dim))))
 
 (extend-protocol mp/PVectorView
   INDArray
@@ -1572,6 +1672,6 @@
 
 ;; registration
 
-(imp/register-implementation (Vector/of (double-array [0])))
+(imp/register-implementation (vectorz-coerce [[1 2] [3 4]]))
 
 :OK

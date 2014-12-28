@@ -17,6 +17,9 @@
   (:import [mikera.vectorz AVector Vectorz Vector])
   (:import [mikera.arrayz INDArray Array NDArray]))
 
+(set! *warn-on-reflection* true)
+(set! *unchecked-math* true)
+
 ;; note - all the operators are core.matrix operators
 
 (set-current-implementation :vectorz)
@@ -63,12 +66,21 @@
   (is (= 1.0 (slice (array [0 1 2]) 1)))
   (is (mp/set-nd (matrix :vectorz [[1 2][3 4]]) [0 1] 3)))
 
+(deftest test-row-column-matrix
+  (let [m (matrix :vectorz [1 2 3])
+        rm (row-matrix m)
+        cm (column-matrix m)]
+    (is (not (equals rm cm)))
+    (is (equals rm (transpose cm)))
+    (is (equals rm [[1 2 3]]))))
+
 (deftest test-mget-regressions
   (is (== 3 (mget (mset (zero-array [4 4]) 0 2 3) 0 2)))
   (is (== 3 (mget (mset (zero-array [4]) 2 3) 2)))
   (is (== 3 (mget (mset (zero-array []) 3)))))
 
 (deftest test-scalar-arrays
+  (is (equals 0 (new-scalar-array :vectorz)))
   (is (equals 3 (scalar-array 3)))
   (is (equals 2 (add 1 (array 1))))
   (is (equals [2 3] (add 1 (array [1 2]))))
@@ -143,7 +155,6 @@
     (add-scaled-product! b [0 1] [3 4] 2)
     (is (equals [1 11] b)))) 
 
-
 (deftest test-coerce
   (is (equals (array [1 2]) (coerce :vectorz [1 2])))
   (is (equals (array [[1 2] [3 4]]) (coerce :vectorz [[1 2] [3 4]])))
@@ -179,7 +190,7 @@
   (is (== -1.0 (det (matrix :vectorz [[0 1] [1 0]])))))
 
 (defn test-round-trip [m]
-  (is (equals m (read-string (.toString m))))
+  (is (equals m (read-string (str m))))
   ;; TODO edn round-tripping?
   )
 
