@@ -774,10 +774,12 @@
   AMatrix
     (get-rows [m]
       (.getSlices m 0))
+  ;; TODO:  still necessary?
   SparseColumnMatrix
     (get-rows [m]
       (.getRows m)))
 
+;; TODO: should there be a specific implementation for SparseRowMatrix?
 (extend-protocol mp/PMatrixColumns
   AMatrix
     (get-columns [m]
