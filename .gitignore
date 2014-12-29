@@ -4,3 +4,5 @@
 /.settings
 /classes
 /.lein-failures
+/.nrepl-port
+/bin/
