@@ -774,16 +774,19 @@
   AMatrix
     (get-rows [m]
       (.getSlices m 0))
-  ;; TODO:  still necessary?
+  ;; TODO: still necessary?
   SparseColumnMatrix
     (get-rows [m]
       (.getRows m)))
 
-;; TODO: should there be a specific implementation for SparseRowMatrix?
 (extend-protocol mp/PMatrixColumns
   AMatrix
     (get-columns [m]
-      (.getSlices m 1)))
+      (.getSlices m 1))
+  ;; TODO: still necessary?    
+  SparseRowMatrix
+    (get-columns [m]
+      (.getColumns m)))
 
 (extend-protocol mp/PRowSetting
   AMatrix
@@ -792,11 +795,6 @@
         (.setRow m (int i) (avector-coerce (.getRow m 0) row))))
     (set-row! [m i row]
       (.setRow m (int i) (avector-coerce (.getRow m 0) row))))
-
-(extend-protocol mp/PMatrixColumns
-  SparseRowMatrix
-  (get-columns [m]
-    (.getColumns m)))
 
 (extend-protocol mp/PColumnSetting
   AMatrix
