@@ -80,8 +80,14 @@
 
 (defn mset!
   "Sets the component of a vector at position i (mutates in place)"
-  ([^AVector v ^long index ^double value]
-    (.set v (int index) value)
+  ([^INDArray v ^double value]
+    (.set v value) 
+    v)
+  ([^INDArray v ^long i ^double value]
+    (.set v (int i) value) 
+    v)
+  ([^INDArray v ^long i ^long j ^double value]
+    (.set v (int i) (int j) value) 
     v))
 
 ;; =====================================================
