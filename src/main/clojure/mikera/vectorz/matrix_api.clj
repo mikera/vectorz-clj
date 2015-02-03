@@ -505,7 +505,7 @@
       (.get m (int x) (int y)))
     (get-nd [m indexes]
       (with-indexes [[x y] indexes]
-        (.get m x y)))
+        (.get m (int x) (int y))))
   AIndex
     (get-1d [m x]
       (.get m (int x)))

@@ -2,7 +2,6 @@
   (:import [mikera.vectorz AVector Vectorz Vector Vector1 Vector2 Vector3 Vector4])
   (:import [mikera.arrayz INDArray])
   (:import [mikera.transformz Transformz])
-  (:require [mikera.vectorz.matrix-api]) 
   (:require [mikera.cljutils.error :refer [error]]) 
   (:refer-clojure :exclude [+ - * / vec vec? vector subvec get set to-array empty]))
 
@@ -43,12 +42,14 @@
     (.elementCount v)))
 
 (defn vec?
-  "Returns true if v is a vector (i.e. an instance of mikera.vectorz.AVector)"
+  "Returns true if v is a vector (i.e. an instance of mikera.vectorz.AVector or a 1-dimensional INDArray)"
   ([v]
-    (instance? AVector v)))
+    (or
+      (instance? AVector v)
+      (and (instance? INDArray v) (== 1 (.dimensionality ^INDArray v))))))
 
 (defn vectorz?
-  "Returns true if v is a vectorz class (i.e. an instance of mikera.arrayz.INDArray)"
+  "Returns true if v is a vectorz array class (i.e. any instance of mikera.arrayz.INDArray)"
   ([a]
     (instance? INDArray a)))
 
@@ -61,8 +62,12 @@
 
 (defn mget
   "Returns the component of a vector at a specific index position"
-  (^double [^INDArray v ^long index]
-    (.get v (int index))))
+  (^double [^INDArray v]
+    (.get v))
+  (^double [^INDArray v ^long i]
+    (.get v (int i)))
+  (^double [^INDArray v ^long i ^long j]
+    (.get v (int i) (int j))))
 
 (defn set
   "DEPRECATED: use mset! instead for consistency with core.matrix
@@ -74,8 +79,14 @@
 
 (defn mset!
   "Sets the component of a vector at position i (mutates in place)"
-  ([^AVector v ^long index ^double value]
-    (.set v (int index) value)
+  ([^INDArray v ^double value]
+    (.set v value) 
+    v)
+  ([^INDArray v ^long i ^double value]
+    (.set v (int i) value) 
+    v)
+  ([^INDArray v ^long i ^long j ^double value]
+    (.set v (int i) (int j) value) 
     v))
 
 ;; =====================================================
