@@ -4,12 +4,13 @@
   (:require [clojure.core.matrix.implementations :as imp])
   (:require [clojure.core.matrix.protocols :as mp])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
+  (:import [mikera.matrixx.impl SparseRowMatrix SparseColumnMatrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
   (:import [mikera.vectorz Scalar])
-  (:import [mikera.vectorz.impl IndexVector])
+  (:import [mikera.vectorz.impl IndexVector ASparseIndexedVector SparseHashedVector ZeroVector SparseIndexedVector])
   (:import [mikera.arrayz Arrayz INDArray Array])
   (:import [mikera.indexz AIndex Index])
-  (:import [java.util List])
+  (:import [java.util List Arrays])
   (:import [mikera.transformz ATransform])
   (:import [mikera.matrixx.decompose QR IQRResult Cholesky ICholeskyResult ICholeskyLDUResult])
   (:import [mikera.matrixx.decompose SVD ISVDResult LUP ILUPResult Eigen IEigenResult])
@@ -772,12 +773,20 @@
 (extend-protocol mp/PMatrixRows
   AMatrix
     (get-rows [m]
-      (.getSlices m 0)))
+      (.getSlices m 0))
+  ;; TODO: still necessary?
+  SparseColumnMatrix
+    (get-rows [m]
+      (.getRows m)))
 
 (extend-protocol mp/PMatrixColumns
   AMatrix
     (get-columns [m]
-      (.getSlices m 1)))
+      (.getSlices m 1))
+  ;; TODO: still necessary?    
+  SparseRowMatrix
+    (get-columns [m]
+      (.getColumns m)))
 
 (extend-protocol mp/PRowSetting
   AMatrix
@@ -929,6 +938,25 @@
         (doseq-indexed [ix indices i]
           (.set a (int-array-coerce ix) (.get vs (int i)))))))
 
+(extend-protocol mp/PNonZeroIndices
+  AVector
+  (non-zero-indices 
+    [m]
+    (.nonZeroIndices m))
+  ASparseIndexedVector
+  (non-zero-indices
+    [m]
+    (.nonZeroIndices m))
+  SparseHashedVector
+  (non-zero-indices
+    [m]
+    (.nonZeroIndices m))
+  AMatrix
+  (non-zero-indices 
+    [m]
+    (vec (for [i (range (mp/dimension-count m 0))]
+           (mp/non-zero-indices (mp/get-major-slice m i))))))
+
 ;; protocols for elementwise ops
 
 (extend-protocol mp/PSummable
@@ -956,6 +984,11 @@
       (with-broadcast-coerce [m a] (.addCopy m a)))
     (matrix-sub [m a]
       (with-broadcast-coerce [m a] (.subCopy m a)))
+  SparseIndexedVector
+    (matrix-add [m a]
+      (with-broadcast-clone [m a] (.add m a)))
+    (matrix-sub [m a]
+      (with-broadcast-clone [m a] (.sub m a)))
   mikera.matrixx.AMatrix
     (matrix-add [m a]
       (with-broadcast-coerce [m a] (.addCopy m a)))
@@ -1102,7 +1135,25 @@
     ([m] 
       (with-clone [m] (.reciprocal m)))
     ([m a] 
-      (with-broadcast-clone [m a] (.divide m a)))))
+       (with-broadcast-clone [m a] (.divide m a))))
+  AVector
+  (element-divide
+    ([m]
+       (with-clone [m] (.reciprocal m)))
+    ([m a]
+       (with-clone [m] (.divide m (vectorz-coerce a))))))
+
+(extend-protocol mp/PMatrixDivideMutable
+  ZeroVector
+  (element-divide!
+    ([m] m)
+    ([m a] m))
+  AVector
+  (element-divide!
+    ([m]
+       (.reciprocal m))
+    ([m a]
+       (.divide m (vectorz-coerce a)))))
 
 (extend-protocol mp/PMatrixDivideMutable
   INDArray
@@ -1123,6 +1174,11 @@
       (.innerProduct m (vectorz-coerce a)))
     (element-multiply [m a]
       (with-broadcast-coerce [m a] (.multiplyCopy m a)))
+  ZeroVector
+    (matrix-multiply [m a]
+      (.innerProduct m (vectorz-coerce a)))
+    (element-multiply [m a]
+      (.multiply m (vectorz-coerce a)))
   AMatrix
     (matrix-multiply [m a]
       (cond 
@@ -1144,9 +1200,14 @@
       (with-broadcast-clone [m a] (.multiply m a))))
 
 (extend-protocol mp/PMatrixMultiplyMutable
+  AVector
+    (matrix-multiply! [m a]
+      (mp/assign! m (mp/inner-product m (vectorz-coerce a))))
+    (element-multiply! [m a]
+      (.multiply m (vectorz-coerce a)))
   INDArray
     (matrix-multiply! [m a]
-      (mp/assign! m (mp/inner-product m a)))
+      (mp/assign! m (mp/inner-product m (vectorz-coerce a))))
     (element-multiply! [m a]
       (.multiply m (vectorz-coerce a))))
 
@@ -1490,6 +1551,105 @@
           :else (loop [v init i 0]
                   (if (< i n)
                     (recur (f v (.unsafeGet m i)) (inc i))
+                    v))))))
+
+  ;; TODO: implement me!
+  ASparseIndexedVector
+  (element-seq
+    [m]
+    (let [ec (.length m)
+          ^doubles data (or (.asDoubleArray m)
+                          (let [arr (double-array ec)]
+                            (.getElements m arr (int 0))
+                            arr))]
+      (seq data)))
+  (element-map
+    ([m f]
+       (let [nzc (int (.nonZeroCount m))
+             ^ints nzi (Arrays/copyOf (.nonZeroIndices m) nzc) 
+             ^doubles data (double-array nzc)]
+         (dotimes [i nzc] (aset data i (double (f (.unsafeGet m (aget nzi i)))))) 
+         (SparseIndexedVector/wrap nzc nzi data)))
+    ([m f a]
+       (let [nzc (int (.nonZeroCount m))
+             ^ints nzi (Arrays/copyOf (.nonZeroIndices m) nzc)
+             a (avector-coerce m a) 
+             ^doubles data (double-array nzc)]
+         (dotimes [i nzc] (aset data i (double (f (.unsafeGet m (aget nzi i)) (.unsafeGet a (aget nzi i)))))) 
+        (SparseIndexedVector/wrap nzc nzi data)))
+    ([m f a more]
+      (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
+  (element-map!
+    ([m f]
+      (let [ec (.elementCount m)]
+        (dotimes [i ec] (.unsafeSet m i (double (f (.unsafeGet m i))))) ))
+    ([m f a]
+      (let [ec (.elementCount m)
+            a (avector-coerce m a)]
+        (dotimes [i ec] (.unsafeSet m i (double (f (.unsafeGet m i) (.unsafeGet a i))))) ))
+    ([m f a more]
+      (mp/assign! m (mp/element-map m f a more))))
+  (element-reduce
+    ([m f]
+      (let [n (.length m)] 
+        (cond 
+          (== 0 n) (f) 
+          (== 1 n) (.unsafeGet m 0) 
+          :else (loop [v ^Object (.unsafeGet m 0) i 1]
+                  (if (< i n)
+                    (recur (f v (.unsafeGet m i)) (inc i))
+                    v)))))
+    ([m f init]
+      (let [n (.length m)] 
+        (cond 
+          (== 0 n) init 
+          :else (loop [v init i 0]
+                  (if (< i n)
+                    (recur (f v (.unsafeGet m i)) (inc i))
+                    v))))))
+  
+  ZeroVector
+  (element-seq
+    [m]
+    (repeat (.elementCount m) 0.0))
+  (element-map
+    ([m f]
+       (map f (mp/element-seq m)))
+    ([m f a]
+      (let [ec (.elementCount m)
+            a (avector-coerce m a) 
+            ^doubles data (double-array ec)]
+        (dotimes [i ec] (aset data i (double (f 0.0 (.unsafeGet a i))))) 
+        (Vector/wrap data)))
+    ([m f a more]
+      (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
+  (element-map!
+    ([m f]
+       (let [ec (.elementCount m)]
+        (dotimes [i ec] (.unsafeSet m i (double (f 0.0))))))
+    ([m f a]
+      (let [ec (.elementCount m)
+            a (avector-coerce m a)]
+        (dotimes [i ec] (.unsafeSet m i (double (f 0.0 (.unsafeGet a i))))) ))
+    ([m f a more]
+      (mp/assign! m (mp/element-map m f a more))))
+  (element-reduce
+    ([m f]
+      (let [n (.length m)] 
+        (cond 
+          (== 0 n) (f) 
+          (== 1 n) 0.0 
+          :else (loop [v ^Object (identity 0.0) i 1]
+                  (if (< i n)
+                    (recur (f v 0.0) (inc i))
+                    v)))))
+    ([m f init]
+      (let [n (.length m)] 
+        (cond 
+          (== 0 n) init 
+          :else (loop [v init i 0]
+                  (if (< i n)
+                    (recur (f v 0.0) (inc i))
                     v))))))
   
   AMatrix
