@@ -943,14 +943,6 @@
   (non-zero-indices 
     [m]
     (.nonZeroIndices m))
-  ASparseIndexedVector
-  (non-zero-indices
-    [m]
-    (.nonZeroIndices m))
-  SparseHashedVector
-  (non-zero-indices
-    [m]
-    (.nonZeroIndices m))
   AMatrix
   (non-zero-indices 
     [m]
@@ -1144,24 +1136,18 @@
        (with-clone [m] (.divide m (vectorz-coerce a))))))
 
 (extend-protocol mp/PMatrixDivideMutable
-  ZeroVector
+  INDArray
   (element-divide!
-    ([m] m)
-    ([m a] m))
+    ([m] 
+       (.reciprocal m))
+    ([m a]
+       (.divide m (vectorz-coerce a))))
   AVector
   (element-divide!
     ([m]
        (.reciprocal m))
     ([m a]
        (.divide m (vectorz-coerce a)))))
-
-(extend-protocol mp/PMatrixDivideMutable
-  INDArray
-  (element-divide!
-    ([m] 
-      (.reciprocal m))
-    ([m a]
-      (.divide m (vectorz-coerce a)))))
 
 (extend-protocol mp/PMatrixMultiply
   AScalar
@@ -1174,11 +1160,6 @@
       (.innerProduct m (vectorz-coerce a)))
     (element-multiply [m a]
       (with-broadcast-coerce [m a] (.multiplyCopy m a)))
-  ZeroVector
-    (matrix-multiply [m a]
-      (.innerProduct m (vectorz-coerce a)))
-    (element-multiply [m a]
-      (.multiply m (vectorz-coerce a)))
   AMatrix
     (matrix-multiply [m a]
       (cond 
@@ -1553,7 +1534,7 @@
                     (recur (f v (.unsafeGet m i)) (inc i))
                     v))))))
 
-  ;; TODO: implement me!
+  ;; TODO: Finish implementing sparse implementations
   ASparseIndexedVector
   (element-seq
     [m]
