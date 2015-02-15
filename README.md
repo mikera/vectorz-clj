@@ -32,7 +32,7 @@ For more information see the [vectorz-clj Wiki](https://github.com/mikera/vector
 `vectorz-clj` is reasonably stable, and implements all of the `core.matrix` API feature set. The `core.matrix` API 
 is still under development, so users may expect some minor changes to the API in future releases.
 
-[![Build Status](https://travis-ci.org/mikera/vectorz-clj.png?branch=develop)](https://travis-ci.org/mikera/vectorz-clj)
+[![Build Status](https://travis-ci.org/mikera/vectorz-clj.png?branch=develop)](https://travis-ci.org/mikera/vectorz-clj) [![Dependency Status](https://www.versioneye.com/user/projects/54deed26271c93696000004a/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54deed26271c93696000004a)
 
 ### License
 
