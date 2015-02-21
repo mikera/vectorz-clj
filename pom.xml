@@ -41,7 +41,7 @@
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>core.matrix</artifactId>
-			<version>0.33.2-SNAPSHOT</version>
+			<version>0.33.2</version>
 		</dependency>
 		<dependency>
 			<groupId>criterium</groupId>
