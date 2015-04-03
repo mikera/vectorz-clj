@@ -41,7 +41,7 @@
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>core.matrix</artifactId>
-			<version>0.33.2</version>
+			<version>0.34.0</version>
 		</dependency>
 		<dependency>
 			<groupId>criterium</groupId>
@@ -58,7 +58,7 @@
 		<dependency>
 			<groupId>org.clojure</groupId>
 			<artifactId>clojure</artifactId>
-			<version>1.7.0-alpha5</version>
+			<version>1.7.0-alpha6</version>
 		</dependency>
 		<dependency>
 			<groupId>net.mikera</groupId>
