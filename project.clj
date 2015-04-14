@@ -18,7 +18,7 @@
                  [org.clojure/test.check "0.5.9"]
                  [net.mikera/cljunit "0.3.1"]
                  [net.mikera/clojure-utils "0.6.1"]
-                 [net.mikera/core.matrix "0.30.2"]
+                 [net.mikera/core.matrix "0.34.0"]
                  [net.mikera/core.matrix.stats "0.4.0"]
                  [net.mikera/vectorz "0.46.0"]]
   
