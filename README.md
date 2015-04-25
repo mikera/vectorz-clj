@@ -1,6 +1,8 @@
 vectorz-clj
 ===========
 
+[![Join the chat at https://gitter.im/mikera/vectorz-clj](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mikera/vectorz-clj?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Clojars Project](http://clojars.org/net.mikera/vectorz-clj/latest-version.svg)](http://clojars.org/net.mikera/vectorz-clj)
 
 [![Build Status](https://travis-ci.org/mikera/vectorz-clj.png?branch=develop)](https://travis-ci.org/mikera/vectorz-clj) [![Dependency Status](https://www.versioneye.com/user/projects/54deed26271c93696000004a/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54deed26271c93696000004a)
