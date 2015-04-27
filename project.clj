@@ -12,7 +12,7 @@
             :url "http://www.gnu.org/licenses/lgpl.html"}
   :source-paths ["src/main/clojure"]
   :test-paths ["src/test/clojure"]
-  :dependencies [[org.clojure/clojure "1.6.0"]
+  :dependencies [[org.clojure/clojure "1.7.0-beta2"]
                  [criterium/criterium "0.4.3"]
                  [org.clojure/tools.analyzer "0.6.0"]
                  [org.clojure/test.check "0.5.9"]
