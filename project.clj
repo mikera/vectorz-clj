@@ -12,13 +12,14 @@
             :url "http://www.gnu.org/licenses/lgpl.html"}
   :source-paths ["src/main/clojure"]
   :test-paths ["src/test/clojure"]
-  :dependencies [[org.clojure/clojure "1.7.0-beta2"]
+  :dependencies [[org.clojure/clojure "1.7.0-RC1"]
                  [criterium/criterium "0.4.3"]
                  [org.clojure/tools.analyzer "0.6.0"]
                  [org.clojure/test.check "0.5.9"]
                  [net.mikera/cljunit "0.3.1"]
                  [net.mikera/clojure-utils "0.6.1"]
                  [net.mikera/core.matrix "0.34.0"]
+                 [net.mikera/core.matrix.testing "0.0.1"]
                  [net.mikera/core.matrix.stats "0.4.0"]
                  [net.mikera/vectorz "0.46.0"]]
   
