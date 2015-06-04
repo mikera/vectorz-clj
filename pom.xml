@@ -41,7 +41,7 @@
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>core.matrix</artifactId>
-			<version>0.34.0</version>
+			<version>0.35.0</version>
 		</dependency>
 		<dependency>
 			<groupId>criterium</groupId>
@@ -63,7 +63,7 @@
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>core.matrix.stats</artifactId>
-			<version>0.5.0</version>
+			<version>0.6.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -80,7 +80,7 @@
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>core.matrix.testing</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.3</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

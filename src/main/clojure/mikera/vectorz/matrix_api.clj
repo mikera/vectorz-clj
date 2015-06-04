@@ -1133,7 +1133,13 @@
     ([m]
        (with-clone [m] (.reciprocal m)))
     ([m a]
-       (with-clone [m] (.divide m (vectorz-coerce a))))))
+       (with-clone [m] (.divide m (vectorz-coerce a)))))
+  Index ;; we need this oiverride, since the default implementation uses reciprocals... doesn't work with indexes!
+  (element-divide
+    ([m]
+       (let [v (.clone (.asVector m))] (.reciprocal v) v))
+    ([m a]
+       (let [v (.clone (.asVector m))] (.divide v (vectorz-coerce a)) v))))
 
 (extend-protocol mp/PMatrixDivideMutable
   INDArray
