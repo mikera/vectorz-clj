@@ -1134,7 +1134,7 @@
        (with-clone [m] (.reciprocal m)))
     ([m a]
        (with-clone [m] (.divide m (vectorz-coerce a)))))
-  Index ;; we need this oiverride, since the default implementation uses reciprocals... doesn't work with indexes!
+  Index ;; we need this special override, since division doesn't work with integer indexes!
   (element-divide
     ([m]
        (let [v (.clone (.asVector m))] (.reciprocal v) v))
@@ -1820,5 +1820,3 @@
 ;; registration
 
 (imp/register-implementation (vectorz-coerce [[1 2] [3 4]]))
-
-:OK
