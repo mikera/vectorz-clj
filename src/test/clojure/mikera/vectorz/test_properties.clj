@@ -1,19 +1,16 @@
 (ns mikera.vectorz.test-properties
   (:use clojure.core.matrix)
   (:require [clojure.test.check :as sc]
-            [clojure.test.check.generators :as gen]
+            [clojure.test.check.generators :as gen :refer (sample)]
+            [clojure.core.matrix.generators :as genm]
             [clojure.test.check.properties :as prop]
             [clojure.test.check.clojure-test :as ct :refer (defspec)])
   (:import [mikera.vectorz AVector Vectorz Vector]))
 
 (set-current-implementation :vectorz)
 
-;; generator for legitimate shapes for vectors
-;; vector sizes grow linearly
-(def gen-vector-shape
-  (gen/fmap vector gen/pos-int))
+(def gen-vectorz-arrays (genm/gen-array (genm/gen-shape) genm/gen-double (gen/return :vectorz)))
 
-;; generator for legitimate shapes of arrays. We don't allow zero-length dimensions
-;; element counts grow linearly
-(def gen-shape
-  :TODO)
+(defspec first-element-is-min-after-sorting 20 
+  (prop/for-all [v gen-vectorz-arrays]
+                (clojure.core.matrix.compliance-tester/instance-test v)))
