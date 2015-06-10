@@ -368,6 +368,9 @@
     (aset-double a 4 9999)
     (is (equals v [1 2 3 4 5]))))
 
+(deftest test-validate-shape
+  (is (equals [2] (mp/validate-shape (v/of 1 2)))))
+
 
 ;; run compliance tests
 

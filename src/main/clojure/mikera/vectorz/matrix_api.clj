@@ -1097,7 +1097,8 @@
 (extend-protocol mp/PValidateShape
   INDArray
     (validate-shape [m]
-      (.validate m))) 
+      (.validate m)
+      (vec (.getShape m)))) 
 
 (extend-protocol mp/PConversion
   AScalar
