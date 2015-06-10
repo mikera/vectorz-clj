@@ -3,6 +3,7 @@
   (:require [clojure.test.check :as sc]
             [clojure.test.check.generators :as gen :refer (sample)]
             [clojure.core.matrix.generators :as genm]
+            [clojure.core.matrix.compliance-tester :as ctest]
             [clojure.test.check.properties :as prop]
             [clojure.test.check.clojure-test :as ct :refer (defspec)])
   (:import [mikera.vectorz AVector Vectorz Vector]))
@@ -13,4 +14,4 @@
 
 (defspec first-element-is-min-after-sorting 20 
   (prop/for-all [v gen-vectorz-arrays]
-                (clojure.core.matrix.compliance-tester/instance-test v)))
+                (ctest/instance-test v)))
