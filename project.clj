@@ -12,16 +12,16 @@
             :url "http://www.gnu.org/licenses/lgpl.html"}
   :source-paths ["src/main/clojure"]
   :test-paths ["src/test/clojure"]
-  :dependencies [[org.clojure/clojure "1.7.0-RC1"]
+  :dependencies [[org.clojure/clojure "1.7.0"]
                  [criterium/criterium "0.4.3"]
-                 [org.clojure/tools.analyzer "0.6.0"]
-                 [org.clojure/test.check "0.5.9"]
+                 [org.clojure/tools.analyzer "0.6.6"]
+                 [org.clojure/test.check "0.7.0"]
                  [net.mikera/cljunit "0.3.1"]
-                 [net.mikera/clojure-utils "0.6.1"]
-                 [net.mikera/core.matrix "0.34.0"]
-                 [net.mikera/core.matrix.testing "0.0.1"]
+                 [net.mikera/clojure-utils "0.6.2"]
+                 [net.mikera/core.matrix "0.36.1"]
+                 [net.mikera/core.matrix.testing "0.0.4"]
                  [net.mikera/core.matrix.stats "0.4.0"]
-                 [net.mikera/vectorz "0.46.0"]]
+                 [net.mikera/vectorz "0.47.0"]]
   
   :profiles {:dev {:java-source-paths ["src/test/java"]}}
   
