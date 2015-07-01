@@ -5,7 +5,7 @@
 ;;
 ;; If you are having trouble building, please check the pom.xml for latest dependency versions
 
-(defproject net.mikera/vectorz-clj "0.25.1-SNAPSHOT"
+(defproject net.mikera/vectorz-clj "0.30.2-SNAPSHOT"
   :description "Fast vector library for Clojure, building on Vectorz and using core.matrix"
   :url "https://github.com/mikera/vectorz-clj"
   :license {:name "GNU Lesser General Public License (LGPL)"
