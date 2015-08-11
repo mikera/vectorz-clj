@@ -54,7 +54,7 @@
     (instance? INDArray a)))
 
 (defn get
-  "DEPRECATED: use mset! instead for consistency with core.matrix
+  "DEPRECATED: use mget instead for consistency with core.matrix
 
    Returns the component of a vector at a specific index position"
   (^double [^INDArray v ^long index]
