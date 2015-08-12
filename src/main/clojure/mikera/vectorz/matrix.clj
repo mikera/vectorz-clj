@@ -1,4 +1,5 @@
 (ns mikera.vectorz.matrix
+  "Namepace for Vectorz functionality using matrices."
   (:import [mikera.vectorz AVector Vectorz Vector Vector3])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.transformz Transformz ATransform AAffineTransform MatrixTransform])

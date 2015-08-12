@@ -1,4 +1,6 @@
 (ns mikera.vectorz.core
+  "Clojure API for directly accessing Vectorz functions. Functions in clojure.core.matrix API
+   should normally be preferred to these."
   (:import [mikera.vectorz AVector Vectorz Vector Vector1 Vector2 Vector3 Vector4])
   (:import [mikera.arrayz INDArray])
   (:import [mikera.transformz Transformz])

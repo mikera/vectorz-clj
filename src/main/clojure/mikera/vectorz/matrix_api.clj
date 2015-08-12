@@ -1,4 +1,6 @@
 (ns mikera.vectorz.matrix-api
+  "Namespace for vectorz-clj core.matrix implementation. Loading this namespace either 
+   directly or indirectly is required to enable the :vectorz implementation for core.matrix."
   (:use clojure.core.matrix)
   (:use clojure.core.matrix.utils)
   (:require [clojure.core.matrix.implementations :as imp])

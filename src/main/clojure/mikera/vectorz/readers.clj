@@ -1,4 +1,5 @@
 (ns mikera.vectorz.readers
+  "Namespace for vectorz-clj data literal readers."
   (:require [clojure.core.matrix :as m])
   (:import [mikera.vectorz AVector Vectorz Vector Vector1 Vector2 Vector3 Vector4 AScalar Scalar])
   (:import [mikera.arrayz INDArray Arrayz])
