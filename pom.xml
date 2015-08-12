@@ -28,14 +28,14 @@
 	<parent>
 		<groupId>net.mikera</groupId>
 		<artifactId>clojure-pom</artifactId>
-		<version>0.5.0</version>
+		<version>0.6.0</version>
 	</parent>
 
 	<dependencies>
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>vectorz</artifactId>
-			<version>0.47.0</version>
+			<version>0.48.0</version>
 		</dependency>
 		<dependency>
 			<groupId>net.mikera</groupId>
@@ -57,7 +57,7 @@
 		<dependency>
 			<groupId>org.clojure</groupId>
 			<artifactId>clojure</artifactId>
-			<version>1.8.0-alpha2</version>
+			<version>1.8.0-alpha4</version>
 		</dependency>
 		<dependency>
 			<groupId>net.mikera</groupId>
