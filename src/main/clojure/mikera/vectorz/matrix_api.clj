@@ -3,6 +3,7 @@
   (:use clojure.core.matrix.utils)
   (:require [clojure.core.matrix.implementations :as imp])
   (:require [clojure.core.matrix.protocols :as mp])
+  (:require [mikera.vectorz.readers])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.matrixx.impl SparseRowMatrix SparseColumnMatrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
@@ -11,6 +12,7 @@
   (:import [mikera.arrayz Arrayz INDArray Array])
   (:import [mikera.indexz AIndex Index])
   (:import [java.util List Arrays])
+  (:import [java.io Writer])
   (:import [mikera.transformz ATransform])
   (:import [mikera.matrixx.decompose QR IQRResult Cholesky ICholeskyResult ICholeskyLDUResult])
   (:import [mikera.matrixx.decompose SVD ISVDResult LUP ILUPResult Eigen IEigenResult])
@@ -1812,11 +1814,30 @@
            `(~fname [~'m] (.applyTo ~op ~'m)))) 
        math-op-mapping)))
 
-;; TODO printing
-;; we want to print in a form that can be constructed again
-;;(defmethod print-method AVector [x writer] (.write writer (str "#" (.getCanonicalName (class x)) (str x))))
-;;(defmethod print-method AScalar [x writer] (.write writer (str "#" (.getCanonicalName (class x)) (str x))))
-;;(defmethod print-method AMatrix [x writer] (.write writer (str "#" (.getCanonicalName (class x)) (str x))))
+;; Printing methods
+(defmethod print-dup AVector [^AVector x ^Writer writer] 
+  (.write writer (str "#vectorz/vector " x)))
+
+(defmethod print-dup AScalar [^AScalar x ^Writer writer] 
+  (.write writer (str "#vectorz/scalar " x)))
+
+(defmethod print-dup AMatrix [^AMatrix x ^Writer writer] 
+  (.write writer (str "#vectorz/matrix " x)))
+
+(defmethod print-dup INDArray [^INDArray x ^Writer writer] 
+  (.write writer (str "#vectorz/array "x)))
+
+(defmethod print-method AVector [^AVector x ^Writer writer] 
+  (.write writer (str "#vectorz/vector " x)))
+
+(defmethod print-method AScalar [^AScalar x ^Writer writer] 
+  (.write writer (str "#vectorz/scalar " x)))
+
+(defmethod print-method AMatrix [^AMatrix x ^Writer writer] 
+  (.write writer (str "#vectorz/matrix " x)))
+
+(defmethod print-method INDArray [^INDArray x ^Writer writer] 
+  (.write writer (str "#vectorz/array "x)))
 
 ;; registration
 
