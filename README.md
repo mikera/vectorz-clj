@@ -7,7 +7,7 @@ vectorz-clj
 
 [![Build Status](https://travis-ci.org/mikera/vectorz-clj.png?branch=develop)](https://travis-ci.org/mikera/vectorz-clj) [![Dependency Status](https://www.versioneye.com/user/projects/54deed26271c93696000004a/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54deed26271c93696000004a)
 
-Fast vector library for Clojure, building on the [Vectorz](https://github.com/mikera/vectorz) library and designed to work with the [core.matrix](https://github.com/mikera/core.matrix) array programming API.
+Fast vector and matrix library for Clojure, building on the [Vectorz](https://github.com/mikera/vectorz) library and designed to work with the [core.matrix](https://github.com/mikera/core.matrix) array programming API.
 
 `vectorz-clj` is designed so that you don't have to compromise, offering both:
 
@@ -29,14 +29,17 @@ Important features:
  
 ## Documentation
 
-For more information see the [vectorz-clj Wiki](https://github.com/mikera/vectorz-clj/wiki).
+*vectorz-clj* is intended to be used primarily as a `core.matrix` implementation. As such, the main API to understand is `core.matrix` itself. See the `core.matrix` wiki for more information:
+
+ - https://github.com/mikera/core.matrix/wiki
+
+For more information about the specific details of vectorz-clj itself, see the [vectorz-clj Wiki](https://github.com/mikera/vectorz-clj/wiki).
 
 ### Status
 
-`vectorz-clj` requires Clojure 1.4 or above, and an up to date version of `core.matrix`
+`vectorz-clj` requires Clojure 1.4 or above, Java 1.7 or above, and an up to date version of *core.matrix*
 
-`vectorz-clj` is reasonably stable, and implements all of the `core.matrix` API feature set. The `core.matrix` API 
-is still under development, so users may expect some minor changes to the API in future releases.
+`vectorz-clj` is reasonably stable, and implements all of the *core.matrix* API feature set. 
 
 
 ### License
