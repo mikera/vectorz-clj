@@ -1018,6 +1018,12 @@
     (matrix-sub! [m a]
       (.sub m (amatrix-coerce m a))))
 
+(extend-protocol mp/PScaleAdd
+  INDArray
+    (scale-add! [m a m2 b c]
+      (.scaleAdd m (double-coerce a) (vectorz-coerce m2) (double-coerce b) (double-coerce c))
+      m))
+
 (extend-protocol mp/PVectorOps
   INDArray
     (vector-dot [a b]
