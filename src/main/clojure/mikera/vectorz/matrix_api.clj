@@ -644,17 +644,15 @@
     (set-2d [m row column v] (error "Can't do 2-dimensional set on a 1D vector!"))
     (set-nd [m indexes v]
       (if (== 1 (count indexes))
-        (let [m (.clone m)] (.set m (int (first indexes)) (double v)) m)
+        (with-clone [m] (.set m (int (first indexes)) (double v)))
         (error "Can't do " (count indexes) "-dimensional set on a 1D vector!"))) 
     (is-mutable? [m] (.isFullyMutable m)) 
   AMatrix
     (set-1d [m row v] (error "Can't do 1-dimensional set on a 2D matrix!"))
     (set-2d [m row column v] 
-      (let [m (.clone m)] (.set m (int row) (int column) (double v)) m))
+      (with-clone [m] (.set m (int row) (int column) (double v))))
     (set-nd [m indexes v]
-      (if (== 2 (count indexes))
-        (with-clone [m] (.set m (int (first indexes)) (int (second indexes)) (double v)))
-        (error "Can't do " (count indexes) "-dimensional set on a 2D matrix!")))
+      (with-clone [m] (.set m (int-array indexes) (double v))))
     (is-mutable? [m] (.isFullyMutable m)))
     
 (extend-protocol mp/PIndexedSettingMutable
@@ -718,9 +716,7 @@
 (extend-protocol mp/PMatrixEqualityEpsilon
   INDArray 
     (matrix-equals-epsilon [a b eps]
-      (if (instance? INDArray b)
-        (.epsilonEquals a ^INDArray b (double eps))
-        (.epsilonEquals a (vectorz-coerce b) (double eps)))))
+      (.epsilonEquals a (vectorz-coerce b) (double eps))))
 
 (extend-protocol mp/PMatrixSlices
   INDArray
@@ -756,11 +752,7 @@
     (get-major-slice [m i]
       (.slice m (int i)))
     (get-slice [m dimension i]
-      (let [dimensions (int dimension)]
-        (cond 
-          (== 0 dimension) (.getRow m (int i))
-          (== 1 dimension) (.getColumn m (int i))
-          :else (error "Can't get slice from matrix with dimension: " dimension)))))
+      (.slice m (int dimension) (int i))))
 
 (extend-protocol mp/PRotate
   INDArray
