@@ -237,7 +237,7 @@
                                  0 0.0
                                  1 (Vectorz/newVector (int (first shape)))
                                  2 (Matrixx/newMatrix (int (first shape)) (int (second shape)))
-                                 (Arrayz/create ^List (mapv (fn [_] (mp/new-matrix-nd m (next shape))) (range (first shape))))))
+                                 (Arrayz/newArray (int-array shape))))
                 (construct-matrix [m data]
                                   (cond 
                                     (instance? INDArray data)
