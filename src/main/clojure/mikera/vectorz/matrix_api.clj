@@ -837,7 +837,7 @@
 (extend-protocol mp/PAssignment
   AScalar
     (assign! 
-      [m source] (.set m (double (mp/get-0d source))))
+      [m source] (.set m (double-coerce source)))
     (assign-array! 
       ([m arr] (.set m (double (nth arr 0))))
       ([m arr start length] (.set m (double (nth arr 0)))))
