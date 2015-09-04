@@ -707,9 +707,13 @@
 (extend-protocol mp/PMatrixEquality
   INDArray
     (matrix-equals [a b]
-      (if (instance? INDArray b)
-        (.equals a ^INDArray b)
-        (.equals a (vectorz-coerce b)))))
+      (.equals a (vectorz-coerce b)))
+  AMatrix
+    (matrix-equals [a b]
+      (.equals a (vectorz-coerce b)))
+  AVector
+    (matrix-equals [a b]
+      (.equals a (vectorz-coerce b))))
 
 (extend-protocol mp/PMatrixEqualityEpsilon
   INDArray 
