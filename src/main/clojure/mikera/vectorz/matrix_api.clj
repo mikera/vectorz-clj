@@ -906,6 +906,20 @@
 ;; protocols for indexed access
 
 (extend-protocol mp/PSelect
+  INDArray
+    (select [a args] 
+      (let [args (mapv #(int-array-coerce %) args)
+            dims (.dimensionality a)
+            next-args (next args)
+            ^ints ixs (first args)
+            n (alength ixs)
+            oa (object-array n)]
+        (if (> dims 1)
+          (do 
+            (dotimes [i n]
+             (aset oa i (mp/select (.slice a (aget ixs i)) next-args)))
+            (Arrayz/create oa))
+          (.select (.asVector a) ixs))))
   AVector
     (select [a args] 
       (let [ixs (int-array-coerce (first args))]
