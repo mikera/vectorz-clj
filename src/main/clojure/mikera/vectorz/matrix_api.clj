@@ -1255,6 +1255,20 @@
     (add-product! [m a b]
       (.addProduct m (avector-coerce m a) (avector-coerce m b)))) 
 
+(extend-protocol mp/PAddInnerProductMutable
+  INDArray
+    (add-inner-product! 
+      ([m a b]
+        (let [a (vectorz-coerce a)
+              b (vectorz-coerce b)]
+          (.addInnerProduct m a b))) 
+      ([m a b factor]
+        (let [factor (double-coerce factor)]
+          (cond 
+            (== 0.0 factor) m
+            (== 1.0 factor) (mp/add-inner-product! m a b)
+            :else (mp/add-inner-product! m a (mp/scale b factor))))))) 
+
 (extend-protocol mp/PAddScaled
   AVector
     (add-scaled [m a factor]

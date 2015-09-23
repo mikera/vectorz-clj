@@ -371,6 +371,15 @@
 (deftest test-validate-shape
   (is (equals [2] (mp/validate-shape (v/of 1 2)))))
 
+(deftest test-add-inner-product
+  (let [m (array :vectorz [1 2])
+        a (array :vectorz [[0 2] [1 0]])
+        b (array :vectorz [10 100])]
+    (add-inner-product! m a b)
+    (is (equals [201 12] m))
+    (add-inner-product! m a b -1)
+    (is (equals [1 2] m))))
+
 
 ;; run compliance tests
 
