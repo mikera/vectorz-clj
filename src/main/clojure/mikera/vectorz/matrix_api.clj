@@ -12,6 +12,7 @@
   (:import [mikera.vectorz Scalar])
   (:import [mikera.vectorz.impl IndexVector ASparseIndexedVector SparseHashedVector ZeroVector SparseIndexedVector])
   (:import [mikera.arrayz Arrayz INDArray Array])
+  (:import [mikera.arrayz.impl SliceArray])
   (:import [mikera.indexz AIndex Index])
   (:import [java.util List Arrays])
   (:import [java.io Writer])
@@ -922,9 +923,10 @@
              (do 
                (dotimes [i n]
                  (aset oa i (mp/select (.slice a (aget ixs i)) next-args)))
-               (Arrayz/create oa))
+               (SliceArray/create ^List (vec oa)))
            :else 
              (.select (.asVector a) ixs)))))
+  ;; TODO AMatrix override
   AVector
     (select [a args] 
       (if (empty? args)

@@ -380,6 +380,11 @@
     (add-inner-product! m a b -1)
     (is (equals [1 2] m))))
 
+(deftest test-select-regression
+  (let [m (new-matrix 3 4)
+        col (select m :all 1)]
+    (assign! col [3 4 5])
+    (is (equals [[0 3 0 0] [0 4 0 0] [0 5 0 0]] m))))
 
 ;; run compliance tests
 
