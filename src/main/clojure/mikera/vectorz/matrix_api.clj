@@ -22,7 +22,7 @@
   (:refer-clojure :exclude [vector?]))
 
 (set! *warn-on-reflection* true)
-(set! *unchecked-math* true)
+(set! *unchecked-math* :warn-on-boxed)
 (declare vectorz-coerce* avector-coerce*)
 
 ;; =======================================================================
@@ -172,7 +172,7 @@
   (^AVector [m]
     (cond
 	    (instance? AVector m) m
-      (== (mp/dimensionality m) 1)
+      (== (dimensionality m) 1)
         (let [len (ecount m)
               r (Vectorz/newVector len)]
           (assign! r m) r)
@@ -245,7 +245,7 @@
                                     (mp/is-scalar? data) 
                                       (double-coerce data)
                                     (array? data) 
-                                      (if (== 0 (mp/dimensionality data))
+                                      (if (== 0 (dimensionality data))
                                         (double-coerce data)
                                         (vectorz-coerce data))
                                     :default
@@ -306,7 +306,7 @@
     (norm [m p]
       (cond 
         (= java.lang.Double/POSITIVE_INFINITY p) (.elementMax m)
-        (number? p) (Math/pow (.elementAbsPowSum m p) (/ 1 p))
+        (number? p) (Math/pow (.elementAbsPowSum m p) (/ 1.0 (double p)))
         :else (error "p must be a number"))))
 
 (extend-protocol mp/PMatrixRank
@@ -314,7 +314,7 @@
     (rank [m]
       (let [{:keys [S]} (mp/svd m {:return [:S]})
             eps 1e-10]
-        (reduce (fn [n x] (if (< (java.lang.Math/abs (double x)) eps) n (inc n))) 0 S))))
+        (reduce (fn [^long n x] (if (< (java.lang.Math/abs (double x)) eps) n (inc n))) 0 S))))
 
 (extend-protocol mp/PSolveLinear
   AMatrix
@@ -445,7 +445,7 @@
     (get-shape [m]
       (.getShape m))
     (dimension-count [m x]
-      (if (== x 0)
+      (if (== 0 (long x))
         (.length m)
         (error "Vector does not have dimension: " x)))
   AMatrix
@@ -721,13 +721,13 @@
 (extend-protocol mp/PMatrixSlices
   INDArray
     (get-row [m i]
-      (if (== 2 (mp/dimensionality m))
+      (if (== 2 (dimensionality m))
         (.slice m (int i))
-        (error "Can't get row of array with dimensionality: " (mp/dimensionality m))))
+        (error "Can't get row of array with dimensionality: " (dimensionality m))))
     (get-column [m i]
-      (if (== 2 (mp/dimensionality m))
+      (if (== 2 (dimensionality m))
         (.slice m (int 1) (int i))
-        (error "Can't get column of array with dimensionality: " (mp/dimensionality m))))
+        (error "Can't get column of array with dimensionality: " (dimensionality m))))
     (get-major-slice [m i]
       (.sliceValue m (int i)))
     (get-slice [m dimension i]
@@ -741,7 +741,7 @@
     (get-major-slice [m i]
       (.sliceValue m (int i)))
     (get-slice [m dimension i]
-      (if (== 0 dimension)
+      (if (== 0 (long dimension))
         (.sliceValue m (int i))
         (error "Can't get slice from vector with dimension: " dimension)))
   AMatrix
@@ -844,7 +844,7 @@
            (.fill m (double source))
         (instance? INDArray source) 
            (.set m ^INDArray source)
-        (== 0 (mp/dimensionality source))
+        (== 0 (dimensionality source))
            (.fill m (double-coerce source))
         :else 
            (.set m (vectorz-coerce source))))
@@ -906,6 +906,7 @@
 ;; protocols for indexed access
 
 (extend-protocol mp/PSelect
+  ;; note that select needs to create a view
   INDArray
     (select [a args] 
       (if (empty? args)
@@ -1109,7 +1110,7 @@
         (vectorz-coerce param)))
   AIndex
     (coerce-param [m param]
-      (if (== 1 (mp/dimensionality param))
+      (if (== 1 (dimensionality param))
         (Index/of (int-array (mp/element-seq param))) 
         (error "Cannot coerce to Index with shape: " (vec (mp/get-shape param))))))
 
@@ -1419,7 +1420,7 @@
   INDArray
     (sparse-coerce [m data]
       (cond 
-        (== 0 (mp/dimensionality data)) (Scalar. (double-coerce data))
+        (== 0 (dimensionality data)) (Scalar. (double-coerce data))
         (vectorz? data) (.sparse ^INDArray data)
         :else (let [ss (map (fn [s] (.sparse (vectorz-coerce s))) (mp/get-major-slice-seq data))]
                (.sparse (Arrayz/create (object-array ss))))))
