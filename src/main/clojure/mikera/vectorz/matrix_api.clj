@@ -1865,6 +1865,76 @@
                     (recur (f v (.get m i)) (inc i))
                     v)))))))
 
+(extend-protocol mp/PCompare
+  AVector
+    (element-compare [a b] 
+      (let [b (avector-coerce a b)] 
+        (.signum (.mutable (.subCopy a b)))))
+    (element-if [m a b] 
+      (let [n (.length m)
+            a (avector-coerce m a)
+            b (avector-coerce m b)
+            r (Vectorz/newVector n)] 
+        (dotimes [i (long n)]
+          (let [i (int i)
+                test (.unsafeGet m i)]
+            (.set r (if (> test 0) (.unsafeGet a i) (.unsafeGet b i)))))
+        r))
+    (element-lt [m a] 
+      (let [n (.length m)
+            a (avector-coerce m a)
+            r (Vectorz/newVector n)] 
+        (dotimes [i (long n)]
+          (let [i (int i)
+                test (- (.unsafeGet m i) (.unsafeGet a i))]
+            (.set r (if (< test 0) 1.0 0.0))))
+        r))
+    (element-le [m a] 
+      (let [n (.length m)
+            a (avector-coerce m a)
+            r (Vectorz/newVector n)] 
+        (dotimes [i (long n)]
+          (let [i (int i)
+                test (- (.unsafeGet m i) (.unsafeGet a i))]
+            (.set r (if (<= test 0) 1.0 0.0))))
+        r))
+    (element-gt [m a] 
+      (let [n (.length m)
+            a (avector-coerce m a)
+            r (Vectorz/newVector n)] 
+        (dotimes [i (long n)]
+          (let [i (int i)
+                test (- (.unsafeGet m i) (.unsafeGet a i))]
+            (.set r (if (> test 0) 1.0 0.0))))
+        r))
+    (element-ge [m a] 
+      (let [n (.length m)
+            a (avector-coerce m a)
+            r (Vectorz/newVector n)] 
+        (dotimes [i (long n)]
+          (let [i (int i)
+                test (- (.unsafeGet m i) (.unsafeGet a i))]
+            (.set r (if (>= test 0) 1.0 0.0))))
+        r))
+    (element-ne [m a] 
+      (let [n (.length m)
+            a (avector-coerce m a)
+            r (Vectorz/newVector n)] 
+        (dotimes [i (long n)]
+          (let [i (int i)
+                test (- (.unsafeGet m i) (.unsafeGet a i))]
+            (.set r (if (not= test 0) 1.0 0.0))))
+        r))
+    (element-eq [m a] 
+      (let [n (.length m)
+            a (avector-coerce m a)
+            r (Vectorz/newVector n)] 
+        (dotimes [i (long n)]
+          (let [i (int i)
+                test (- (.unsafeGet m i) (.unsafeGet a i))]
+            (.set r (if (== test 0) 1.0 0.0))))
+        r)))
+
 ;; ==============================================================
 ;; Generator for mathematical functions
 
