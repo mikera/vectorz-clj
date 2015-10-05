@@ -22,6 +22,18 @@
   (:import [mikera.matrixx.solve Linear])
   (:refer-clojure :exclude [vector?]))
 
+;; ======================================================================
+;; General implementation notes
+;;
+;; Vectorz supports double element types only. All internal calculation is done with 
+;; unboxed double primitives for speed, however boxing may be required for return values, 
+;; passing to other core.matrix protocols etc.
+;;
+;; Arguments other then the first argument are *not* guaranteed to be Vectorz types
+;; so we need to coerce to appropriate forms before use. This ensures that we can work with
+;; types from all other working numerical implementations. 
+;; Utility functions to do this include: vectorz-coerce, double-coerce, avector-coerce
+
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* :warn-on-boxed)
 (declare vectorz-coerce* avector-coerce*)
@@ -194,30 +206,29 @@
 (defn vectorz-coerce* 
   "Function to attempt conversion to a Vectorz INDArray object. May return nil if conversion fails."
   (^INDArray [p]
-	  (let [dims (dimensionality p)]
-	    (cond
-		    (instance? INDArray p) p
-	      (== 0 dims)
-	        (cond 
-	          (number? p) (Scalar. (.doubleValue ^Number p))
-	          (instance? AScalar p) p
-            (nil? p) nil
-	          :else (do
-                   ;; (println (str "Coercing " p))
-                   (Scalar. (double (mp/get-0d p)))))
-		    (== 1 dims)
-		      (try (Vector/wrap (mp/to-double-array p)) (catch Throwable e nil))
-		    (== 2 dims)
-		      (let [rows (int (mp/dimension-count p 0))
-                cols (int (mp/dimension-count p 1))]
-            (try 
-              (if (< (* rows cols) 10000) ;; dense default for small matrices
-                (Matrix/wrap rows cols (mp/to-double-array p)) 
-                (Matrixx/create ^java.util.List (mapv vectorz-coerce* (slices p)))) 
-              (catch Throwable e nil)))
-		    :else 
-	        (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
-	          (and (seq sv) (sv 0) (Arrayz/create sv)))))))
+	  (let [dims (long (mp/dimensionality p))]
+	   (cond
+	     (== 0 dims)
+	       (cond 
+	         (number? p) (Scalar. (.doubleValue ^Number p))
+	         (instance? AScalar p) p
+           (nil? p) nil
+	         :else (do
+                  ;; (println (str "Coercing " p))
+                  (Scalar. (double (mp/get-0d p)))))
+		   (== 1 dims)
+		     (try (Vector/wrap (mp/to-double-array p)) (catch Throwable e nil))
+		   (== 2 dims)
+		     (let [rows (int (mp/dimension-count p 0))
+               cols (int (mp/dimension-count p 1))]
+           (try 
+             (if (< (* rows cols) 10000) ;; dense default for small matrices
+               (Matrix/wrap rows cols (mp/to-double-array p)) 
+               (Matrixx/create ^java.util.List (mapv vectorz-coerce* (slices p)))) 
+             (catch Throwable e nil)))
+		   :else 
+	       (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
+	         (and (seq sv) (sv 0) (Arrayz/create sv)))))))
 
 (defmacro double-coerce [x]
   `(let [x# ~x]
@@ -1519,10 +1530,10 @@
 
 (extend-protocol mp/PElementMinMax
   INDArray
-  (element-min [m]
-    (.elementMin m))
-  (element-max [m]
-    (.elementMax m)))
+    (element-min [m]
+      (.elementMin m))
+    (element-max [m]
+      (.elementMax m)))
 
 (extend-protocol mp/PComputeMatrix
   INDArray
