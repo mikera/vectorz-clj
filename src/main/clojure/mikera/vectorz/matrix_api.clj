@@ -269,6 +269,12 @@
               ~available)))
 
 (extend-protocol mp/PQRDecomposition
+  INDArray
+    (qr [m options]
+      (let [dims (dimensionality m)]
+        (if (== 2 dims)
+         (mp/qr (Matrixx/toMatrix m) options)
+         (error "Can't compute QR on an array of dimensionality " dims))))
   AMatrix
     (qr [m options]
       (let
@@ -278,6 +284,12 @@
         (with-keys {:Q (.getQ result) :R (.getR result)} (:return options)))))
 
 (extend-protocol mp/PLUDecomposition
+  INDArray
+    (lu [m options]
+      (let [dims (dimensionality m)]
+        (if (== 2 dims)
+         (mp/lu (Matrixx/toMatrix m) options)
+         (error "Can't compute LU on an array of dimensionality " dims))))  AMatrix
   AMatrix
     (lu [m options]
       (let
@@ -285,22 +297,34 @@
         (with-keys {:L (.getL result) :U (.getU result) :P (.getP result)} (:return options)))))
 
 (extend-protocol mp/PCholeskyDecomposition
+  INDArray
+    (cholesky [m options]
+      (let [dims (dimensionality m)]
+        (if (== 2 dims)
+         (mp/cholesky (Matrixx/toMatrix m) options)
+         (error "Can't compute cholesky on an array of dimensionality " dims))))  AMatrix
   AMatrix
-  (cholesky [m options] 
-      (let
-        [result (Cholesky/decompose m)]
-        (if result
-          (with-keys {:L (.getL result) :L* (.getU result)} (:return options))
-          nil))))
+    (cholesky [m options] 
+        (let
+          [result (Cholesky/decompose m)]
+          (if result
+            (with-keys {:L (.getL result) :L* (.getU result)} (:return options))
+            nil))))
 
 (extend-protocol mp/PSVDDecomposition
+  INDArray
+    (cholesky [m options]
+      (let [dims (dimensionality m)]
+        (if (== 2 dims)
+         (mp/svd (Matrixx/toMatrix m) options)
+         (error "Can't compute SVD on an array of dimensionality " dims))))  AMatrix
   AMatrix
-  (svd [m options] 
-      (let
-        [result (SVD/decompose m)]
-        (if result
-          (with-keys {:U (.getU result) :S (diagonal (.getS result)) :V* (.getTranspose (.getV result))} (:return options))
-          nil))))
+    (svd [m options] 
+        (let
+          [result (SVD/decompose m)]
+          (if result
+            (with-keys {:U (.getU result) :S (diagonal (.getS result)) :V* (.getTranspose (.getV result))} (:return options))
+            nil))))
 
 (extend-protocol mp/PNorm
   INDArray
@@ -311,6 +335,12 @@
         :else (error "p must be a number"))))
 
 (extend-protocol mp/PMatrixRank
+  INDArray
+    (rank [m options]
+      (let [dims (dimensionality m)]
+        (if (== 2 dims)
+         (mp/rank (Matrixx/toMatrix m))
+         (error "Can't compute matrix rank on an array of dimensionality " dims))))  AMatrix
   AMatrix
     (rank [m]
       (let [{:keys [S]} (mp/svd m {:return [:S]})
@@ -332,6 +362,15 @@
     (element-type [m] (Double/TYPE))
   AIndex
     (element-type [m] (Integer/TYPE)))
+
+(extend-protocol mp/PGenericValues
+  INDArray
+    (generic-zero [m]
+      0.0)
+    (generic-one [m]
+      1.0)
+    (generic-value [m]
+      0.0))
 
 (extend-protocol mp/PMutableMatrixConstruction
   INDArray

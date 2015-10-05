@@ -7,4 +7,9 @@
 (defn test-impls []
 	(array [1])
 	
-	(def protos (utils/extract-protocols)))
+	(def protos (utils/extract-protocols))
+ 
+  (utils/unimplemented mikera.arrayz.INDArray) 
+  (utils/unimplemented mikera.matrixx.AMatrix) 
+  (utils/unimplemented mikera.vectorz.AVector)
+)
