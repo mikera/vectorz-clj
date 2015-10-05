@@ -1355,7 +1355,7 @@
   INDArray
     (add-scaled-product [m a b factor]
       (with-clone [m]
-        (.addMultiple m (mul a b) (double factor))))
+        (.addMultiple m (vectorz-coerce (mul a b)) (double factor))))
   AVector
     (add-scaled-product [m a b factor]
       (with-clone [m]
