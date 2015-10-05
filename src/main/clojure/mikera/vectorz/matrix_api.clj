@@ -849,6 +849,11 @@
     (get-major-slice-view [m i] 
       (.slice m (int i))))
 
+(extend-protocol mp/PSliceView2
+  INDArray
+    (get-slice-view [m dim i]
+      (.slice m (int dim) (int i))))
+
 (extend-protocol mp/PSliceSeq
   INDArray  
     (get-major-slice-seq [m] 
@@ -859,6 +864,20 @@
   Index
     (get-major-slice-seq [m] 
       (seq (.getData m))))
+
+(extend-protocol mp/PSliceSeq2
+  INDArray
+    (get-slice-seq [m dimension]
+      (let [ldimension (long dimension)]
+        (cond
+          (== ldimension 0) (mp/get-major-slice-seq m)
+          (< ldimension 0) (error "Can't get slices of a negative dimension: " dimension)
+          :else (map #(mp/get-slice m dimension %) (range (mp/dimension-count m dimension))))))
+  AVector
+    (get-slice-seq [m dimension]
+      (if (== 0 (long dimension))
+        m
+        (error "Can't access dimension " dimension " of a vector"))))
 
 (extend-protocol mp/PSliceViewSeq
   INDArray
@@ -1312,6 +1331,10 @@
             :else (mp/add-inner-product! m a (mp/scale b factor))))))) 
 
 (extend-protocol mp/PAddScaled
+  INDArray
+    (add-scaled [m a factor]
+      (with-clone [m] 
+        (.scaleAdd m 1.0 (vectorz-coerce a) (double-coerce factor) 0.0)))
   AVector
     (add-scaled [m a factor]
       (with-clone [m] 
