@@ -386,6 +386,14 @@
     (assign! col [3 4 5])
     (is (equals [[0 3 0 0] [0 4 0 0] [0 5 0 0]] m))))
 
+(deftest test-array-add-product-regression
+  (let [a (array :vectorz [[[1]]])]
+    (is (equals [[[61]]] (add-scaled-product a [2] [3] 10)))
+    (is (equals [[[1]]] a)))
+  (let [a (array :vectorz [[[1]]])]
+    (is (equals [[[61]]] (add-scaled-product! a [2] [3] 10)))
+    (is (equals [[[61]]] a))))
+
 ;; run compliance tests
 
 (deftest instance-tests

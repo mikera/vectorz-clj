@@ -1363,8 +1363,8 @@
 
 (extend-protocol mp/PAddScaledProductMutable
   INDArray
-    (add-scaled-product [m a b factor]
-      (.addMultiple m (mul a b) (double factor)))  
+    (add-scaled-product! [m a b factor]
+      (.addMultiple m (vectorz-coerce (mul a b)) (double factor)))  
   AVector
     (add-scaled-product! [m a b factor]
       (.addProduct m (avector-coerce m a) (avector-coerce m b) (double factor)))) 
