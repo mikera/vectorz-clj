@@ -982,19 +982,19 @@
       (if (empty? args)
         a
         (let [args (mapv #(int-array-coerce %) args)
-             dims (.dimensionality a)
-             next-args (next args)
-             ^ints ixs (first args)
-             n (alength ixs)
-             oa (object-array n)]
-         (cond 
-           (> dims 1)
-             (do 
-               (dotimes [i n]
-                 (aset oa i (mp/select (.slice a (aget ixs i)) next-args)))
-               (SliceArray/create ^List (vec oa)))
-           :else 
-             (.select (.asVector a) ixs)))))
+	            dims (.dimensionality a)
+	            next-args (next args)
+	            ^ints ixs (first args)
+	            n (alength ixs)
+	            oa (object-array n)]
+	        (cond 
+	          (> dims 1)
+	            (do 
+	              (dotimes [i n]
+	                (aset oa i (mp/select (.slice a (aget ixs i)) next-args)))
+	              (SliceArray/create ^List (vec oa)))
+	          :else 
+	            (.select (.asVector a) ixs)))))
   ;; TODO AMatrix override
   AVector
     (select [a args] 
@@ -1013,12 +1013,12 @@
 
 (extend-protocol mp/PIndicesAccess
   INDArray
-  (get-indices [a indices] 
-    (let [c (int (count indices))
-          r (Vectorz/newVector c)]
-      (doseq-indexed [ix indices i]
-        (.unsafeSet r (int i) (.get a (int-array-coerce ix))))
-      r)))
+    (get-indices [a indices] 
+      (let [c (int (count indices))
+            r (Vectorz/newVector c)]
+        (doseq-indexed [ix indices i]
+          (.unsafeSet r (int i) (.get a (int-array-coerce ix))))
+        r)))
 
 (extend-protocol mp/PIndicesSetting
   INDArray
@@ -1207,7 +1207,7 @@
       (into [] (seq m)))
   AMatrix
     (convert-to-nested-vectors [m]
-      (mapv #(into [] %) (mp/get-major-slice-seq m)))
+      (mapv mp/convert-to-nested-vectors (.getSlices m)))
   INDArray
     (convert-to-nested-vectors [m]
       (if (== 0 (.dimensionality m))
