@@ -12,4 +12,5 @@
   (utils/unimplemented mikera.arrayz.INDArray) 
   (utils/unimplemented mikera.matrixx.AMatrix) 
   (utils/unimplemented mikera.vectorz.AVector)
+  (utils/unimplemented mikera.vectorz.AScalar)
 )
