@@ -22,7 +22,7 @@
     (cond
        (instance? List a) (Vectorz/create ^List a)
        (sequential? a) (Vectorz/create ^List (vec a))
-       :else (error "Vector nust be read from a vector literal"))))
+       :else (error "Vector must be read from a vector literal"))))
 
 (defn matrix 
   "Reads a data structure into a Vectorz vector"
@@ -30,12 +30,12 @@
     (cond 
       (instance? List a) (Matrixx/create ^List a)
       (sequential? a) (Matrixx/create ^List (vec a))
-      :else (error "Matrix nust be read as a vector of vectors"))))
+      :else (error "Matrix must be read as a vector of vectors"))))
 
 (defn scalar 
   "Reads a data structure into a Vectorz vector"
   (^AScalar [a]
     (if (number? a)
       (Scalar/create (double a))
-      (error "Scalar nust be read as a numerical value"))))
+      (error "Scalar must be read as a numerical value"))))
 

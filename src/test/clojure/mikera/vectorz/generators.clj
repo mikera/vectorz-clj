@@ -20,8 +20,7 @@
       [(gm/gen-array (gm/gen-shape) gm/gen-double :vectorz)])))
 
 (defn mutable-vector 
-  "Create a generator for fully mutable vectors
-"
+  "Create a generator for fully mutable vectors"
   ([]
     (gen/one-of 
       [(gm/gen-vector gm/gen-double :vectorz)
