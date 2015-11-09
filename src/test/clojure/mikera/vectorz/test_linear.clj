@@ -22,12 +22,12 @@
     (is (equals A (mmul Q R)))))
 
 ;; TODO: Reinstate once linear algebra implementation complete
-;(deftest test-solve
-;  (let [A [[1 2]
-;           [2 1]]
-;        b [22
-;           26]]
-;    (is (equals [10 6] (solve A b)))))
+(deftest test-solve
+  (let [A [[1 2]
+           [2 1]]
+        b [22
+           26]]
+    (is (equals [10 6] (solve A b)))))
 
 
 (deftest test-QR-decomposition
