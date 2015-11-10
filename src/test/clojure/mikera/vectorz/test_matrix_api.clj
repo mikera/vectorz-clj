@@ -394,6 +394,10 @@
     (is (equals [[[61]]] (add-scaled-product! a [2] [3] 10)))
     (is (equals [[[61]]] a))))
 
+;; regression test for #54
+(deftest test-diagonal-inverse-regression
+  (is (equals (inverse [[1 0] [0 2]]) (inverse (diagonal-matrix [1 2])))))
+
 ;; run compliance tests
 
 (deftest instance-tests
