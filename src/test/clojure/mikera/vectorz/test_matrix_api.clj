@@ -380,6 +380,9 @@
     (add-inner-product! m a b -1)
     (is (equals [1 2] m))))
 
+(deftest test-logistic
+  (is (equals [0 0.5 1] (logistic (array :vectorz [-1000 0 1000])))))
+
 (deftest test-select-regression
   (let [m (new-matrix 3 4)
         col (select m :all 1)]

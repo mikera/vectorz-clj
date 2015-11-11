@@ -1474,6 +1474,16 @@
         (with-clone [m] (.pow m (double-coerce exponent)))
         (mp/element-map m #(Math/pow %1 %2) (vectorz-coerce m exponent)))))
 
+(extend-protocol mp/PLogistic
+  INDArray
+    (logistic [m]
+      (.applyOpCopy m Ops/LOGISTIC)))
+
+(extend-protocol mp/PLogisticMutable
+  INDArray
+    (logistic! [m]
+      (.applyOp m Ops/LOGISTIC)))
+
 (extend-protocol mp/PElementCount
   INDArray
     (element-count [m]
