@@ -18,7 +18,7 @@
   (:import [mikera.arrayz INDArray Array NDArray]))
 
 (set! *warn-on-reflection* true)
-(set! *unchecked-math* true)
+(set! *unchecked-math* :warn-on-boxed)
 
 ;; note - all the operators are core.matrix operators
 
@@ -31,7 +31,7 @@
     (is (== 1 (ecount v1)))
     (is (not (matrix? v1))))
   (let [m (coerce (matrix [[1 2]]) [[1 2] [3 4]])] 
-    (is (every? true? (map == (range 1 (inc (ecount m))) (eseq m)))))
+    (is (every? true? (map == (range 1 (inc (long (ecount m)))) (eseq m)))))
   (let [m (matrix [[1 2] [3 4]])] 
     (is (== 2 (ecount (first (slices m)))))
     (scale! (first (slices m)) 2.0)
@@ -48,8 +48,8 @@
   (let [v (v/vec [1 2 3])]
     (is (equals [2 4 6] (add v v))))
   (let [v (Vector/of (double-array 0))]
-    (is (== 10 (reduce (fn [acc _] (inc acc)) 10 (eseq v))))
-    (is (== 10 (ereduce (fn [acc _] (inc acc)) 10 v))))
+    (is (== 10 (reduce (fn [acc _] (inc (long acc))) 10 (eseq v))))
+    (is (== 10 (ereduce (fn [acc _] (inc (long acc))) 10 v))))
   (let [m (reshape (array (double-array (range 9))) [3 3])]
     (is (equals [[0 1 2]] (submatrix m 0 [0 1])))
     (is (equals [[0 1 2]] (submatrix m [[0 1] nil])))
