@@ -765,6 +765,14 @@
     (matrix-equals [a b]
       (.equals a (vectorz-coerce b))))
 
+(extend-protocol mp/PValueEquality
+  INDArray
+    (value-equals [a b]
+      (let [b (vectorz-coerce b)] 
+        (and
+          (.isSameShape a b)
+          (.equals a b)))))
+
 (extend-protocol mp/PMatrixEqualityEpsilon
   INDArray 
     (matrix-equals-epsilon [a b eps]
