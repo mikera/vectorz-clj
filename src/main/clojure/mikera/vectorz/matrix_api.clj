@@ -10,6 +10,7 @@
   (:import [mikera.matrixx.impl SparseRowMatrix SparseColumnMatrix])
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
   (:import [mikera.vectorz Scalar])
+  (:import [mikera.vectorz FnOp])
   (:import [mikera.vectorz.impl IndexVector ASparseIndexedVector SparseHashedVector ZeroVector SparseIndexedVector])
   (:import [mikera.arrayz Arrayz INDArray Array])
   (:import [mikera.arrayz.impl SliceArray])
@@ -1579,12 +1580,7 @@
       (seq data)))
   (element-map
     ([m f]
-      (let [ec (.elementCount m)
-            ^doubles data (double-array ec)
-            ^ints sh (.getShape m)]
-        (.getElements m data (int 0))
-        (dotimes [i ec] (aset data i (double (f (aget data i))))) 
-        (Arrayz/createFromVector (Vector/wrap data) sh)))
+      (.applyOpCopy m (FnOp/wrap f)))
     ([m f a]
       (let [ec (.elementCount m)
             a (vectorz-coerce a) 
@@ -1636,10 +1632,7 @@
       (seq data)))
   (element-map
     ([m f]
-      (let [ec (.elementCount m)
-            ^doubles data (double-array ec)]
-        (dotimes [i ec] (aset data i (double (f (.unsafeGet m i))))) 
-        (Vector/wrap data)))
+      (.applyOpCopy m (FnOp/wrap f)))
     ([m f a]
       (let [ec (.elementCount m)
             a (avector-coerce m a) 
@@ -1689,11 +1682,7 @@
       (seq data)))
   (element-map
     ([m f]
-       (let [nzc (int (.nonZeroCount m))
-             ^ints nzi (Arrays/copyOf (.nonZeroIndices m) nzc) 
-             ^doubles data (double-array nzc)]
-         (dotimes [i nzc] (aset data i (double (f (.unsafeGet m (aget nzi i)))))) 
-         (SparseIndexedVector/wrap nzc nzi data)))
+       (.applyOpCopy m (FnOp/wrap f)))
     ([m f a]
        (let [nzc (int (.nonZeroCount m))
              ^ints nzi (Arrays/copyOf (.nonZeroIndices m) nzc)
@@ -1787,13 +1776,7 @@
       (seq data)))
   (element-map
     ([m f]
-      (let [rc (.rowCount m)
-            cc (.columnCount m)
-            ec (* rc cc)
-            ^doubles data (double-array ec)]
-        (.getElements m data (int 0))
-        (dotimes [i ec] (aset data i (double (f (aget data i))))) 
-        (Matrix/wrap rc cc data)))
+      (.applyOpCopy m (FnOp/wrap f)))
     ([m f a]
       (let [a (amatrix-coerce m a)
             rc (.rowCount m)
