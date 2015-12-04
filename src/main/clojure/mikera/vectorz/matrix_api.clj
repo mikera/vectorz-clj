@@ -1493,6 +1493,37 @@
     (logistic! [m]
       (.applyOp m Ops/LOGISTIC)))
 
+(extend-protocol mp/PSoftplus
+  INDArray
+    (softplus [m]
+      (.applyOpCopy m Ops/SOFTPLUS)))
+
+(extend-protocol mp/PSoftplusMutable
+  INDArray
+    (softplus! [m]
+      (.applyOp m Ops/SOFTPLUS)))
+
+(extend-protocol mp/PSoftmax
+  AVector
+    (softmax [m]
+      (.softmaxCopy m)))
+
+(extend-protocol mp/PSoftmaxMutable
+  AVector
+    (softmax! [m]
+      (.softmax m)))
+
+(extend-protocol mp/PReLU
+  INDArray
+    (relu [m]
+      (.applyOpCopy m Ops/RECTIFIER)))
+
+(extend-protocol mp/PReLUMutable
+  INDArray
+    (relu! [m]
+      (.applyOp m Ops/RECTIFIER)))
+
+
 (extend-protocol mp/PElementCount
   INDArray
     (element-count [m]
