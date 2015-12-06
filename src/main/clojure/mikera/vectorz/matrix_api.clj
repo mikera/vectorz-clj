@@ -247,7 +247,7 @@
                 (new-matrix [m rows columns] (Matrixx/newMatrix (int rows) (int columns)))
                 (new-matrix-nd [m shape] 
                                (case (count shape)
-                                 0 0.0
+                                 0 (Scalar/create 0.0)
                                  1 (Vectorz/newVector (int (first shape)))
                                  2 (Matrixx/newMatrix (int (first shape)) (int (second shape)))
                                  (Arrayz/newArray (int-array shape))))
