@@ -1,6 +1,7 @@
 (ns mikera.vectorz.core
-  "Clojure API for directly accessing Vectorz functions. Functions in clojure.core.matrix API
-   should normally be preferred to these."
+  "Clojure API for directly accessing Vectorz functions. 
+
+   These are equivalent to similar function in clojure.core.matrix API, but specialised for Vectorz arrays."
   (:import [mikera.vectorz AVector Vectorz Vector Vector1 Vector2 Vector3 Vector4])
   (:import [mikera.arrayz INDArray])
   (:import [mikera.transformz Transformz])
@@ -145,7 +146,7 @@
       (if (instance? Vector2 v) 
         v
         (error "Can't create Vector2 from: " (str coll)))))
-  (^Vector2 [x y]
+  (^Vector2 [^double x ^double y]
     (Vector2/of (double x) (double y)))) 
 
 (defn vec3
@@ -157,7 +158,7 @@
       (if (instance? Vector3 v) 
         v
         (error "Can't create Vector3 from: " (str coll)))))
-  (^Vector3 [x y z]
+  (^Vector3 [^double x ^double y ^double z]
     (Vector3/of (double x) (double y) (double z)))) 
 
 (defn vec4
@@ -169,14 +170,13 @@
       (if (instance? Vector4 v) 
         v
         (error "Can't create Vector4 from: " (str coll)))))
-  (^Vector4 [x y z t]
+  (^Vector4 [^double x ^double y ^double z ^double t]
     (Vector4/of (double x) (double y) (double z) (double t)))) 
 
 (defn vector 
   "Creates a vector from zero or more numerical components."
   (^AVector [& xs]
     (vec xs)))
-
 
 (defn create-length
   "Creates a vector of a specified length. Will use optimised primitive vectors for small lengths"
@@ -185,12 +185,12 @@
 
 (defn empty
   "Creates an empty vector of a specified length. Will use optimised primitive vectors for small lengths"
-  (^AVector [len]
+  (^AVector [^long len]
     (Vectorz/newVector (int len))))
 
 (defn subvec
   "Returns a subvector of a vector. The subvector is a reference (i.e can be sed to modify the original vector)" 
-  (^AVector [^AVector v start end]
+  (^AVector [^AVector v ^long start ^long end]
     (.subVector v (int start) (int end))))
 
 (defn join 
