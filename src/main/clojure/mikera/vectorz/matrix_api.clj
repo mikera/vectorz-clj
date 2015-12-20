@@ -1481,7 +1481,7 @@
     (element-pow [m exponent]
       (if (number? m)
         (with-clone [m] (.pow m (double-coerce exponent)))
-        (mp/element-map m #(Math/pow %1 %2) (vectorz-coerce m exponent)))))
+        (mp/element-map m (fn ^double [^double x ^double y] (Math/pow x y)) (vectorz-coerce m exponent)))))
 
 (extend-protocol mp/PLogistic
   INDArray
