@@ -12,16 +12,15 @@
             :url "http://www.gnu.org/licenses/lgpl.html"}
   :source-paths ["src/main/clojure"]
   :test-paths ["src/test/clojure"]
-  :dependencies [[org.clojure/clojure "1.7.0"]
+  :dependencies [[org.clojure/clojure "1.8.0-RC4"]
                  [criterium/criterium "0.4.3"]
-                 [org.clojure/tools.analyzer "0.6.6"]
-                 [org.clojure/test.check "0.7.0"]
+                 [org.clojure/tools.analyzer "0.6.7"]
+                 [org.clojure/test.check "0.9.0"]
                  [net.mikera/cljunit "0.3.1"]
                  [net.mikera/clojure-utils "0.6.2"]
-                 [net.mikera/core.matrix "0.36.1"]
-                 [net.mikera/core.matrix.testing "0.0.4"]
-                 [net.mikera/core.matrix.stats "0.4.0"]
-                 [net.mikera/vectorz "0.47.0"]]
+                 [net.mikera/core.matrix "0.47.1"]
+                 ;; [net.mikera/core.matrix "0.47.1" :type "test-jar"] ;; bug in Lein!!!! see: https://github.com/technomancy/leiningen/issues/1975
+                 [net.mikera/vectorz "0.55.0"]]
   
   :profiles {:dev {:java-source-paths ["src/test/java"]}}
   
