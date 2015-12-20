@@ -6,3 +6,4 @@
 /.lein-failures
 /.nrepl-port
 /bin/
+/.lein-repl-history
