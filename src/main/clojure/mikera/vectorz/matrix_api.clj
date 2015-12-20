@@ -8,9 +8,9 @@
   (:require [mikera.vectorz.readers])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.matrixx.impl SparseRowMatrix SparseColumnMatrix])
-  (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops])
+  (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops Op2])
   (:import [mikera.vectorz Scalar])
-  (:import [mikera.vectorz FnOp])
+  (:import [mikera.vectorz FnOp FnOp2])
   (:import [mikera.vectorz.impl IndexVector ASparseIndexedVector SparseHashedVector ZeroVector SparseIndexedVector])
   (:import [mikera.arrayz Arrayz INDArray Array])
   (:import [mikera.arrayz.impl SliceArray])
@@ -1621,16 +1621,8 @@
     ([m f]
       (.applyOpCopy m (FnOp/wrap f)))
     ([m f a]
-      (let [ec (.elementCount m)
-            a (vectorz-coerce a) 
-            ^doubles data (double-array ec)
-            ^doubles data2 (double-array ec)
-            ^ints sh (.getShape m)]
-        (when-not (== ec (.elementCount a)) (error "Arrays do do have matching number of elements")) 
-        (.getElements m data (int 0))
-        (.getElements a data2 (int 0))
-        (dotimes [i ec] (aset data i (double (f (aget data i) (aget data2 i))))) 
-        (Arrayz/createFromVector (Vector/wrap data) sh)))
+      (with-clone [m]
+        (.applyOp m ^Op2 (FnOp2/wrap f) ^INDArray (vectorz-coerce a))))
     ([m f a more]
       (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
   (element-map!
