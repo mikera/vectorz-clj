@@ -1213,7 +1213,7 @@
       (.get m))  
   AVector
     (convert-to-nested-vectors [m]
-      (into [] (seq m)))
+      (into [] m))
   AMatrix
     (convert-to-nested-vectors [m]
       (mapv mp/convert-to-nested-vectors (.getSlices m)))
@@ -1639,9 +1639,9 @@
       (mp/assign! m (mp/element-map m f a more))))
   (element-reduce
     ([m f]
-      (reduce f (mp/element-seq m)))
+      (.reduce m (FnOp2/wrap f)))
     ([m f init]
-      (reduce f init (mp/element-seq m))))
+      (.reduce m (FnOp2/wrap f) (double init))))
   
   AVector
   (element-seq
@@ -1675,22 +1675,9 @@
       (mp/assign! m (mp/element-map m f a more))))
   (element-reduce
     ([m f]
-      (let [n (.length m)] 
-        (cond 
-          (== 0 n) (f) 
-          (== 1 n) (.unsafeGet m 0) 
-          :else (loop [v ^Object (.unsafeGet m 0) i 1]
-                  (if (< i n)
-                    (recur (f v (.unsafeGet m i)) (inc i))
-                    v)))))
+      (.reduce m (FnOp2/wrap f)))
     ([m f init]
-      (let [n (.length m)] 
-        (cond 
-          (== 0 n) init 
-          :else (loop [v init i 0]
-                  (if (< i n)
-                    (recur (f v (.unsafeGet m i)) (inc i))
-                    v))))))
+      (.reduce m (FnOp2/wrap f) (double init))))
 
   ;; TODO: Finish implementing sparse implementations
   ASparseIndexedVector
@@ -1726,22 +1713,9 @@
       (mp/assign! m (mp/element-map m f a more))))
   (element-reduce
     ([m f]
-      (let [n (.length m)] 
-        (cond 
-          (== 0 n) (f) 
-          (== 1 n) (.unsafeGet m 0) 
-          :else (loop [v ^Object (.unsafeGet m 0) i 1]
-                  (if (< i n)
-                    (recur (f v (.unsafeGet m i)) (inc i))
-                    v)))))
+      (.reduce m (FnOp2/wrap f)))
     ([m f init]
-      (let [n (.length m)] 
-        (cond 
-          (== 0 n) init 
-          :else (loop [v init i 0]
-                  (if (< i n)
-                    (recur (f v (.unsafeGet m i)) (inc i))
-                    v))))))
+      (.reduce m (FnOp2/wrap f) (double init))))
   
   ZeroVector
   (element-seq
@@ -1770,22 +1744,9 @@
       (mp/assign! m (mp/element-map m f a more))))
   (element-reduce
     ([m f]
-      (let [n (.length m)] 
-        (cond 
-          (== 0 n) (f) 
-          (== 1 n) 0.0 
-          :else (loop [v ^Object (identity 0.0) i 1]
-                  (if (< i n)
-                    (recur (f v 0.0) (inc i))
-                    v)))))
+      (.reduce m (FnOp2/wrap f)))
     ([m f init]
-      (let [n (.length m)] 
-        (cond 
-          (== 0 n) init 
-          :else (loop [v init i 0]
-                  (if (< i n)
-                    (recur (f v 0.0) (inc i))
-                    v))))))
+      (.reduce m (FnOp2/wrap f) (double init))))
   
   AMatrix
   (element-seq
@@ -1830,9 +1791,9 @@
       (mp/assign! m (mp/element-map m f a more))))
   (element-reduce
     ([m f]
-      (mp/element-reduce (.asVector m) f))
+      (.reduce m (FnOp2/wrap f)))
     ([m f init]
-      (mp/element-reduce (.asVector m) f init)))
+      (.reduce m (FnOp2/wrap f) (double init))))
   
   
  AIndex

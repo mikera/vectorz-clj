@@ -30,7 +30,7 @@ public final class FnOp2 extends mikera.vectorz.Op2 {
 	
 	@Override
 	public double apply(double x, double y) {
-		return ((Number)fn.invoke(x)).doubleValue();
+		return ((Number)fn.invoke(x,y)).doubleValue();
 	}
 	
 	@Override 
