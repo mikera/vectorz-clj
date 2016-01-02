@@ -1389,6 +1389,24 @@
     (add-scaled-product! [m a b factor]
       (.addProduct m (avector-coerce m a) (avector-coerce m b) (double factor)))) 
 
+(extend-protocol mp/PLerp
+  INDArray
+    (lerp [a b factor]
+      (let [factor (double-coerce factor)]
+        (with-clone [a]
+          (.scaleAdd a (- 1.0 factor) (vectorz-coerce b) factor 0.0))))
+    (lerp! [a b factor]
+      (let [factor (double-coerce factor)]
+        (.scaleAdd a (- 1.0 factor) (vectorz-coerce b) factor 0.0)))
+  AVector
+    (lerp [a b factor]
+      (let [factor (double-coerce factor)]
+        (with-clone [a]
+          (.scaleAdd a (- 1.0 factor) (avector-coerce a b) factor 0.0))))
+    (lerp! [a b factor]
+      (let [factor (double-coerce factor)]
+        (.scaleAdd a (- 1.0 factor) (avector-coerce a b) factor 0.0))))
+
 (extend-protocol mp/PMatrixScaling
   AScalar 
     (scale [m a] (vectorz-scale m (double-coerce a)))
