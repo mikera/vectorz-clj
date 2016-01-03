@@ -63,6 +63,12 @@
   (^AVector [^AMatrix m ^long row]
     (.getRow m (int row))))
 
+(defn get-column
+  "Gets a column of the matrix as a vector"
+  (^AVector [^AMatrix m ^long row]
+    (.getColumn m (int row))))
+
+
 ;; ============================================
 ;; Matrix predicates
 
