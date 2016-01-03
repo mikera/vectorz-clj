@@ -4,6 +4,9 @@
   (:use clojure.test)
   (:require [mikera.vectorz.core :as v]))
 
+(set! *warn-on-reflection* true)
+(set! *unchecked-math* :warn-on-boxed)
+
 (deftest test-mean
   (let [vs (map v/vec [[1 2] [3 4] [5 6] [7 8]])]
     (is (e== [4 5] (mean vs)))))

@@ -5,6 +5,9 @@
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.vectorz AVector Vectorz Vector]))
 
+(set! *warn-on-reflection* true)
+(set! *unchecked-math* :warn-on-boxed)
+
 (deftest test-constructors
   (testing "identity"
     (is (= (m/matrix [[1 0] [0 1]]) (m/identity-matrix 2)))

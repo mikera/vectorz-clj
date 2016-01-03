@@ -4,6 +4,8 @@
   (:require [mikera.vectorz.core :as v])
   (:import [mikera.vectorz AVector Vectorz Vector]))
 
+(set! *warn-on-reflection* true)
+(set! *unchecked-math* :warn-on-boxed)
 
 (deftest test-arithmetic
   (testing "addition"
