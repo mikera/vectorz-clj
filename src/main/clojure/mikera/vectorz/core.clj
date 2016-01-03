@@ -6,10 +6,10 @@
   (:import [mikera.arrayz INDArray])
   (:import [mikera.transformz Transformz])
   (:require [mikera.cljutils.error :refer [error]]) 
-  (:refer-clojure :exclude [+ - * / vec vec? vector subvec get set to-array empty]))
+  (:refer-clojure :exclude [+ - * vec vec? vector subvec get set to-array empty]))
 
 (set! *warn-on-reflection* true)
-(set! *unchecked-math* true)
+(set! *unchecked-math* :warn-on-boxed)
 
 ;; ==================================================
 ;; Protocols
@@ -45,7 +45,8 @@
     (.elementCount v)))
 
 (defn vec?
-  "Returns true if v is a vector (i.e. an instance of mikera.vectorz.AVector or a 1-dimensional INDArray)"
+  "Returns true if v is a vectorz vector 
+   (i.e. an instance of mikera.vectorz.AVector or a 1-dimensional INDArray)"
   ([v]
     (or
       (instance? AVector v)
@@ -319,27 +320,31 @@
 (defn add
   "Add a vector to another"
   (^AVector [^AVector dest ^AVector source]
-    (add! (clone dest) source)))
+    (.addCopy dest source)))
 
 (defn add-multiple
   "Add a vector to another"
   (^AVector [^AVector dest ^AVector source ^double factor]
-    (add-multiple! (clone dest) source factor)))
+    (.addMultipleCopy dest source factor)))
 
 (defn sub
   "Subtract a vector from another"
   (^AVector [^AVector dest ^AVector source]
-    (sub! (clone dest) source)))
+    (.subCopy dest source)))
 
 (defn mul
   "Multiply a vector with another vector or scalar"
   (^AVector [^AVector dest source]
-    (mul! (clone dest) source)))
+    (if (number? source)
+      (.scaleCopy dest (double source))
+      (.multiplyCopy dest ^AVector source))))
 
 (defn div
   "Divide a vector by another vector or scalar"
   (^AVector [^AVector dest source]
-    (div! (clone dest) source)))
+    (if (number? source)
+      (.scaleCopy dest (/ 1.0 (double source)))
+      (.divideCopy dest ^AVector source))))
 
 (defn interpolate
   (^AVector [^AVector a ^AVector b position]
@@ -350,22 +355,22 @@
 (defn normalise
   "Normalises a vector to unit length and returns it"
   (^AVector [^AVector a]
-    (normalise! (clone a))))
+    (.normaliseCopy a)))
 
 (defn negate 
   "Negates a vector and returns it" 
   (^AVector [^AVector a]
-    (negate! (clone a))))
+    (.negateCopy a)))
 
 (defn abs 
   "Computes the absolute value of a vector and returns it" 
   (^AVector [^AVector a]
-    (abs! (clone a))))
+    (.absCopy a)))
 
 (defn scale 
   "Scales a vector by a scalar numerical factor" 
   ([^AVector a ^double factor]
-    (scale! (clone a) factor)))
+    (.scaleCopy a factor)))
 
 (defn scale-add 
   "Scales a vector by a scalar numerical factor and adds a second vector" 
