@@ -111,7 +111,7 @@
 
 (defn of 
   "Creates a vector from its numerical components"
-  ([& xs]
+  (^AVector [& xs]
     (let [len (int (count xs))
           ss (seq xs)
           ^AVector v (Vectorz/newVector len)]
@@ -124,12 +124,12 @@
 
 (defn vec
   "Creates a vector from a collection, a sequence or anything else that implements the PVectorisable protocol"
-  ([coll]
-  (cond 
-    (vec? coll) (clone coll)
-    (satisfies? PVectorisable coll) (to-vector coll)
-    (sequential? coll) (apply of coll)
-    :else (error "Can't create vector from: " (class coll)))))
+  (^AVector [coll]
+    (cond 
+      (vec? coll) (clone coll)
+      (satisfies? PVectorisable coll) (to-vector coll)
+      (sequential? coll) (apply of coll)
+      :else (error "Can't create vector from: " (class coll)))))
 
 (defn vec1
   "Creates a Vector1 instance"
@@ -210,12 +210,12 @@
 
 (defn to-array 
   "Converts a vector to a double array"
-  ([^AVector a]
+  (^doubles [^AVector a]
     (.toArray a)))
 
 (defn to-list 
   "Converts a vector to a list of doubles"
-  ([^AVector a]
+  (^java.util.List [^AVector a]
     (.toList a)))
 
 ;; =====================================
@@ -223,7 +223,7 @@
 
 (defn assign! 
   "Fills a vector in place with the value of another vector" 
-  ([^AVector a ^AVector new-value]
+  (^AVector [^AVector a ^AVector new-value]
     (.set a new-value)
     a))
 
@@ -235,7 +235,7 @@
 
 (defn add-multiple!
   "Add a vector to another (in-place)"
-  ([^AVector dest ^AVector source ^double factor]
+  (^AVector [^AVector dest ^AVector source ^double factor]
     (.addMultiple dest source factor)
     dest))
 
@@ -263,7 +263,7 @@
 
 (defn normalise! 
   "Normalises a vector in place to unit length and returns it"
-  ([^AVector a]
+  (^AVector [^AVector a]
     (.normalise a)
     a))
 
@@ -274,25 +274,25 @@
 
 (defn negate! 
   "Negates a vector in place and returns it" 
-  ([^AVector a]
+  (^AVector [^AVector a]
     (.negate a)
     a))
 
 (defn abs! 
   "Computes the absolute value of a vector in place and returns it" 
-  ([^AVector a]
+  (^AVector [^AVector a]
     (.abs a)
     a))
 
 (defn scale! 
   "Scales a vector in place by a scalar numerical factor" 
-  ([^AVector a ^double factor]
+  (^AVector [^AVector a ^double factor]
     (.scale a factor)
     a))
 
 (defn scale-add! 
   "Scales a fector in place by a scalar numerical factor and adds a second vector" 
-  ([^AVector a ^double factor ^AVector b]
+  (^AVector [^AVector a ^double factor ^AVector b]
     (.scaleAdd a factor b)
     a))
 
@@ -304,7 +304,7 @@
 
 (defn fill! 
   "Fills a vector in place with a specific numerical value" 
-  ([^AVector a ^double value]
+  (^AVector [^AVector a ^double value]
     (.fill a value)
     a))
 
