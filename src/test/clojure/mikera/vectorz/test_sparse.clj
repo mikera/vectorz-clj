@@ -12,7 +12,7 @@
   (:import [mikera.arrayz INDArray Array NDArray]))
 
 (set! *warn-on-reflection* true)
-(set! *unchecked-math* true)
+(set! *unchecked-math* :warn-on-boxed)
 
 (deftest test-new-sparse-array
   (let [s [1000 1000]

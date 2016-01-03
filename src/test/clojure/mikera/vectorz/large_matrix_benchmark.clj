@@ -7,6 +7,9 @@
   (:require [mikera.vectorz.matrix :as m])
   (:import [mikera.vectorz Vector3 Vectorz]))
 
+(set! *warn-on-reflection* true)
+(set! *unchecked-math* :warn-on-boxed)
+
 (set-current-implementation :vectorz)
 
 (defn benchmarks []

@@ -4,6 +4,9 @@
         [clojure.core.matrix.linear])
   (:require [mikera.vectorz.core :as v]))
 
+(set! *warn-on-reflection* true)
+(set! *unchecked-math* :warn-on-boxed)
+
 (set-current-implementation :vectorz)
 
 (deftest test-svd
@@ -137,7 +140,7 @@
         (is (lower-triangular? L))
         (is (and L (not L*)))
         (is (equals M (mmul L (transpose L)) epsilon))
-        (is (reduce (fn [a b] (and a (> b 0))) true (diagonal L)))))
+        (is (reduce (fn [a b] (and a (> (double b) 0))) true (diagonal L)))))
     (testing "test1"
       (let [M (matrix [[2 -1 0][-1 2 -1][0 -1 2]])
             {:keys [L L*]} (cholesky M {:return [:L :L*]})]
@@ -145,8 +148,8 @@
         (is (upper-triangular? L*))
         (is (equals L (transpose L*) epsilon))
         (is (equals M (mmul L L*) epsilon))
-        (is (reduce (fn [a b] (and a (> b 0))) true (diagonal L)))
-        (is (reduce (fn [a b] (and a (> b 0))) true (diagonal L*)))))))
+        (is (reduce (fn [a b] (and a (> (double b) 0))) true (diagonal L)))
+        (is (reduce (fn [a b] (and a (> (double b) 0))) true (diagonal L*)))))))
 
 (deftest test-norm
   (let [M (matrix [[1 2 3][4 5 6][7 8 9]])]
@@ -155,7 +158,7 @@
     (is (equals 9 (norm M java.lang.Double/POSITIVE_INFINITY) 1e-10))
     (is (equals 16.88194301613 (norm M) 1e-10))
     (is (equals 12.65148997952 (norm M 3) 1e-10))
-    (let [V (.asVector M)]
+    (let [V (as-vector M)]
       (is (equals 45.0 (norm V 1) 1e-10))
       (is (equals 16.88194301613 (norm V 2) 1e-10))
       (is (equals 9 (norm V java.lang.Double/POSITIVE_INFINITY) 1e-10))

@@ -5,6 +5,9 @@
             [clojure.test.check.properties :as prop]
             [mikera.cljutils.error :refer [error]]))
 
+(set! *warn-on-reflection* true)
+(set! *unchecked-math* :warn-on-boxed)
+
 (defn subvector
   "Creates a subvector generator from a vector generator"
   ([g-vector]

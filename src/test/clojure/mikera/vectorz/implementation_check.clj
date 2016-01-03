@@ -2,6 +2,9 @@
   (:use clojure.core.matrix)
   (:require [clojure.core.matrix.utils :as utils]))
 
+(set! *warn-on-reflection* true)
+(set! *unchecked-math* :warn-on-boxed)
+
 (set-current-implementation :vectorz)
 
 (defn test-impls []
