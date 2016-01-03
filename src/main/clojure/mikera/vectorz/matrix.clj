@@ -43,7 +43,7 @@
     (instance? AAffineTransform (to-transform m))))
 
 (defn matrix?
-  "Returns true if m is a matrix (i.e. an instance of mikera.matrixx.AMatrix)"
+  "Returns true if m is a Vectorz matrix (i.e. an instance of mikera.matrixx.AMatrix)"
   ([m]
     (instance? AMatrix m)))
 
@@ -60,7 +60,7 @@
 
 (defn get-row
   "Gets a row of the matrix as a vector"
-  ([^AMatrix m ^long row]
+  (^AVector [^AMatrix m ^long row]
     (.getRow m (int row))))
 
 ;; ============================================
