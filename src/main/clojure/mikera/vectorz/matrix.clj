@@ -15,7 +15,7 @@
   (:refer-clojure :exclude [* get set zero?]))
   
 (set! *warn-on-reflection* true)
-(set! *unchecked-math* true)
+(set! *unchecked-math* :warn-on-boxed)
 
 ;; ============================================
 ;; Core functions
