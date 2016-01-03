@@ -141,7 +141,7 @@
     (Matrixx/createScaleMatrix (int dimensions) (double factor))))
 
 (defn scalar-matrix 
-  "Creates a dioagonal scalar matrix (multiplies all components by same factor)"
+  "Creates a diagonal scalar matrix (multiplies all components by same factor)"
   (^AMatrix [dimensions factor]
     (Matrixx/createScalarMatrix (int dimensions) (double factor))))
 
@@ -196,7 +196,7 @@
     (.getTranspose m)))
 
 (defn as-vector
-  "Treats a Matrix as a vector reference (in row major order)"
+  "Returns a vector view over all elements of a matrix (in row major order)"
   (^AVector [^AMatrix m]
     (.asVector m)))
 
