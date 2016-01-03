@@ -64,14 +64,14 @@
   ;; => Execution time mean per addition : 285 ns
   
   ;; Adding two core.matrix vectors (pure functions, i.e. creating a new vector)
-  (let [a (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])
-        b (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])]
+  (let [a (array :vectorz [1 2 3 4 5 6 7 8 9 10])
+        b (array :vectorz [1 2 3 4 5 6 7 8 9 10])]
     (c/quick-bench (dotimes [i 1000] (add a b))))
   ;; => Execution time mean per addition: 120 ns
   
   ;; Adding two core.matrix vectors (mutable operation, i.e. adding to the first vector)
-  (let [a (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])
-        b (matrix :vectorz [1 2 3 4 5 6 7 8 9 10])]
+  (let [a (array :vectorz [1 2 3 4 5 6 7 8 9 10])
+        b (array :vectorz [1 2 3 4 5 6 7 8 9 10])]
     (c/quick-bench (dotimes [i 1000] (add! a b))))
   ;; => Execution time mean per addition: 28 ns
   
