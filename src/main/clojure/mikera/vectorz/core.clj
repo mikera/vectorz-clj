@@ -1,5 +1,5 @@
 (ns mikera.vectorz.core
-  "Clojure API for directly accessing Vectorz functions. 
+  "Clojure API for directly accessing Vectorz vector functions. 
 
    In most cases these are relatively lightweight wrappers over equivalent functions in Vectorz,
    but specialised with type hints for handling Vectorz vectors for performance purposes.

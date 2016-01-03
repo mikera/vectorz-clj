@@ -1,5 +1,12 @@
 (ns mikera.vectorz.matrix
-  "Namepace for Vectorz functionality using matrices."
+  "Clojure API for directly accessing Vectorz matrix functions. 
+
+   In most cases these are relatively lightweight wrappers over equivalent functions in Vectorz,
+   but specialised with type hints for handling Vectorz matrices for performance purposes.
+
+   These are generally equivalent to similar functions in clojure.core.matrix API. If performance is
+   less of a concern, consider using the clojure.core.matrix API directly, which offer more functionality
+   and work with a much broader range of array shapes and argument types."
   (:import [mikera.vectorz AVector Vectorz Vector Vector3])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.transformz Transformz ATransform AAffineTransform MatrixTransform])
