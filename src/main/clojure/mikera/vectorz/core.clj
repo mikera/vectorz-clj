@@ -1,7 +1,12 @@
 (ns mikera.vectorz.core
   "Clojure API for directly accessing Vectorz functions. 
 
-   These are equivalent to similar function in clojure.core.matrix API, but specialised for Vectorz arrays."
+   In most cases these are relatively lightweight wrappers over equivalent functions in Vectorz,
+   but specialised with type hints for handling Vectorz vectors for performance purposes.
+
+   These are generally equivalent to similar functions in clojure.core.matrix API. If performance is
+   less of a concern, consider using the clojure.core.matrix API directly, which offer more functionality
+   and work with a much broader range of array shapes and argument types."
   (:import [mikera.vectorz AVector Vectorz Vector Vector1 Vector2 Vector3 Vector4])
   (:import [mikera.arrayz INDArray])
   (:import [mikera.transformz Transformz])
