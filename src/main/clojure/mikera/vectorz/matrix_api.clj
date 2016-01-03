@@ -8,7 +8,7 @@
   (:require [mikera.vectorz.readers])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.matrixx.impl SparseRowMatrix SparseColumnMatrix])
-  (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops Op2])
+  (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops Op Op2])
   (:import [mikera.vectorz Scalar])
   (:import [mikera.vectorz FnOp FnOp2])
   (:import [mikera.vectorz.impl IndexVector ASparseIndexedVector SparseHashedVector ZeroVector SparseIndexedVector])
@@ -1645,12 +1645,7 @@
       (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
   (element-map!
     ([m f]
-      (let [ec (.elementCount m)
-            ^doubles data (double-array ec)
-            ^ints sh (.getShape m)]
-        (.getElements m data (int 0))
-        (dotimes [i ec] (aset data i (double (f (aget data i))))) 
-        (.setElements m data)))
+      (.applyOp m ^Op (FnOp/wrap f)))
     ([m f a]
       (.applyOp m ^Op2 (FnOp2/wrap f) ^INDArray (vectorz-coerce a)))
     ([m f a more]
