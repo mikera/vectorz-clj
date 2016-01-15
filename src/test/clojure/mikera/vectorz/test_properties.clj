@@ -13,8 +13,23 @@
 
 (set-current-implementation :vectorz)
 
+;; ====================================================
+;; vectrorz-specific generator functions
+
 (def gen-vectorz-arrays (genm/gen-array (genm/gen-shape) genm/gen-double (gen/return :vectorz)))
 
-(defspec first-element-is-min-after-sorting 20 
+
+;; ====================================================
+;; property based tests
+
+(defspec generative-instance-tests 20 
   (prop/for-all [v gen-vectorz-arrays]
                 (ctest/instance-test v)))
+
+(defspec add-test 20 
+  (prop/for-all [v gen-vectorz-arrays]
+                (equals (mul v 2) (add v v))))
+
+(defspec clone-test 20 
+  (prop/for-all [v gen-vectorz-arrays]
+                (equals v (clone v))))
