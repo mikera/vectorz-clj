@@ -1645,8 +1645,7 @@
   (element-seq
     [m]
     (let [ec (.elementCount m)
-          ^doubles data (double-array ec)]
-      (.getElements m data (int 0))
+          ^doubles data (or (.asDoubleArray m) (.toDoubleArray m))]
       (seq data)))
   (element-map
     ([m f]
@@ -1673,93 +1672,21 @@
   (element-seq
     [m]
     (let [ec (.length m)
-          ^doubles data (or (.asDoubleArray m)
-                          (let [arr (double-array ec)]
-                            (.getElements m arr (int 0))
-                            arr))]
+          ^doubles data (or (.asDoubleArray m) (.toDoubleArray m))]
       (seq data)))
   (element-map
     ([m f]
       (.applyOpCopy m (FnOp/wrap f)))
     ([m f a]
-      (let [ec (.elementCount m)
-            a (avector-coerce m a) 
-            ^doubles data (double-array ec)]
-        (dotimes [i ec] (aset data i (double (f (.unsafeGet m i) (.unsafeGet a i))))) 
-        (Vector/wrap data)))
+      (with-clone [m]
+        (.applyOp m ^Op2 (FnOp2/wrap f) ^INDArray (vectorz-coerce a))))
     ([m f a more]
       (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
   (element-map!
     ([m f]
       (.applyOp m ^Op (FnOp/wrap f)))
     ([m f a]
-      (let [ec (.elementCount m)
-            a (avector-coerce m a)]
-        (dotimes [i ec] (.unsafeSet m i (double (f (.unsafeGet m i) (.unsafeGet a i))))) ))
-    ([m f a more]
-      (mp/assign! m (mp/element-map m f a more))))
-  (element-reduce
-    ([m f]
-      (.reduce m (FnOp2/wrap f)))
-    ([m f init]
-      (.reduce m (FnOp2/wrap f) (double init))))
-
-  ;; TODO: Finish implementing sparse implementations
-  ASparseIndexedVector
-  (element-seq
-    [m]
-    (let [ec (.length m)
-          ^doubles data (or (.asDoubleArray m) (.toDoubleArray m))]
-      (seq data)))
-  (element-map
-    ([m f]
-       (.applyOpCopy m (FnOp/wrap f)))
-    ([m f a]
-       (let [nzc (int (.nonZeroCount m))
-             ^ints nzi (Arrays/copyOf (.nonZeroIndices m) nzc)
-             a (avector-coerce m a) 
-             ^doubles data (double-array nzc)]
-         (dotimes [i nzc] (aset data i (double (f (.unsafeGet m (aget nzi i)) (.unsafeGet a (aget nzi i)))))) 
-        (SparseIndexedVector/wrap nzc nzi data)))
-    ([m f a more]
-      (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
-  (element-map!
-    ([m f]
-      (.applyOp m ^Op (FnOp/wrap f)))
-    ([m f a]
-      (let [ec (.elementCount m)
-            a (avector-coerce m a)]
-        (dotimes [i ec] (.unsafeSet m i (double (f (.unsafeGet m i) (.unsafeGet a i))))) ))
-    ([m f a more]
-      (mp/assign! m (mp/element-map m f a more))))
-  (element-reduce
-    ([m f]
-      (.reduce m (FnOp2/wrap f)))
-    ([m f init]
-      (.reduce m (FnOp2/wrap f) (double init))))
-  
-  ZeroVector
-  (element-seq
-    [m]
-    (repeat (.elementCount m) 0.0))
-  (element-map
-    ([m f]
-       (map f (mp/element-seq m)))
-    ([m f a]
-      (let [ec (.elementCount m)
-            a (avector-coerce m a) 
-            ^doubles data (double-array ec)]
-        (dotimes [i ec] (aset data i (double (f 0.0 (.unsafeGet a i))))) 
-        (Vector/wrap data)))
-    ([m f a more]
-      (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
-  (element-map!
-    ([m f]
-       (.applyOp m ^Op (FnOp/wrap f)))
-    ([m f a]
-      (let [ec (.elementCount m)
-            a (avector-coerce m a)]
-        (dotimes [i ec] (.unsafeSet m i (double (f 0.0 (.unsafeGet a i))))) ))
+      (.applyOp m ^Op2 (FnOp2/wrap f) ^INDArray (vectorz-coerce a)))
     ([m f a more]
       (mp/assign! m (mp/element-map m f a more))))
   (element-reduce
@@ -1778,28 +1705,15 @@
     ([m f]
       (.applyOpCopy m (FnOp/wrap f)))
     ([m f a]
-      (let [a (amatrix-coerce m a)
-            rc (.rowCount m)
-            cc (.columnCount m)
-            ec (* rc cc)
-            ^doubles data (double-array ec)
-            ^doubles data2 (double-array ec)]
-        (.getElements m data (int 0))
-        (.getElements a data2 (int 0))
-        (dotimes [i ec] (aset data i (double (f (aget data i) (aget data2 i))))) 
-        (Matrix/wrap rc cc data)))
+      (with-clone [m]
+        (.applyOp m ^Op2 (FnOp2/wrap f) ^INDArray (vectorz-coerce a))))
     ([m f a more]
       (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
   (element-map!
     ([m f]
       (.applyOp m ^Op (FnOp/wrap f)))
     ([m f a]
-      (let [a (amatrix-coerce m a)
-            rc (.rowCount m)
-            cc (.columnCount m)]
-        (dotimes [i rc] 
-          (dotimes [j cc] 
-            (.unsafeSet m i j (double (f (.unsafeGet m i j) (.unsafeGet a i j)))))) ))
+      (.applyOp m ^Op2 (FnOp2/wrap f) ^INDArray (vectorz-coerce a)))
     ([m f a more]
       (mp/assign! m (mp/element-map m f a more))))
   (element-reduce
@@ -1807,7 +1721,6 @@
       (.reduce m (FnOp2/wrap f)))
     ([m f init]
       (.reduce m (FnOp2/wrap f) (double init))))
-  
   
  AIndex
   (element-seq
