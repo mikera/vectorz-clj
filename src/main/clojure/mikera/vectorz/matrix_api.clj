@@ -1130,7 +1130,7 @@
     (length-squared [a]
       (.magnitudeSquared (avector-coerce a)))
     (normalise [a]
-      (with-clone [a] (.normalise (avector-coerce a))))
+      (with-clone [a] (.toNormal (avector-coerce a))))
   
   AVector
     (vector-dot [a b]
@@ -1140,7 +1140,7 @@
     (length-squared [a]
       (.magnitudeSquared a))
     (normalise [a]
-      (with-clone [a] (.normalise a))))
+      (.toNormal a)))
 
 (extend-protocol mp/PNegation
   AScalar (negate [m] (with-clone [m] (.negate m)))
@@ -1282,7 +1282,7 @@
             (.transform m ^AVector a r)
             r)
         (instance? AMatrix a) (.innerProduct m ^AMatrix a) 
-        (number? a) (with-clone [m] (.multiply m (double a)))
+        (number? a) (.multiplyCopy m (double a))
         :else (.innerProduct m (vectorz-coerce a))))
     (element-multiply [m a]
       (with-broadcast-clone [m a] (.multiply m a)))
@@ -1349,6 +1349,21 @@
             (== 0.0 factor) m
             (== 1.0 factor) (mp/add-inner-product! m a b)
             :else (mp/add-inner-product! m a (mp/scale b factor))))))) 
+
+(extend-protocol mp/PSetInnerProductMutable
+  INDArray
+    (set-inner-product! 
+      ([m a b]
+        (let [a (vectorz-coerce a)
+              b (vectorz-coerce b)]
+          (.setInnerProduct m a b))) 
+      ([m a b factor]
+        (let [factor (double-coerce factor)]
+          (cond 
+            (== 0.0 factor) m
+            (== 1.0 factor) (mp/set-inner-product! m a b)
+            :else (mp/set-inner-product! m a (mp/scale b factor))))))) 
+
 
 (extend-protocol mp/PAddScaled
   INDArray
@@ -1464,7 +1479,7 @@
       [m]
       (and 
         (== 2 (.dimensionality m))
-        (identity-matrix? (Matrixx/toMatrix m)))) ;; TODO: make cheaper
+        (.isIdentity (Matrixx/toMatrix m))))
     (zero-matrix?
       [m]
       (.isZero m))
@@ -1476,9 +1491,7 @@
   AMatrix
     (identity-matrix?
       [m]
-      (and
-        (.isSquare m)    ;; workaround for vectorz bug until 0.21.1
-        (.isIdentity m)))
+      (.isIdentity m))
     (zero-matrix?
       [m]
       (.isZero m))
@@ -1678,8 +1691,7 @@
       (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
   (element-map!
     ([m f]
-      (let [ec (.elementCount m)]
-        (dotimes [i ec] (.unsafeSet m i (double (f (.unsafeGet m i))))) ))
+      (.applyOp m ^Op (FnOp/wrap f)))
     ([m f a]
       (let [ec (.elementCount m)
             a (avector-coerce m a)]
@@ -1697,10 +1709,7 @@
   (element-seq
     [m]
     (let [ec (.length m)
-          ^doubles data (or (.asDoubleArray m)
-                          (let [arr (double-array ec)]
-                            (.getElements m arr (int 0))
-                            arr))]
+          ^doubles data (or (.asDoubleArray m) (.toDoubleArray m))]
       (seq data)))
   (element-map
     ([m f]
@@ -1716,8 +1725,7 @@
       (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
   (element-map!
     ([m f]
-      (let [ec (.elementCount m)]
-        (dotimes [i ec] (.unsafeSet m i (double (f (.unsafeGet m i))))) ))
+      (.applyOp m ^Op (FnOp/wrap f)))
     ([m f a]
       (let [ec (.elementCount m)
             a (avector-coerce m a)]
@@ -1747,8 +1755,7 @@
       (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
   (element-map!
     ([m f]
-       (let [ec (.elementCount m)]
-        (dotimes [i ec] (.unsafeSet m i (double (f 0.0))))))
+       (.applyOp m ^Op (FnOp/wrap f)))
     ([m f a]
       (let [ec (.elementCount m)
             a (avector-coerce m a)]
@@ -1765,10 +1772,7 @@
   (element-seq
     [m]
     (let [ec (.elementCount m)
-          ^doubles data (or (.asDoubleArray m)
-                          (let [arr (double-array ec)]
-                            (.getElements m arr (int 0))
-                            arr))]
+          ^doubles data (or (.asDoubleArray m) (.toDoubleArray m))]
       (seq data)))
   (element-map
     ([m f]
@@ -1788,11 +1792,7 @@
       (mp/coerce-param m (mp/element-map (mp/convert-to-nested-vectors m) f a more))))
   (element-map!
     ([m f]
-      (let [rc (.rowCount m)
-            cc (.columnCount m)]
-        (dotimes [i rc] 
-          (dotimes [j cc] 
-            (.unsafeSet m i j (double (f (.unsafeGet m i j)))))) ))
+      (.applyOp m ^Op (FnOp/wrap f)))
     ([m f a]
       (let [a (amatrix-coerce m a)
             rc (.rowCount m)
