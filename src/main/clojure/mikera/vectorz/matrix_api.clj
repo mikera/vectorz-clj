@@ -248,9 +248,9 @@
                 (new-matrix-nd [m shape] 
                                (case (count shape)
                                  0 (Scalar/create 0.0)
-                                 1 (Vectorz/newVector (int (first shape)))
-                                 2 (Matrixx/newMatrix (int (first shape)) (int (second shape)))
-                                 (Arrayz/newArray (int-array shape))))
+                                 1 (Vector/createLength (int (first shape)))
+                                 2 (Matrix/create (int (first shape)) (int (second shape)))
+                                 (Array/newArray (int-array shape))))
                 (construct-matrix [m data]
                                   (cond 
                                     (instance? INDArray data)
