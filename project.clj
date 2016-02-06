@@ -5,12 +5,13 @@
 ;;
 ;; If you are having trouble building, please check the pom.xml for latest dependency versions
 
-(defproject net.mikera/vectorz-clj "0.43.0"
+(defproject net.mikera/vectorz-clj "0.43.1-SNAPSHOT"
   :description "Fast vector library for Clojure, building on Vectorz and using core.matrix"
   :url "https://github.com/mikera/vectorz-clj"
   :license {:name "GNU Lesser General Public License (LGPL)"
             :url "http://www.gnu.org/licenses/lgpl.html"}
   :source-paths ["src/main/clojure"]
+  :java-source-paths ["src/main/java"]
   :test-paths ["src/test/clojure"]
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [criterium/criterium "0.4.3"]
