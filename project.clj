@@ -19,7 +19,7 @@
                  [org.clojure/test.check "0.9.0"]
                  [net.mikera/cljunit "0.3.1"]
                  [net.mikera/clojure-utils "0.6.2"]
-                 [net.mikera/core.matrix "0.45.0-CLJS-SNAPSHOT"]
+                 [net.mikera/core.matrix "0.50.0-SNAPSHOT"]
                  [net.mikera/vectorz "0.59.0"]]
 
   :profiles {:dev {:java-source-paths ["src/test/java"]}}
