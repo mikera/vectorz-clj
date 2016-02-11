@@ -195,10 +195,7 @@
 (defn amatrix-coerce* 
   "Coerces to an AMatrix instance, broadcasting if necessary" 
   (^AMatrix [^AMatrix v m]
-	  (cond
-      (number? m) 
-        (let [r (Matrix/create (.rowCount v) (.columnCount v))] (.fill r (double m)) r)
-      :else (.broadcastLike ^INDArray (vectorz-coerce* m) v)))
+	  (.broadcastLike ^INDArray (vectorz-coerce* m) v))
   (^AMatrix [m]
     (cond
 	    (instance? AMatrix m) m
@@ -833,18 +830,10 @@
 (extend-protocol mp/PMatrixRows
   AMatrix
     (get-rows [m]
-      (.getSlices m 0))
-  ;; TODO: still necessary?
-  SparseColumnMatrix
-    (get-rows [m]
       (.getRows m)))
 
 (extend-protocol mp/PMatrixColumns
   AMatrix
-    (get-columns [m]
-      (.getSlices m 1))
-  ;; TODO: still necessary?    
-  SparseRowMatrix
     (get-columns [m]
       (.getColumns m)))
 
