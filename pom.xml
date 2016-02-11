@@ -14,11 +14,11 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:git://github.com/thinktopic/vectorz-clj.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/thinktopic/vectorz-clj.git</developerConnection>
-    <tag>3a6eb4a5ac14fc9257b2fe9ca02a2c009dc01ab0
+    <connection>scm:git:git://github.com/mikera/vectorz-clj.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/mikera/vectorz-clj.git</developerConnection>
+    <tag>259aefd17b072c82cffaefca37caee6ef9bdc6f9
 </tag>
-    <url>https://github.com/thinktopic/vectorz-clj</url>
+    <url>https://github.com/mikera/vectorz-clj</url>
   </scm>
   <build>
     <sourceDirectory>src/main/clojure</sourceDirectory>
@@ -29,9 +29,6 @@
       </resource>
     </resources>
     <testResources>
-      <testResource>
-        <directory>dev-resources</directory>
-      </testResource>
       <testResource>
         <directory>resources</directory>
       </testResource>
@@ -105,32 +102,13 @@
     </dependency>
     <dependency>
       <groupId>net.mikera</groupId>
+      <artifactId>clojure-utils</artifactId>
+      <version>0.6.2</version>
+    </dependency>
+    <dependency>
+      <groupId>net.mikera</groupId>
       <artifactId>vectorz</artifactId>
       <version>0.59.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.clojure</groupId>
-      <artifactId>tools.nrepl</artifactId>
-      <version>0.2.6</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.clojure</groupId>
-          <artifactId>clojure</artifactId>
-        </exclusion>
-      </exclusions>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>clojure-complete</groupId>
-      <artifactId>clojure-complete</artifactId>
-      <version>0.2.3</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.clojure</groupId>
-          <artifactId>clojure</artifactId>
-        </exclusion>
-      </exclusions>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>criterium</groupId>
@@ -154,12 +132,6 @@
       <groupId>net.mikera</groupId>
       <artifactId>cljunit</artifactId>
       <version>0.3.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.mikera</groupId>
-      <artifactId>clojure-utils</artifactId>
-      <version>0.6.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

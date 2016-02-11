@@ -181,7 +181,7 @@
   (^AVector [^AVector v m]
 	  (cond
       (number? m)
-        (let [r (Vectorz/newVector (.length v))] (.fill r (double m)) r)
+        (Vectorz/createRepeatedElement (.length v) (double m))
       :else (.broadcastLike ^INDArray (vectorz-coerce* m) v)))
   (^AVector [m]
     (cond
@@ -195,10 +195,7 @@
 (defn amatrix-coerce*
   "Coerces to an AMatrix instance, broadcasting if necessary"
   (^AMatrix [^AMatrix v m]
-	  (cond
-      (number? m)
-        (let [r (Matrix/create (.rowCount v) (.columnCount v))] (.fill r (double m)) r)
-      :else (.broadcastLike ^INDArray (vectorz-coerce* m) v)))
+	  (.broadcastLike ^INDArray (vectorz-coerce* m) v))
   (^AMatrix [m]
     (cond
 	    (instance? AMatrix m) m
@@ -833,23 +830,16 @@
 (extend-protocol mp/PMatrixRows
   AMatrix
     (get-rows [m]
-      (.getSlices m 0))
-  ;; TODO: still necessary?
-  SparseColumnMatrix
-    (get-rows [m]
       (.getRows m)))
 
 (extend-protocol mp/PMatrixColumns
   AMatrix
     (get-columns [m]
-      (.getSlices m 1))
-  ;; TODO: still necessary?
-  SparseRowMatrix
-    (get-columns [m]
       (.getColumns m)))
 
 (extend-protocol mp/PRowSetting
   AMatrix
+    ;; note: use avector-coerce on the argument to ensure correct broadcasting
     (set-row [m i row]
       (with-clone [m]
         (.setRow m (int i) (avector-coerce (.getRow m 0) row))))
@@ -858,6 +848,7 @@
 
 (extend-protocol mp/PColumnSetting
   AMatrix
+    ;; note: use avector-coerce on the argument to ensure correct broadcasting
     (set-column [m i v]
       (with-clone [m]
         (.setColumn m (int i) (avector-coerce (.getColumn m 0) v))))
@@ -880,6 +871,7 @@
       (seq (.getSlices m)))
   AVector
     (get-major-slice-seq [m]
+      ;; we want Clojure to produce an efficient ArraySeq, so we convert to double array first
       (seq (or (.asDoubleArray m) (.toDoubleArray m))))
   Index
     (get-major-slice-seq [m]
