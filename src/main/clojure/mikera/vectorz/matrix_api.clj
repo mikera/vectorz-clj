@@ -181,7 +181,7 @@
   (^AVector [^AVector v m]
 	  (cond 
       (number? m) 
-        (let [r (Vectorz/newVector (.length v))] (.fill r (double m)) r)
+        (Vectorz/createRepeatedElement (.length v) (double m))
       :else (.broadcastLike ^INDArray (vectorz-coerce* m) v)))
   (^AVector [m]
     (cond
