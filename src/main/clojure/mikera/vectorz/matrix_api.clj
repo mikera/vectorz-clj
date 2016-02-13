@@ -5,6 +5,7 @@
   (:use clojure.core.matrix.utils)
   (:require [clojure.core.matrix.implementations :as imp])
   (:require [clojure.core.matrix.protocols :as mp])
+  (:require [clojure.core.matrix.protocols :as mp])
   (:require [mikera.vectorz.readers])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
   (:import [mikera.matrixx.impl SparseRowMatrix SparseColumnMatrix])
