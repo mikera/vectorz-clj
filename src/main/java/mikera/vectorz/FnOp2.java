@@ -36,7 +36,7 @@ public final class FnOp2 extends mikera.vectorz.Op2 {
 	@Override 
 	public void applyTo(double[] xs, int offset, int length, AVector ys) {
 		for (int i=0; i<length; i++) {
-			xs[i]=((Number)fn.invoke(xs[i],ys.unsafeGet(i))).doubleValue();
+			xs[offset+i]=((Number)fn.invoke(xs[offset+i],ys.unsafeGet(i))).doubleValue();
 		}
 	}
 }

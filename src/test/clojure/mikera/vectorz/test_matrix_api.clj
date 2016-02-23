@@ -64,7 +64,10 @@
   (is (equals [[1 2] [3 4] [5 6]] (join (array [[1 2] [3 4]]) (array [[5 6]]))))
   (is (equals [[1 3] [2 4] [5 6]] (join (transpose (array [[1 2] [3 4]])) (array [[5 6]]))))
   (is (= 1.0 (slice (array [0 1 2]) 1)))
-  (is (mp/set-nd (matrix :vectorz [[1 2][3 4]]) [0 1] 3)))
+  (is (mp/set-nd (matrix :vectorz [[1 2][3 4]]) [0 1] 3))
+  (testing "Regression with matrix applyOp arity 2"
+    (let [t (array :vectorz [[10] [20]])]
+      (is (equals [[1] [2]] (emap / t 10))))))
 
 (deftest test-row-column-matrix
   (let [m (matrix :vectorz [1 2 3])
