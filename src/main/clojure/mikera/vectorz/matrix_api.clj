@@ -482,7 +482,7 @@
     (is-scalar? [m]
       false) ;; this isn't an immutable scalar value in the core.matrix sense
     (get-shape [m]
-      (.getShape m))
+      [])
     (dimension-count [m x]
       (error "Scalar does not have dimension: " x))
   AVector
@@ -493,7 +493,7 @@
     (is-scalar? [m]
       false)
     (get-shape [m]
-      (.getShape m))
+      [(long (.length m))])
     (dimension-count [m x]
       (if (== 0 (long x))
         (.length m)
@@ -506,7 +506,7 @@
     (is-scalar? [m]
       false)
     (get-shape [m]
-      (.getShape m))
+      [(long (.rowCount m)) (long (.columnCount m))])
     (dimension-count [m x]
       (let [x (int x)]
         (cond 
@@ -521,7 +521,7 @@
     (is-scalar? [m]
       false)
     (get-shape [m]
-      [(.length m)])
+      [(long (.length m))])
     (dimension-count [m x]
       (let [x (int x)]
         (cond 
