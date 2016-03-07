@@ -820,6 +820,19 @@
         (.rotateView m dim (int places))
         m)))) 
 
+(extend-protocol mp/PShift
+  AVector
+    (shift [m dim shift]
+      (if (== (long dim) 0)
+        (.shiftCopy m (int shift))
+        (error "Can't shift vector along dimension: " dim)))
+    (shift-all [m shifts]
+      (let [n (count shifts)]
+        (cond 
+          (== n 0) m
+          (== n 1) (.shiftCopy m (int (first shifts)))
+          :else (error "Can't shift vector along more than one dimension")))))
+
 (extend-protocol mp/POrder
   INDArray
   (order
