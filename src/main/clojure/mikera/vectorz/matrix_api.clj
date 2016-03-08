@@ -1370,7 +1370,6 @@
             (== 1.0 factor) (mp/set-inner-product! m a b)
             :else (mp/set-inner-product! m a (mp/scale b factor))))))) 
 
-
 (extend-protocol mp/PAddScaled
   INDArray
     (add-scaled [m a factor]
