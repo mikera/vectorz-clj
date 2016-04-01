@@ -374,14 +374,28 @@
 (deftest test-validate-shape
   (is (equals [2] (mp/validate-shape (v/of 1 2)))))
 
-(deftest test-add-inner-product
+(deftest test-add-inner-product!
   (let [m (array :vectorz [1 2])
         a (array :vectorz [[0 2] [1 0]])
         b (array :vectorz [10 100])]
     (add-inner-product! m a b)
     (is (equals [201 12] m))
     (add-inner-product! m a b -1)
-    (is (equals [1 2] m))))
+    (is (equals [1 2] m)))
+  (is (equals [101 102] (add-inner-product! (array :vectorz [1 2]) 10 10)))
+  (is (equals [101 102] (add-inner-product! (array :vectorz [1 2]) [1 2 3] [1 3 1] 10))))
+
+(deftest test-add-outer-product!
+  (let [m (array :vectorz [[1 2] [3 4]])
+        a (array :vectorz [10 100])
+        b (array :vectorz [7 9])]
+    (add-outer-product! m a b)
+    (is (equals [[71 92] [703 904]] m))
+    (add-outer-product! m a b -1)
+    (is (equals [[1 2] [3 4]] m)))
+  (is (equals [11 32] (add-outer-product! (array :vectorz [1 2]) [1 3] 10)))
+  (is (equals [11 32] (add-outer-product! (array :vectorz [1 2]) 10 [1 3])))
+  (is (equals [101 302] (add-outer-product! (array :vectorz [1 2]) 10 [1 3] 10))))
 
 (deftest test-logistic
   (is (equals [0 0.5 1] (logistic (array :vectorz [-1000 0 1000])))))

@@ -1356,6 +1356,20 @@
             (== 1.0 factor) (mp/add-inner-product! m a b)
             :else (mp/add-inner-product! m a (mp/scale b factor))))))) 
 
+(extend-protocol mp/PAddOuterProductMutable
+  INDArray
+    (add-outer-product! 
+      ([m a b]
+        (let [a (vectorz-coerce a)
+              b (vectorz-coerce b)]
+          (.addOuterProduct m a b))) 
+      ([m a b factor]
+        (let [factor (double-coerce factor)]
+          (cond 
+            (== 0.0 factor) m
+            (== 1.0 factor) (mp/add-outer-product! m a b)
+            :else (mp/add-outer-product! m a (mp/scale b factor))))))) 
+
 (extend-protocol mp/PSetInnerProductMutable
   INDArray
     (set-inner-product! 
