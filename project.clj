@@ -16,11 +16,11 @@
                  [criterium/criterium "0.4.4"]
                  [org.clojure/tools.analyzer "0.6.7"]
                  [org.clojure/test.check "0.9.0"]
-                 [net.mikera/cljunit "0.4.0"]
-                 [net.mikera/clojure-utils "0.6.2"]
-                 [net.mikera/core.matrix "0.50.0"]
+                 [net.mikera/cljunit "0.4.1"]
+                 [net.mikera/clojure-utils "0.7.0"]
+                 [net.mikera/core.matrix "0.52.0"]
                  ;; [net.mikera/core.matrix "0.47.1" :type "test-jar"] ;; bug in Lein!!!! see: https://github.com/technomancy/leiningen/issues/1975
-                 [net.mikera/vectorz "0.60.0"]]
+                 [net.mikera/vectorz "0.62.0"]]
   
   :profiles {:dev {:java-source-paths ["src/test/java"]}}
   
