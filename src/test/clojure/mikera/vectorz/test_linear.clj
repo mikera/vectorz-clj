@@ -1,6 +1,6 @@
 (ns mikera.vectorz.test-linear
   (:use [clojure.test]
-        [clojure.core.matrix]
+        [clojure.core.matrix :exclude [rank]]
         [clojure.core.matrix.linear])
   (:require [mikera.vectorz.core :as v]))
 
