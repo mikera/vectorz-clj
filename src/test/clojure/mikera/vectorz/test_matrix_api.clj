@@ -281,6 +281,28 @@
     (is (== 2.0 (- 4 2.0)))
     (is (== 6 (- 10 2 2))))) 
 
+(deftest test-compare
+  (testing "eif"
+    (is (= (eif (array [1 0 0]) (array [1 2 3]) (array [4 5 6])) (array [1 5 6]))))
+  (testing "lt"
+    (is (= (lt (array [0 2 -1 2]) 0) (array [0 0 1 0])))
+    (is (= (lt (array [0 2 -1 2]) (array [1 2 3 4])) (array [1 0 1 1]))))
+  (testing "le"
+    (is (= (le (array [0 2 -1 2]) 0) (array [1 0 1 0])))
+    (is (= (le (array [0 2 -1 2]) (array [1 2 3 4])) (array [1 1 1 1]))))
+  (testing "gt"
+    (is (= (gt (array [-1 2 0 4]) 0) (array [0 1 0 1])))
+    (is (= (gt (array [-1 2 0 4]) (array [1 2 3 4])) (array [0 0 0 0]))))
+  (testing "ge"
+    (is (= (ge (array [-1 2 0 4]) 0) (array [0 1 1 1])))
+    (is (= (ge (array [-1 2 0 4]) (array [1 2 3 4])) (array [0 1 0 1]))))
+  (testing "ne"
+    (is (= (ne (array [-1 2 0 4]) 0) (array [1 1 0 1])))
+    (is (= (ne (array [-1 2 0 4]) (array [1 2 3 4])) (array [1 0 1 0]))))
+  (testing "eq"
+    (is (= (eq (array [-1 2 0 4]) 0) (array [0 0 1 0])))
+    (is (= (eq (array [-1 2 0 4]) (array [1 2 3 4])) (array [0 1 0 1])))))
+
 (deftest test-construction
   (testing "1D"
     (is (= (v/of 1.0) (matrix [1])))

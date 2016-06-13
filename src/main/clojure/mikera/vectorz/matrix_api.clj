@@ -1799,7 +1799,7 @@
         (dotimes [i (long n)]
           (let [i (int i)
                 test (.unsafeGet m i)]
-            (.set r (if (> test 0) (.unsafeGet a i) (.unsafeGet b i)))))
+            (.set r i (if (> test 0) (.unsafeGet a i) (.unsafeGet b i)))))
         r))
     (element-lt [m a] 
       (let [n (.length m)
@@ -1808,7 +1808,7 @@
         (dotimes [i (long n)]
           (let [i (int i)
                 test (- (.unsafeGet m i) (.unsafeGet a i))]
-            (.set r (if (< test 0) 1.0 0.0))))
+            (.set r i (if (< test 0) 1.0 0.0))))
         r))
     (element-le [m a] 
       (let [n (.length m)
@@ -1817,7 +1817,7 @@
         (dotimes [i (long n)]
           (let [i (int i)
                 test (- (.unsafeGet m i) (.unsafeGet a i))]
-            (.set r (if (<= test 0) 1.0 0.0))))
+            (.set r i (if (<= test 0) 1.0 0.0))))
         r))
     (element-gt [m a] 
       (let [n (.length m)
@@ -1826,7 +1826,7 @@
         (dotimes [i (long n)]
           (let [i (int i)
                 test (- (.unsafeGet m i) (.unsafeGet a i))]
-            (.set r (if (> test 0) 1.0 0.0))))
+            (.set r i (if (> test 0) 1.0 0.0))))
         r))
     (element-ge [m a] 
       (let [n (.length m)
@@ -1835,7 +1835,7 @@
         (dotimes [i (long n)]
           (let [i (int i)
                 test (- (.unsafeGet m i) (.unsafeGet a i))]
-            (.set r (if (>= test 0) 1.0 0.0))))
+            (.set r i (if (>= test 0) 1.0 0.0))))
         r))
     (element-ne [m a] 
       (let [n (.length m)
@@ -1844,7 +1844,7 @@
         (dotimes [i (long n)]
           (let [i (int i)
                 test (- (.unsafeGet m i) (.unsafeGet a i))]
-            (.set r (if (not= test 0) 1.0 0.0))))
+            (.set r i (if-not (== test 0) 1.0 0.0))))
         r))
     (element-eq [m a] 
       (let [n (.length m)
@@ -1853,7 +1853,7 @@
         (dotimes [i (long n)]
           (let [i (int i)
                 test (- (.unsafeGet m i) (.unsafeGet a i))]
-            (.set r (if (== test 0) 1.0 0.0))))
+            (.set r i (if (== test 0) 1.0 0.0))))
         r)))
 
 ;; ==============================================================
