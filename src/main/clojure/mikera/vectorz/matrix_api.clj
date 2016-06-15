@@ -194,13 +194,17 @@
       :else (Vectorz/toVector ^INDArray (vectorz-coerce* m))))) 
 
 (defn amatrix-coerce* 
-  "Coerces to an AMatrix instance, broadcasting if necessary" 
-  (^AMatrix [^AMatrix v m]
-	  (.broadcastLike ^INDArray (vectorz-coerce* m) v))
+  "Coerces to an AMatrix instance, broadcasting to the shape of an optional target if necessary" 
+  (^AMatrix [^AMatrix target m]
+	  (.broadcastLike ^INDArray (vectorz-coerce* m) target))
   (^AMatrix [m]
-    (cond
-	    (instance? AMatrix m) m
-      :else (Matrixx/toMatrix ^INDArray (vectorz-coerce* m))))) 
+    (if (instance? AMatrix m) 
+      m
+      (let [rows (int (mp/dimension-count m 0))
+            cols (int (mp/dimension-count m 1))]
+        (if (< (* rows cols) 10000) ;; dense default for small matrices
+          (Matrix/wrap rows cols (mp/to-double-array m)) 
+          (Matrixx/create ^java.util.List (mapv vectorz-coerce* (slices m)))))))) 
 
 (defn vectorz-coerce* 
   "Function to attempt conversion to a Vectorz INDArray object."
@@ -218,11 +222,7 @@
 		   (== 1 dims)
 		     (try (Vector/wrap (mp/to-double-array p)) (catch Throwable e nil))
 		   (== 2 dims)
-		     (let [rows (int (mp/dimension-count p 0))
-               cols (int (mp/dimension-count p 1))]
-           (if (< (* rows cols) 10000) ;; dense default for small matrices
-             (Matrix/wrap rows cols (mp/to-double-array p)) 
-             (Matrixx/create ^java.util.List (mapv vectorz-coerce* (slices p)))))
+		     (amatrix-coerce* p)
 		   :else 
 	       (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
 	         (and (seq sv) (sv 0) (Arrayz/create sv)))))))
