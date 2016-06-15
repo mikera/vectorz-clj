@@ -203,7 +203,7 @@
       :else (Matrixx/toMatrix ^INDArray (vectorz-coerce* m))))) 
 
 (defn vectorz-coerce* 
-  "Function to attempt conversion to a Vectorz INDArray object. May return nil if conversion fails."
+  "Function to attempt conversion to a Vectorz INDArray object."
   (^INDArray [p]
 	  (let [dims (long (mp/dimensionality p))]
 	   (cond
@@ -211,7 +211,7 @@
 	       (cond 
 	         (number? p) (Scalar. (.doubleValue ^Number p))
 	         (instance? AScalar p) p
-           (nil? p) nil
+           (nil? p) (error "Can't convert nil to vectorz format")
 	         :else (do
                   ;; (println (str "Coercing " p))
                   (Scalar. (double (mp/get-0d p)))))
@@ -220,11 +220,9 @@
 		   (== 2 dims)
 		     (let [rows (int (mp/dimension-count p 0))
                cols (int (mp/dimension-count p 1))]
-           (try 
-             (if (< (* rows cols) 10000) ;; dense default for small matrices
-               (Matrix/wrap rows cols (mp/to-double-array p)) 
-               (Matrixx/create ^java.util.List (mapv vectorz-coerce* (slices p)))) 
-             (catch Throwable e nil)))
+           (if (< (* rows cols) 10000) ;; dense default for small matrices
+             (Matrix/wrap rows cols (mp/to-double-array p)) 
+             (Matrixx/create ^java.util.List (mapv vectorz-coerce* (slices p)))))
 		   :else 
 	       (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
 	         (and (seq sv) (sv 0) (Arrayz/create sv)))))))
