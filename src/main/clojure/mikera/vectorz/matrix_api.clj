@@ -178,7 +178,9 @@
 	           (let [[~@syms] (seq ~isym)] ~@body))))))
 
 (defn avector-coerce* 
-  "Coerces to an AVector instance, broadcasting to the shape of a vector target if necessary" 
+  "Coerces any numerical array to an AVector instance.
+   May broadcast to the shape of an optional target if necessary.
+   Does *not* guarantee a new copy - may return same data." 
   (^AVector [^AVector target m]
 	  (cond 
 	    (instance? INDArray m) 
@@ -193,23 +195,27 @@
 	    (instance? AVector m) m
       (== (dimensionality m) 1)
         (Vector/wrap ^doubles (mp/to-double-array m))
-      :else (error "Can't coerce to AVector: " m)))) 
+      :else (error "Can't coerce to AVector with shape: " (mp/get-shape m))))) 
 
 (defn amatrix-coerce* 
-  "Coerces to an AMatrix instance, broadcasting to the shape of an optional target if necessary" 
+  "Coerces any numerical array to an AMatrix instance.
+   May broadcast to the shape of an optional target if necessary.
+   Does *not* guarantee a new copy - may return same data." 
   (^AMatrix [^AMatrix target m]
 	  (.broadcastLike ^INDArray (vectorz-coerce* m) target))
   (^AMatrix [m]
-    (if (instance? AMatrix m) 
-      m
+    (if (instance? AMatrix m) m
       (let [rows (int (mp/dimension-count m 0))
             cols (int (mp/dimension-count m 1))]
-        (if (< (* rows cols) 10000) ;; dense default for small matrices
+        (if (< (* rows cols) 10000) 
+          ;; dense default for small matrices
           (Matrix/wrap rows cols (mp/to-double-array m)) 
+          ;; for larger matrices - TODO think aboutr sparse case?
           (Matrixx/create ^java.util.List (mapv vectorz-coerce* (slices m)))))))) 
 
 (defn vectorz-coerce* 
-  "Function to attempt conversion to a Vectorz INDArray object."
+  "Function to attempt conversion to a Vectorz INDArray object. Should work on any core.matrix
+   numerical array or scalar. Does *not* guarantee a new copy - may return same data."
   (^INDArray [p]
 	  (let [dims (long (mp/dimensionality p))]
 	   (cond
