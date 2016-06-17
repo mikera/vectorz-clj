@@ -65,12 +65,12 @@
 		<dependency>
 			<groupId>org.clojure</groupId>
 			<artifactId>clojure</artifactId>
-			<version>1.9.0-alpha3</version>
+			<version>1.9.0-alpha7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.clojure</groupId>
 			<artifactId>tools.analyzer</artifactId>
-			<version>0.6.7</version>
+			<version>0.6.9</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
