@@ -38,7 +38,7 @@
 
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* :warn-on-boxed)
-(declare vectorz-coerce* avector-coerce*)
+(declare vectorz-coerce* avector-coerce* double-coerce)
 
 ;; =======================================================================
 ;; Macros and helper functions
@@ -178,20 +178,22 @@
 	           (let [[~@syms] (seq ~isym)] ~@body))))))
 
 (defn avector-coerce* 
-  "Coerces to an AVector instance, broadcasting if necessary" 
-  (^AVector [^AVector v m]
+  "Coerces to an AVector instance, broadcasting to the shape of a vector target if necessary" 
+  (^AVector [^AVector target m]
 	  (cond 
-      (number? m) 
-        (Vectorz/createRepeatedElement (.length v) (double m))
-      :else (.broadcastLike ^INDArray (vectorz-coerce* m) v)))
+	    (instance? INDArray m) 
+         (.broadcastLike ^INDArray m target)
+      (number? m)
+        (Vectorz/createRepeatedElement (.length target) (double m))
+      (== 0 (long (mp/dimensionality m))) 
+        (Vectorz/createRepeatedElement (.length target) (double-coerce m))
+      :else (.broadcastLike (Vector/wrap ^doubles (mp/to-double-array m)) target)))
   (^AVector [m]
     (cond
 	    (instance? AVector m) m
       (== (dimensionality m) 1)
-        (let [len (ecount m)
-              r (Vectorz/newVector len)]
-          (assign! r m) r)
-      :else (Vectorz/toVector ^INDArray (vectorz-coerce* m))))) 
+        (Vector/wrap ^doubles (mp/to-double-array m))
+      :else (error "Can't coerce to AVector: " m)))) 
 
 (defn amatrix-coerce* 
   "Coerces to an AMatrix instance, broadcasting to the shape of an optional target if necessary" 
@@ -220,7 +222,7 @@
                   ;; (println (str "Coercing " p))
                   (Scalar. (double (mp/get-0d p)))))
 		   (== 1 dims)
-		     (try (Vector/wrap (mp/to-double-array p)) (catch Throwable e nil))
+		     (avector-coerce* p)
 		   (== 2 dims)
 		     (amatrix-coerce* p)
 		   :else 
