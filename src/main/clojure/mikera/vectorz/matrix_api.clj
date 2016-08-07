@@ -38,7 +38,7 @@
 
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* :warn-on-boxed)
-(declare vectorz-coerce* avector-coerce*)
+(declare vectorz-coerce* avector-coerce* double-coerce)
 
 ;; =======================================================================
 ;; Macros and helper functions
@@ -178,32 +178,44 @@
 	           (let [[~@syms] (seq ~isym)] ~@body))))))
 
 (defn avector-coerce* 
-  "Coerces to an AVector instance, broadcasting if necessary" 
-  (^AVector [^AVector v m]
+  "Coerces any numerical array to an AVector instance.
+   May broadcast to the shape of an optional target if necessary.
+   Does *not* guarantee a new copy - may return same data." 
+  (^AVector [^AVector target m]
 	  (cond 
-      (number? m) 
-        (Vectorz/createRepeatedElement (.length v) (double m))
-      :else (.broadcastLike ^INDArray (vectorz-coerce* m) v)))
+	    (instance? INDArray m) 
+         (.broadcastLike ^INDArray m target)
+      (number? m)
+        (Vectorz/createRepeatedElement (.length target) (double m))
+      (== 0 (long (mp/dimensionality m))) 
+        (Vectorz/createRepeatedElement (.length target) (double-coerce m))
+      :else (.broadcastLike (Vector/wrap ^doubles (mp/to-double-array m)) target)))
   (^AVector [m]
     (cond
 	    (instance? AVector m) m
       (== (dimensionality m) 1)
-        (let [len (ecount m)
-              r (Vectorz/newVector len)]
-          (assign! r m) r)
-      :else (Vectorz/toVector ^INDArray (vectorz-coerce* m))))) 
+        (Vector/wrap ^doubles (mp/to-double-array m))
+      :else (error "Can't coerce to AVector with shape: " (mp/get-shape m))))) 
 
 (defn amatrix-coerce* 
-  "Coerces to an AMatrix instance, broadcasting if necessary" 
-  (^AMatrix [^AMatrix v m]
-	  (.broadcastLike ^INDArray (vectorz-coerce* m) v))
+  "Coerces any numerical array to an AMatrix instance.
+   May broadcast to the shape of an optional target if necessary.
+   Does *not* guarantee a new copy - may return same data." 
+  (^AMatrix [^AMatrix target m]
+	  (.broadcastLike ^INDArray (vectorz-coerce* m) target))
   (^AMatrix [m]
-    (cond
-	    (instance? AMatrix m) m
-      :else (Matrixx/toMatrix ^INDArray (vectorz-coerce* m))))) 
+    (if (instance? AMatrix m) m
+      (let [rows (int (mp/dimension-count m 0))
+            cols (int (mp/dimension-count m 1))]
+        (if (< (* rows cols) 10000) 
+          ;; dense default for small matrices
+          (Matrix/wrap rows cols (mp/to-double-array m)) 
+          ;; for larger matrices - TODO think aboutr sparse case?
+          (Matrixx/create ^java.util.List (mapv vectorz-coerce* (slices m)))))))) 
 
 (defn vectorz-coerce* 
-  "Function to attempt conversion to a Vectorz INDArray object. May return nil if conversion fails."
+  "Function to attempt conversion to a Vectorz INDArray object. Should work on any core.matrix
+   numerical array or scalar. Does *not* guarantee a new copy - may return same data."
   (^INDArray [p]
 	  (let [dims (long (mp/dimensionality p))]
 	   (cond
@@ -211,20 +223,14 @@
 	       (cond 
 	         (number? p) (Scalar. (.doubleValue ^Number p))
 	         (instance? AScalar p) p
-           (nil? p) nil
+           (nil? p) (error "Can't convert nil to vectorz format")
 	         :else (do
                   ;; (println (str "Coercing " p))
                   (Scalar. (double (mp/get-0d p)))))
 		   (== 1 dims)
-		     (try (Vector/wrap (mp/to-double-array p)) (catch Throwable e nil))
+		     (avector-coerce* p)
 		   (== 2 dims)
-		     (let [rows (int (mp/dimension-count p 0))
-               cols (int (mp/dimension-count p 1))]
-           (try 
-             (if (< (* rows cols) 10000) ;; dense default for small matrices
-               (Matrix/wrap rows cols (mp/to-double-array p)) 
-               (Matrixx/create ^java.util.List (mapv vectorz-coerce* (slices p)))) 
-             (catch Throwable e nil)))
+		     (amatrix-coerce* p)
 		   :else 
 	       (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
 	         (and (seq sv) (sv 0) (Arrayz/create sv)))))))
@@ -1792,7 +1798,7 @@
         (dotimes [i (long n)]
           (let [i (int i)
                 test (.unsafeGet m i)]
-            (.set r (if (> test 0) (.unsafeGet a i) (.unsafeGet b i)))))
+            (.set r i (if (> test 0) (.unsafeGet a i) (.unsafeGet b i)))))
         r))
     (element-lt [m a] 
       (let [n (.length m)
@@ -1801,7 +1807,7 @@
         (dotimes [i (long n)]
           (let [i (int i)
                 test (- (.unsafeGet m i) (.unsafeGet a i))]
-            (.set r (if (< test 0) 1.0 0.0))))
+            (.set r i (if (< test 0) 1.0 0.0))))
         r))
     (element-le [m a] 
       (let [n (.length m)
@@ -1810,7 +1816,7 @@
         (dotimes [i (long n)]
           (let [i (int i)
                 test (- (.unsafeGet m i) (.unsafeGet a i))]
-            (.set r (if (<= test 0) 1.0 0.0))))
+            (.set r i (if (<= test 0) 1.0 0.0))))
         r))
     (element-gt [m a] 
       (let [n (.length m)
@@ -1819,7 +1825,7 @@
         (dotimes [i (long n)]
           (let [i (int i)
                 test (- (.unsafeGet m i) (.unsafeGet a i))]
-            (.set r (if (> test 0) 1.0 0.0))))
+            (.set r i (if (> test 0) 1.0 0.0))))
         r))
     (element-ge [m a] 
       (let [n (.length m)
@@ -1828,7 +1834,7 @@
         (dotimes [i (long n)]
           (let [i (int i)
                 test (- (.unsafeGet m i) (.unsafeGet a i))]
-            (.set r (if (>= test 0) 1.0 0.0))))
+            (.set r i (if (>= test 0) 1.0 0.0))))
         r))
     (element-ne [m a] 
       (let [n (.length m)
@@ -1837,7 +1843,7 @@
         (dotimes [i (long n)]
           (let [i (int i)
                 test (- (.unsafeGet m i) (.unsafeGet a i))]
-            (.set r (if (not= test 0) 1.0 0.0))))
+            (.set r i (if-not (== test 0) 1.0 0.0))))
         r))
     (element-eq [m a] 
       (let [n (.length m)
@@ -1846,7 +1852,7 @@
         (dotimes [i (long n)]
           (let [i (int i)
                 test (- (.unsafeGet m i) (.unsafeGet a i))]
-            (.set r (if (== test 0) 1.0 0.0))))
+            (.set r i (if (== test 0) 1.0 0.0))))
         r)))
 
 ;; ==============================================================
