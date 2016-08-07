@@ -12,7 +12,7 @@
   (:import [mikera.vectorz AVector Vectorz Vector AScalar Vector3 Ops Op Op2])
   (:import [mikera.vectorz Scalar])
   (:import [mikera.vectorz FnOp FnOp2])
-  (:import [mikera.vectorz.impl IndexVector ASparseIndexedVector SparseHashedVector ZeroVector SparseIndexedVector])
+  (:import [mikera.vectorz.impl ASparseIndexedVector SparseHashedVector ZeroVector SparseIndexedVector])
   (:import [mikera.arrayz Arrayz INDArray Array])
   (:import [mikera.arrayz.impl SliceArray])
   (:import [mikera.indexz AIndex Index])
@@ -643,14 +643,7 @@
 (extend-protocol mp/PReshaping
   INDArray 
     (reshape [m target-shape]
-      (.reshape m (int-array target-shape)))
-  Index 
-    (reshape [m target-shape]
-      (cond
-        (== 1 (count target-shape))
-          (Index/of (int-array (take (first target-shape) (seq m))))
-        :else 
-          (.reshape (IndexVector/of (.data m)) (int-array target-shape))))) 
+      (.reshape m (int-array target-shape)))) 
 
 (extend-protocol mp/PZeroCount
   INDArray
