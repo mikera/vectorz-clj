@@ -36,19 +36,19 @@
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>vectorz</artifactId>
-			<version>0.62.0</version>
+			<version>0.63.0</version>
 		</dependency>
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>core.matrix</artifactId>
-			<version>0.53.0</version>
-			<type>test-jar</type>
+			<version>0.54.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.mikera</groupId>
+			<artifactId>core.matrix</artifactId>
+			<version>0.54.0</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.mikera</groupId>
-			<artifactId>core.matrix</artifactId>
-			<version>0.53.0</version>
+			<classifier>tests</classifier>
 		</dependency>
 		<dependency>
 			<groupId>criterium</groupId>
@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>org.clojure</groupId>
 			<artifactId>clojure</artifactId>
-			<version>1.9.0-alpha7</version>
+			<version>1.9.0-alpha10</version>
 		</dependency>
 		<dependency>
 			<groupId>org.clojure</groupId>

@@ -1250,9 +1250,9 @@
   Index ;; we need this special override, since division doesn't work with integer indexes!
   (element-divide
     ([m]
-       (let [v (.clone (.asVector m))] (.reciprocal v) v))
+       (let [v (Vectorz/create m)] (.reciprocal v) v))
     ([m a]
-       (let [v (.clone (.asVector m))] (.divide v (vectorz-coerce a)) v))))
+       (let [v (Vectorz/create m)] (.divide v (vectorz-coerce a)) v))))
 
 (extend-protocol mp/PMatrixDivideMutable
   INDArray
