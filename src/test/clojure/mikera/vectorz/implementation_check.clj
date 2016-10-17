@@ -12,8 +12,9 @@
 	
 	(def protos (utils/extract-protocols))
  
-  (utils/unimplemented mikera.arrayz.INDArray) 
-  (utils/unimplemented mikera.matrixx.AMatrix) 
-  (utils/unimplemented mikera.vectorz.AVector)
-  (utils/unimplemented mikera.vectorz.AScalar)
+  (into {} (mapv #(do [% (utils/unimplemented %)])
+                 [mikera.arrayz.INDArray
+                  mikera.matrixx.AMatrix
+                  mikera.vectorz.AVector
+                  mikera.vectorz.AScalar]))
 )
