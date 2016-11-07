@@ -321,26 +321,43 @@
          (error "Can't compute cholesky on an array of dimensionality " dims))))  AMatrix
   AMatrix
     (cholesky [m options] 
-        (let
-          [result (Cholesky/decompose m)]
-          (if result
-            (with-keys {:L (.getL result) :L* (.getU result)} (:return options))
-            nil))))
+      (when-let [result (Cholesky/decompose m)]
+        (with-keys {:L (.getL result) :L* (.getU result)} (:return options)))))
 
 (extend-protocol mp/PSVDDecomposition
   INDArray
-    (cholesky [m options]
+    (svd [m options]
       (let [dims (dimensionality m)]
         (if (== 2 dims)
          (mp/svd (Matrixx/toMatrix m) options)
          (error "Can't compute SVD on an array of dimensionality " dims))))  AMatrix
   AMatrix
     (svd [m options] 
-        (let
-          [result (SVD/decompose m)]
-          (if result
-            (with-keys {:U (.getU result) :S (diagonal (.getS result)) :V* (.getTranspose (.getV result))} (:return options))
-            nil))))
+      (when-let [result (SVD/decompose m)]
+        (with-keys {:U (.getU result) :S (diagonal (.getS result)) :V* (.getTranspose (.getV result))} (:return options)))))
+
+;; TODO: complete Eigendecomposition
+;; Need to handle complex numbers!
+;
+;(extend-protocol mp/PEigenDecomposition
+;  INDArray
+;    (eigen [m options]
+;      (let [dims (dimensionality m)]
+;        (if (== 2 dims)
+;         (mp/eigen (Matrixx/toMatrix m) options)
+;         (error "Can't compute Eigendecomposition on an array of dimensionality " dims))))  AMatrix
+;  AMatrix
+;    (eigen [m options]
+;      (when-let [result (Eigen/decompose m)]
+;        (let [eigenvalues (.getEigenvalues result)
+;              eigenvectors (.getEigenVectors result)
+;              Qt (VectorMatrixMN/wrap eigenvectors)]
+;          (with-keys {:Q (.transpose Qt) 
+;                      :Qt Qt 
+;                      :A (DiagonalMatrix/create eigenvectors) 
+;                      :eigenvalues eigenvalues 
+;                      :eigenvectorss eigenvectors} 
+;           (:return options))))))
 
 (extend-protocol mp/PNorm
   INDArray
