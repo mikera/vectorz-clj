@@ -217,27 +217,30 @@
   "Function to attempt conversion to a Vectorz INDArray object. Should work on any core.matrix
    numerical array or scalar. Does *not* guarantee a new copy - may return same data."
   (^INDArray [p]
-	  (let [dims (long (mp/dimensionality p))]
-	   (cond
-	     (== 0 dims)
-	       (cond 
-	         (number? p) (Scalar. (.doubleValue ^Number p))
-	         (instance? AScalar p) p
-           (nil? p) (error "Can't convert nil to vectorz format")
-	         :else (do
-                  ;; (println (str "Coercing " p))
-                  (Scalar. (double (mp/get-0d p)))))
-		   (== 1 dims)
-		     (avector-coerce* p)
-		   (== 2 dims)
-		     (amatrix-coerce* p)
-		   :else 
-	       (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
-	         (and (seq sv) (sv 0) (Arrayz/create sv)))))))
+	  (if (number? p)
+      (Scalar. (double p))
+      (let [dims (long (mp/dimensionality p))]
+	     (cond
+	       (== 0 dims)
+	         (cond 
+	           (instance? AScalar p) p
+             (nil? p) (error "Can't convert nil to vectorz format")
+	           :else (do
+                    ;; (println (str "Coercing " p))
+                    (Scalar. (double (mp/get-0d p)))))
+		     (== 1 dims)
+		       (avector-coerce* p)
+		     (== 2 dims)
+		       (amatrix-coerce* p)
+		     :else 
+	         (let [^List sv (mapv (fn [sl] (vectorz-coerce sl)) (slices p))]
+	           (and (seq sv) (sv 0) (Arrayz/create sv))))))))
 
-(defmacro double-coerce [x]
+(defmacro double-coerce 
+  "Macro to coerce to a primitive double value. Works on numbers and 0d arrays."
+  ([x]
   `(let [x# ~x]
-     (double (if (number? x#) x# (mp/get-0d x#)))))
+     (double (if (number? x#) x# (mp/get-0d x#))))))
 
 (eval
   `(extend-protocol mp/PImplementation
