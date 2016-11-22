@@ -41,12 +41,12 @@
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>core.matrix</artifactId>
-			<version>0.56.0</version>
+			<version>0.57.0</version>
 		</dependency>
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>core.matrix</artifactId>
-			<version>0.56.0</version>
+			<version>0.57.0</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
