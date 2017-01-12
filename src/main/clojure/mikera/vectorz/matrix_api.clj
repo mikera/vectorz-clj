@@ -1057,12 +1057,15 @@
 (extend-protocol mp/PIndicesSetting
   INDArray
     (set-indices [a indices values] 
-      (mp/set-indices! (.clone a) indices values))
+      (let [result (.clone a)] 
+        (mp/set-indices! result indices values)
+        result))
     (set-indices! [a indices values] 
       (let [c (int (count indices))
             vs (avector-coerce values)]
         (doseq-indexed [ix indices i]
-          (.set a (int-array-coerce ix) (.get vs (int i)))))))
+          (.set a (int-array-coerce ix) (.get vs (int i))))
+        a)))
 
 (extend-protocol mp/PNonZeroIndices
   AVector
