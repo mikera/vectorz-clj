@@ -69,6 +69,9 @@
     (let [t (array :vectorz [[10] [20]])]
       (is (equals [[1] [2]] (emap / t 10))))))
 
+(deftest test-set-indices-62 ;; fix for #62 issue
+  (is (equals [[1 1] [2 9]] (set-indices (matrix :vectorz [[1 1] [2 2]]) [[1 1]] [9]))))
+
 (deftest test-row-column-matrix
   (let [m (matrix :vectorz [1 2 3])
         rm (row-matrix m)
