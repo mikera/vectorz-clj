@@ -72,6 +72,10 @@
 (deftest test-set-indices-62 ;; fix for #62 issue
   (is (equals [[1 1] [2 9]] (set-indices (matrix :vectorz [[1 1] [2 2]]) [[1 1]] [9]))))
 
+(deftest test-set-column ;; fix for #63 issue
+  (let [m (matrix :vectorz [[1 2 3] [3 4 5]])]
+    (is (equals [[1 2 10] [3 4 11]] (set-column m 2 [10 11])))))
+
 (deftest test-row-column-matrix
   (let [m (matrix :vectorz [1 2 3])
         rm (row-matrix m)
