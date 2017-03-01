@@ -211,7 +211,7 @@
 (defn to-array 
   "Converts a vector to a double array"
   (^doubles [^AVector a]
-    (.toArray a)))
+    (.toDoubleArray a)))
 
 (defn to-list 
   "Converts a vector to a list of doubles"
