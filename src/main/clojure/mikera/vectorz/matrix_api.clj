@@ -205,9 +205,10 @@
 	  (.broadcastLike ^INDArray (vectorz-coerce* m) target))
   (^AMatrix [m]
     (if (instance? AMatrix m) m
-      (let [rows (int (mp/dimension-count m 0))
-            cols (int (mp/dimension-count m 1))]
-        (if (< (* rows cols) 10000) 
+      (let [rows (long (mp/dimension-count m 0))
+            cols (long (mp/dimension-count m 1))
+            elems (* rows cols)]
+        (if (< elems 10000) 
           ;; dense default for small matrices
           (Matrix/wrap rows cols (mp/to-double-array m)) 
           ;; for larger matrices - TODO think aboutr sparse case?
