@@ -41,12 +41,12 @@
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>core.matrix</artifactId>
-			<version>0.57.0</version>
+			<version>0.59.0</version>
 		</dependency>
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>core.matrix</artifactId>
-			<version>0.57.0</version>
+			<version>0.59.0</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
@@ -59,13 +59,13 @@
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>cljunit</artifactId>
-			<version>0.4.1</version>
+			<version>0.6.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.clojure</groupId>
 			<artifactId>clojure</artifactId>
-			<version>1.9.0-alpha10</version>
+			<version>1.9.0-alpha16</version>
 		</dependency>
 		<dependency>
 			<groupId>org.clojure</groupId>
@@ -76,7 +76,7 @@
 		<dependency>
 			<groupId>net.mikera</groupId>
 			<artifactId>clojure-utils</artifactId>
-			<version>0.7.0</version>
+			<version>0.8.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.clojure</groupId>

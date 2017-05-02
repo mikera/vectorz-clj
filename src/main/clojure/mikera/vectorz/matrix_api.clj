@@ -1232,9 +1232,18 @@
 
 (extend-protocol mp/PValidateShape
   INDArray
-    (validate-shape [m]
-      (.validate m)
-      (vec (.getShape m)))) 
+     (validate-shape 
+       ([m]
+        (.validate m)
+        (vec (.getShape m)))
+       ([m expected-shape]
+        (.validate m)
+        (if (nil? expected-shape) 
+           (error "Shape validation failed, expected a scalar but was a Vectorz array")
+           (let [shape (vec (.getShape m))]
+             (if (= shape (vec expected-shape))
+               shape
+               (error "Shape validation failed, expected " expected-shape "but was " shape))))))) 
 
 (extend-protocol mp/PConversion
   AScalar
