@@ -14,9 +14,9 @@
 (deftest test-add-emap
   (testing "Vectorz Op"     
     (let [dest (array :vectorz [10 100])]
-    (is (equals [14 106] (add-emap! dest Ops/ADD (array :vectorz [1 2]) [3 4]))))))
+      (is (equals [14 106] (add-emap! dest Ops/ADD (array :vectorz [1 2]) [3 4]))))))
 
 (deftest test-set-emap
   (testing "Vectorz Op"     
     (let [dest (array :vectorz [10 100])]
-    (is (equals [4 6] (set-emap! dest Ops/ADD (array :vectorz [1 2]) [3 4]))))))
+      (is (equals [4 6] (set-emap! dest Ops/ADD (array :vectorz [1 2]) [3 4]))))))
