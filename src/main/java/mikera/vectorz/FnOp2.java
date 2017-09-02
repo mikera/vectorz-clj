@@ -13,7 +13,9 @@ public final class FnOp2 extends mikera.vectorz.Op2 {
 	protected IFn fn;
 	
 	public static Op2 wrap(Object f) {
-		if (f instanceof DDD) {
+		if (f instanceof Op2) {
+			return (Op2) f;
+		} else if (f instanceof DDD) {
 			return new PrimitiveFnOp2((DDD)f);
 		} else {
 			return new FnOp2(f);

@@ -13,7 +13,9 @@ public final class FnOp extends mikera.vectorz.ops.AFunctionOp {
 	protected IFn fn;
 	
 	public static Op wrap(Object f) {
-		if (f instanceof DD) {
+		if (f instanceof Op) {
+			return (Op) f;
+		} else if (f instanceof DD) {
 			return new PrimitiveFnOp((DD)f);
 		} else {
 			return new FnOp(f);
