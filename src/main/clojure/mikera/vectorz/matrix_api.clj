@@ -367,7 +367,7 @@
   INDArray
     (norm [m p]
       (cond 
-        (= java.lang.Double/POSITIVE_INFINITY p) (.elementMax m)
+        (= java.lang.Double/POSITIVE_INFINITY p) (.elementMaxAbs m)
         (number? p) (Math/pow (.elementAbsPowSum m p) (/ 1.0 (double p)))
         :else (error "p must be a number"))))
 
