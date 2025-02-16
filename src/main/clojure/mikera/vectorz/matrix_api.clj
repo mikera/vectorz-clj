@@ -1,10 +1,10 @@
 (ns mikera.vectorz.matrix-api
   "Namespace for vectorz-clj core.matrix implementation. Loading this namespace either 
    directly or indirectly is required to enable the :vectorz implementation for core.matrix."
+  (:refer-clojure :exclude [abs vector?])
   (:use clojure.core.matrix)
   (:use clojure.core.matrix.utils)
   (:require [clojure.core.matrix.implementations :as imp])
-  (:require [clojure.core.matrix.protocols :as mp])
   (:require [clojure.core.matrix.protocols :as mp])
   (:require [mikera.vectorz.readers])
   (:import [mikera.matrixx AMatrix Matrixx Matrix])
@@ -21,8 +21,7 @@
   (:import [mikera.transformz ATransform])
   (:import [mikera.matrixx.decompose QR IQRResult Cholesky ICholeskyResult ICholeskyLDUResult])
   (:import [mikera.matrixx.decompose SVD ISVDResult LUP ILUPResult Eigen IEigenResult])
-  (:import [mikera.matrixx.solve Linear])
-  (:refer-clojure :exclude [vector?]))
+  (:import [mikera.matrixx.solve Linear]))
 
 ;; ======================================================================
 ;; General implementation notes
